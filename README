@@ -1,0 +1,41 @@
+Campus Marketplace
+
+Campus Marketplace is a platform designed for college students to easily buy & sell items, join group chats, and connect with local businesses. It combines a student-friendly second-hand market with social features and business engagement opportunities.
+
+🌟 Key Features
+
+Listings – Students can post and browse second-hand items (with images, descriptions, and DM feature).
+
+Group Chats – Join interest-based groups to chat, share updates, and build communities.
+
+Local Business Ads – Businesses can register and promote their stores to students directly.
+
+Search & Navigation – Quickly find items, groups, or stores with a simple navigation system.
+
+Create Button (+) – Floating action button for fast access to:
+
+Create Listings
+
+Create Groups
+
+Join Stores (for local business advertising)
+
+🎯 Goal
+
+To provide university students with a convenient, safe, and social platform where they can:
+
+Save money by buying & selling second-hand items.
+
+Build communities through group chats.
+
+Discover local business offers and promotions.
+
+🛠️ Tech Stack
+
+Frontend: React
+
+Backend: PHP
+
+Database: MySQL
+
+Design & Prototype: Figma
