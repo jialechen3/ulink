@@ -38,7 +38,7 @@ function RegisterPage({ onRegister, onBack }) {
 
     setLoading(true);
  try {
-    const res = await fetch("http://localhost/Ulink/db.php", {
+    const res = await fetch("http://localhost:8000/db.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "register", name, password }),
