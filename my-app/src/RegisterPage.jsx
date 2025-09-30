@@ -37,48 +37,40 @@ function RegisterPage({ onRegister, onBack }) {
 
 
     setLoading(true);
+ try {
+    const res = await fetch("http://localhost/Ulink/db.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "register", name, password }),
+    });
+
+    // ADD THESE DEBUG LINES:
+    console.log("Status:", res.status);
+    const responseText = await res.text();
+    console.log("Raw response:", responseText);
+    
     try {
-      const res = await fetch(
-        "http://localhost/Ulink/db.php",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "register", name, password }),
-        }
-      );
-
-      if (res.status === 409) {
-        const data = await res.json().catch(() => null);
-        setError("Username already taken.");
-        return;
-      }
-
-      if (res.status === 400) {
-        const data = await res.json().catch(() => null);
-        if (data?.error === "INVALID_USERNAME") {
-          setError("Username must be 3–20 chars, letters/digits/underscore only.");
-        } else if (data?.error === "WEAK_PASSWORD") {
-          setError("Password must be ≥8 chars and include letters and digits.");
-        } else {
-          setError("Invalid input.");
-        }
-        return;
-      }
-
-      const data = await res.json().catch(() => null);
-      if (res.ok && data?.success) {
+      const data = JSON.parse(responseText);
+      console.log("Parsed JSON:", data);
+      
+      if (res.ok && data.ok) {
         alert("Registered successfully!");
         onRegister?.(name);
       } else {
         setError(data?.message || `Registration failed (${res.status}).`);
       }
-    } catch (err) {
-      console.error(err);
-      setError("Network error or server unavailable.");
-    } finally {
-      setLoading(false);
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      setError("Invalid server response");
     }
-  };
+
+  } catch (err) {
+    console.error("Fetch error:", err);
+    setError("Network error or server unavailable.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="register-container">

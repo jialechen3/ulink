@@ -1,4 +1,7 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Allow CORS for development (adjust for production)
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -12,7 +15,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
 }
 
 // Require validation helpers
-require_once __DIR__ . "/backend/lib/validate.php";
+//require_once __DIR__ . "/backend/lib/validate.php";
 
 // Database connection config
 $servername = "localhost";
@@ -57,48 +60,35 @@ if ($method === 'POST') {
     $action = $data['action'] ?? '';
 
     // ---------------- REGISTER ----------------
-    if ($action === 'register') {
-        try {
-            // Normalize and validate input
-            $rawName = $data['name'] ?? '';
-            $pwd     = $data['password'] ?? '';
-            $name    = normalize_username($rawName); // reject leading/trailing spaces
-            validate_username($name);                // 3–20, [A-Za-z0-9_]
-            validate_password($pwd, false);          // ≥8, must contain letters and digits
+if ($action === 'register') {
+    $rawName = $data['name'] ?? '';
+    $pwd     = $data['password'] ?? '';
+    $name    = $rawName;
 
-            // Check duplicate username
-            $check = $conn->prepare("SELECT 1 FROM users WHERE name = ?");
-            $check->bind_param("s", $name);
-            $check->execute();
-            if ($check->get_result()->fetch_row()) {
-                http_response_code(409);
-                echo json_encode(["error" => "USERNAME_TAKEN"]);
-                $conn->close();
-                exit;
-            }
-
-            // Insert new user
-            $hashed = password_hash($pwd, PASSWORD_BCRYPT);
-            $stmt = $conn->prepare("INSERT INTO users (name, password) VALUES (?, ?)");
-            $stmt->bind_param("ss", $name, $hashed);
-            if ($stmt->execute()) {
-                echo json_encode(["ok" => true, "id" => $conn->insert_id]);
-            } else {
-                http_response_code(500);
-                echo json_encode(["error" => "REGISTRATION_FAILED"]);
-            }
-        } catch (InvalidArgumentException $e) {
-            // Map validation to stable error codes
-            $code = $e->getMessage();
-            if ($code !== 'INVALID_USERNAME' && $code !== 'WEAK_PASSWORD') {
-                $code = 'VALIDATION_ERROR';
-            }
-            http_response_code(400);
-            echo json_encode(["error" => $code]);
-        }
+    // Check duplicate username
+    $check = $conn->prepare("SELECT 1 FROM users WHERE name = ?");
+    $check->bind_param("s", $name);
+    $check->execute();
+    if ($check->get_result()->fetch_row()) {
+        http_response_code(409);
+        echo json_encode(["error" => "USERNAME_TAKEN"]);
         $conn->close();
         exit;
     }
+
+    // Insert new user
+    $hashed = password_hash($pwd, PASSWORD_BCRYPT);
+    $stmt = $conn->prepare("INSERT INTO users (name, password) VALUES (?, ?)");
+    $stmt->bind_param("ss", $name, $hashed);
+    if ($stmt->execute()) {
+        echo json_encode(["ok" => true, "id" => $conn->insert_id]);
+    } else {
+        http_response_code(500);
+        echo json_encode(["error" => "REGISTRATION_FAILED"]);
+    }
+    $conn->close();
+    exit;
+}
 }
 
 // Fallback for other methods

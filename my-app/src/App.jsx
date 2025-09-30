@@ -1,8 +1,8 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import RegisterPage from "./RegisterPage";
 
 function App() {
-    const [step, setStep] = useState("register"); // Start with register page
     const [userId, setUserId] = useState(null);
     const [username, setUsername] = useState("");
     const [loggedIn, setLoggedIn] = useState(false);
@@ -16,25 +16,40 @@ function App() {
         setUserId(null);
         setUsername("");
         setLoggedIn(false);
-        setStep("register");
     };
 
     return (
-        <div className="app-container">
-            {loggedIn ? (
-                <div style={{ textAlign: "center", marginTop: "50px" }}>
-                    <h1>You are logged in, {username}!</h1>
-                    <button onClick={handleLogout}>
-                        Log Out
-                    </button>
-                </div>
-            ) : (
-                <RegisterPage
-                    onRegister={handleRegister}
-                    onBack={() => console.log("Back clicked")}
-                />
-            )}
-        </div>
+        <Router>
+            <div className="app-container">
+                {loggedIn ? (
+                    <div style={{ textAlign: "center", marginTop: "50px" }}>
+                        <h1>You are logged in, {username}!</h1>
+                        <button onClick={handleLogout}>
+                            Log Out
+                        </button>
+                    </div>
+                ) : (
+                    <Routes>
+                        {/* Home page route */}
+                        <Route path="/" element={
+                            <div style={{ textAlign: "center", marginTop: "50px" }}>
+                                <h1>Welcome to Our App</h1>
+                                <p>Please register to continue</p>
+                                <a href="/register">Go to Registration</a>
+                            </div>
+                        } />
+                        
+                        {/* Registration page route */}
+                        <Route path="/register" element={
+                            <RegisterPage
+                                onRegister={handleRegister}
+                                onBack={() => window.history.back()}
+                            />
+                        } />
+                    </Routes>
+                )}
+            </div>
+        </Router>
     );
 }
 
