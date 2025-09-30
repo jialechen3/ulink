@@ -1,40 +1,107 @@
 <?php
+// Allow CORS for development (adjust for production)
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Methods: GET, POST, PATCH, OPTIONS");
+header("Content-Type: application/json; charset=utf-8");
+
+// Handle CORS preflight request
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
+// Require validation helpers
+require_once __DIR__ . "/backend/lib/validate.php";
+
+// Database connection config
 $servername = "localhost";
-$username = "zzhong5";
-$password = "50457160";
-$dbname = "UlinkDB";
+$username   = "root";
+$password   = "";
+$dbname     = "testdb";
 
+// Connect to MySQL
 $conn = new mysqli($servername, $username, $password, $dbname);
-
 if ($conn->connect_error) {
+    http_response_code(500);
     die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
 }
+// Set charset to utf8mb4 (supports emojis and multi-byte characters)
+mysqli_set_charset($conn, 'utf8mb4');
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $result = $conn->query("SELECT * FROM users");
+// Enforce JSON for write methods: return 415 if not application/json
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+if (in_array($method, ['POST', 'PATCH'], true)) {
+    $ct = $_SERVER['CONTENT_TYPE'] ?? $_SERVER['HTTP_CONTENT_TYPE'] ?? '';
+    if (stripos($ct, 'application/json') !== 0) {
+        http_response_code(415);
+        echo json_encode(["error" => "UNSUPPORTED_MEDIA_TYPE"]);
+        exit;
+    }
+}
+
+// ========================== GET ==========================
+// Fetch all users (id, name, university)
+if ($method === 'GET') {
+    $result = $conn->query("SELECT id, name, university FROM users");
     $users = [];
-    while ($row = $result->fetch_assoc()) {
-        $users[] = $row;
-    }
+    while ($row = $result->fetch_assoc()) $users[] = $row;
     echo json_encode($users);
+    $conn->close();
+    exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents("php://input"), true);
-    $name = $data['name'] ?? '';
+// ========================== POST ==========================
+if ($method === 'POST') {
+    $data = json_decode(file_get_contents("php://input"), true) ?? [];
+    $action = $data['action'] ?? '';
 
-    if ($name) {
-        $stmt = $conn->prepare("INSERT INTO users (name) VALUES (?)");
-        $stmt->bind_param("s", $name);
-        $stmt->execute();
-        echo json_encode(["success" => true, "message" => "User added"]);
-    } else {
-        echo json_encode(["success" => false, "message" => "No name provided"]);
+    // ---------------- REGISTER ----------------
+    if ($action === 'register') {
+        try {
+            // Normalize and validate input
+            $rawName = $data['name'] ?? '';
+            $pwd     = $data['password'] ?? '';
+            $name    = normalize_username($rawName); // reject leading/trailing spaces
+            validate_username($name);                // 3–20, [A-Za-z0-9_]
+            validate_password($pwd, false);          // ≥8, must contain letters and digits
+
+            // Check duplicate username
+            $check = $conn->prepare("SELECT 1 FROM users WHERE name = ?");
+            $check->bind_param("s", $name);
+            $check->execute();
+            if ($check->get_result()->fetch_row()) {
+                http_response_code(409);
+                echo json_encode(["error" => "USERNAME_TAKEN"]);
+                $conn->close();
+                exit;
+            }
+
+            // Insert new user
+            $hashed = password_hash($pwd, PASSWORD_BCRYPT);
+            $stmt = $conn->prepare("INSERT INTO users (name, password) VALUES (?, ?)");
+            $stmt->bind_param("ss", $name, $hashed);
+            if ($stmt->execute()) {
+                echo json_encode(["ok" => true, "id" => $conn->insert_id]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["error" => "REGISTRATION_FAILED"]);
+            }
+        } catch (InvalidArgumentException $e) {
+            // Map validation to stable error codes
+            $code = $e->getMessage();
+            if ($code !== 'INVALID_USERNAME' && $code !== 'WEAK_PASSWORD') {
+                $code = 'VALIDATION_ERROR';
+            }
+            http_response_code(400);
+            echo json_encode(["error" => $code]);
+        }
+        $conn->close();
+        exit;
     }
 }
 
+// Fallback for other methods
+http_response_code(405);
+echo json_encode(["error" => "METHOD_NOT_ALLOWED"]);
 $conn->close();
-?>
