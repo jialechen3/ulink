@@ -1,52 +1,81 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import RegisterPage from "./RegisterPage";
 
 function App() {
-    const [users, setUsers] = useState([]);
-    const [newUser, setNewUser] = useState("");
-    const fetchUsers = () => {
-        fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php")
-            .then((res) => res.json())
-            .then((data) => setUsers(data))
-            .catch((err) => console.error("Fetch error:", err));
+    const [step, setStep] = useState("signin");
+    const [userId, setUserId] = useState(null);
+    const [username, setUsername] = useState(""); // 保存用户名
+    const [loggedIn, setLoggedIn] = useState(false); // 是否登录成功
+
+    // 登录成功
+    const handleSignIn = (id, name) => {
+        setUserId(id);
+        setUsername(name);
+        setLoggedIn(true); // 标记已登录
     };
 
-    useEffect(() => {
-        fetchUsers();
-    }, []);
+    // 注册成功 → 跳大学选择页面
+    const handleRegister = (id, name) => {
+        setUserId(id);
+        setUsername(name);
+        setStep("university");
+    };
 
-    const addUser = () => {
-        if (!newUser) return;
-        fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: newUser }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data);
-                setNewUser("");
-                fetchUsers();
-            })
-            .catch((err) => console.error("Add user error:", err));
+    // 大学选择完成 → 跳登录页面
+    const handleUniversityConfirm = (university) => {
+        alert("University saved successfully! Please log in.");
+        setStep("signin");
+    };
+
+    const handleLogout = () => {
+        setUserId(null);
+        setUsername("");
+        setLoggedIn(false);
+        setStep("signin");
     };
 
     return (
-        <div>
-            <h1>Users from DB</h1>
-            <ul>
-                {users.map((u) => (
-                    <li key={u.id}>{u.name}</li>
-                ))}
-            </ul>
-
-            <h2>Add User</h2>
-            <input
-                type="text"
-                value={newUser}
-                onChange={(e) => setNewUser(e.target.value)}
-                placeholder="Enter new user"
-            />
-            <button onClick={addUser}>Add</button>
+        <div className="app-container">
+            {loggedIn ? (
+                <div style={{ textAlign: "center", marginTop: "50px" }}>
+                    <h1>You are logged in, {username}!</h1>
+                    <button
+                        onClick={handleLogout}
+                        style={{
+                            marginTop: "20px",
+                            padding: "10px 20px",
+                            backgroundColor: "#4a76d9",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "6px",
+                            cursor: "pointer",
+                        }}
+                    >
+                        Log Out
+                    </button>
+                </div>
+            ) : (
+                <>
+                    {step === "signin" && (
+                        <SignInPage
+                            onSignIn={handleSignIn}
+                            onBack={() => setStep("register")}
+                        />
+                    )}
+                    {step === "register" && (
+                        <RegisterPage
+                            onRegister={handleRegister}
+                            onBack={() => setStep("signin")}
+                        />
+                    )}
+                    {step === "university" && (
+                        <UniversitySelection
+                            userId={userId}
+                            onConfirm={handleUniversityConfirm}
+                        />
+                    )}
+                </>
+            )}
         </div>
     );
 }
