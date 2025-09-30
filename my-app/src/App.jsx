@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { useState } from "react";
 import RegisterPage from "./RegisterPage";
 
@@ -30,16 +30,14 @@ function App() {
                     </div>
                 ) : (
                     <Routes>
-                        {/* Home page route */}
                         <Route path="/" element={
                             <div style={{ textAlign: "center", marginTop: "50px" }}>
                                 <h1>Welcome to Our App</h1>
                                 <p>Please register to continue</p>
-                                <a href="/register">Go to Registration</a>
+                                <Link to="/register">Go to Registration</Link>
                             </div>
                         } />
                         
-                        {/* Registration page route */}
                         <Route path="/register" element={
                             <RegisterPage
                                 onRegister={handleRegister}

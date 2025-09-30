@@ -21,6 +21,10 @@ function RegisterPage({ onRegister, onBack }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (/['"\\;]/.test(username)) {
+    setError("Invalid characters in username");
+    return;
+  }
     if (password !== confirmPassword) {
       setError("Passwords do not match!");
       return;
@@ -38,12 +42,19 @@ function RegisterPage({ onRegister, onBack }) {
 
     setLoading(true);
  try {
-    const res = await fetch("http://localhost:8000/db.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "register", name, password }),
-    });
+  const res = await fetch("./db.php",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "register", name, password }),
+  }
+);
 
+    if (res.status === 409) {
+    setError("Username already taken.");
+    setLoading(false);
+    return;
+  }
     // ADD THESE DEBUG LINES:
     console.log("Status:", res.status);
     const responseText = await res.text();

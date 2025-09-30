@@ -19,9 +19,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
 
 // Database connection config
 $servername = "localhost";
-$username   = "root";
-$password   = "";
-$dbname     = "testdb";
+$username = "jchen544";
+$password = "50407228";
+$dbname = "testdb";
 
 // Connect to MySQL
 $conn = new mysqli($servername, $username, $password, $dbname);
