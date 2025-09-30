@@ -21,7 +21,10 @@ function RegisterPage({ onRegister, onBack }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
+    if (password !== confirmPassword) {
+      setError("Passwords do not match!");
+      return;
+    }
     const name = username.trim();
     if (name !== username) {
       setError("Username cannot have leading/trailing spaces.");
@@ -31,10 +34,7 @@ function RegisterPage({ onRegister, onBack }) {
       setError("Password must be ≥8 chars and include letters and digits.");
       return;
     }
-    if (password !== confirmPassword) {
-      setError("Passwords do not match!");
-      return;
-    }
+
 
     setLoading(true);
     try {
