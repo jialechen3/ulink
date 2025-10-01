@@ -10,7 +10,44 @@ function RegisterPage({ onRegister, onBack }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // 与后端 V2 对齐：≥8 且包含字母和数字（符号可选）
+  // HTML escaping function for security
+  const escapeHtml = (unsafe) => {
+    if (!unsafe) return '';
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  };
+
+  // Comprehensive username validation
+  const validateUsername = (username) => {
+    const sanitized = username.trim();
+    
+    // Check for leading/trailing spaces
+    if (sanitized !== username) {
+      return "Username cannot have leading or trailing spaces.";
+    }
+    
+    // Check length
+    if (sanitized.length < 3) {
+      return "Username must be at least 3 characters long.";
+    }
+    
+    if (sanitized.length > 20) {
+      return "Username cannot exceed 20 characters.";
+    }
+    
+    // Check allowed characters (alphanumeric, underscore, hyphen)
+    if (!/^[a-zA-Z0-9_-]+$/.test(sanitized)) {
+      return "Username can only contain letters, numbers, underscores, and hyphens.";
+    }
+    
+    return null; // No errors
+  };
+
+  // Password validation rules
   const rules = {
     length: password.length >= 8,
     letter: /[A-Za-z]/.test(password),
@@ -21,72 +58,96 @@ function RegisterPage({ onRegister, onBack }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (/['"\\;]/.test(username)) {
-    setError("Invalid characters in username");
-    return;
-  }
+    
+    // Client-side validation
+    const usernameValidation = validateUsername(username);
+    if (usernameValidation) {
+      setError(usernameValidation);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match!");
       return;
     }
-    const name = username.trim();
-    if (name !== username) {
-      setError("Username cannot have leading/trailing spaces.");
-      return;
-    }
-    if (!allValid) {
-      setError("Password must be ≥8 chars and include letters and digits.");
-      return;
-    }
 
+    if (!allValid) {
+      setError("Password must be at least 8 characters and include both letters and numbers.");
+      return;
+    }
 
     setLoading(true);
- try {
-  const res = await fetch("./db.php",
-  {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "register", name, password }),
-  }
-);
 
-    if (res.status === 409) {
-    setError("Username already taken.");
-    setLoading(false);
-    return;
-  }
-    // ADD THESE DEBUG LINES:
-    console.log("Status:", res.status);
-    const responseText = await res.text();
-    console.log("Raw response:", responseText);
-    
     try {
-      const data = JSON.parse(responseText);
-      console.log("Parsed JSON:", data);
+      const sanitizedUsername = username.trim();
       
-      if (res.ok && data.ok) {
-        alert("Registered successfully!");
-        onRegister?.(name);
-      } else {
-        setError(data?.message || `Registration failed (${res.status}).`);
-      }
-    } catch (parseError) {
-      console.error("JSON parse error:", parseError);
-      setError("Invalid server response");
-    }
+      const res = await fetch("./db.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          action: "register", 
+          name: sanitizedUsername, 
+          password: password 
+        }),
+      });
 
-  } catch (err) {
-    console.error("Fetch error:", err);
-    setError("Network error or server unavailable.");
-  } finally {
-    setLoading(false);
-  }
-};
+      // Debug logging
+      console.log("Status:", res.status);
+      const responseText = await res.text();
+      console.log("Raw response:", responseText);
+      
+      try {
+        const data = JSON.parse(responseText);
+        console.log("Parsed JSON:", data);
+        
+        if (res.ok && data.ok) {
+          alert("Registered successfully!");
+          onRegister?.(sanitizedUsername);
+        } else {
+          // Use escaped error message from server
+          const safeMessage = escapeHtml(data?.message || `Registration failed (${res.status}).`);
+          setError(safeMessage);
+        }
+      } catch (parseError) {
+        console.error("JSON parse error:", parseError);
+        setError("Invalid server response. Please try again.");
+      }
+
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Network error or server unavailable. Please check your connection.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Real-time username validation feedback
+  const [usernameError, setUsernameError] = useState("");
+
+  const handleUsernameChange = (e) => {
+    const value = e.target.value;
+    setUsername(value);
+    
+    // Only show validation errors after user starts typing
+    if (value.length > 0) {
+      const validationError = validateUsername(value);
+      setUsernameError(validationError || "");
+    } else {
+      setUsernameError("");
+    }
+  };
 
   return (
     <div className="register-container">
       <div className="register-header">
-        <button className="icon-btn" onClick={onBack} disabled={loading}>←</button>
+        <button 
+          className="icon-btn" 
+          onClick={onBack} 
+          disabled={loading}
+          type="button"
+        >
+          ←
+        </button>
         <div className="spacer" />
         <button className="icon-btn" disabled>⋮</button>
       </div>
@@ -99,10 +160,14 @@ function RegisterPage({ onRegister, onBack }) {
           <input
             type="text"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={handleUsernameChange}
             required
             disabled={loading}
+            placeholder="3-20 characters, letters, numbers, _-"
           />
+          {usernameError && (
+            <div className="error-text small">{usernameError}</div>
+          )}
         </div>
 
         <div className="form-group">
@@ -114,11 +179,13 @@ function RegisterPage({ onRegister, onBack }) {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
+              placeholder="At least 8 characters with letters and numbers"
             />
             <button 
               type="button"
               className="password-toggle"
               onClick={() => setShowPassword(!showPassword)}
+              disabled={loading}
             >
               {showPassword ? "Hide" : "Show"}
             </button>
@@ -146,20 +213,31 @@ function RegisterPage({ onRegister, onBack }) {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={loading}
+              placeholder="Re-enter your password"
             />
             <button 
               type="button"
               className="password-toggle"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              disabled={loading}
             >
               {showConfirmPassword ? "Hide" : "Show"}
             </button>
           </div>
         </div>
 
-        {error && <div className="error-text">{error}</div>}
+        {error && (
+          <div 
+            className="error-text" 
+            dangerouslySetInnerHTML={{ __html: error }}
+          />
+        )}
 
-        <button type="submit" className="signup-btn" disabled={loading || !allValid}>
+        <button 
+          type="submit" 
+          className="signup-btn" 
+          disabled={loading || !allValid || usernameError}
+        >
           {loading ? "Signing up..." : "Sign Up"}
         </button>
       </form>
