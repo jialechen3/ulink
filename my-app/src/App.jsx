@@ -1,52 +1,50 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import RegisterPage from "./RegisterPage";
+import UniversitySelection from "./UniversitySelection";
+import SignInPage from "./SignInPage";
 
 function App() {
-    const [users, setUsers] = useState([]);
-    const [newUser, setNewUser] = useState("");
-    const fetchUsers = () => {
-        fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php")
-            .then((res) => res.json())
-            .then((data) => setUsers(data))
-            .catch((err) => console.error("Fetch error:", err));
+    const [step, setStep] = useState("signin"); // 默认 Sign In
+    const [userId, setUserId] = useState(null);
+
+    // 登录成功
+    const handleSignIn = (id) => {
+        setUserId(id);
+        alert("Login successful!");
     };
 
-    useEffect(() => {
-        fetchUsers();
-    }, []);
+    // 注册成功 → 跳大学选择页面
+    const handleRegister = (id) => {
+        setUserId(id); // 保存用户ID
+        setStep("university"); // 注册后直接选大学
+    };
 
-    const addUser = () => {
-        if (!newUser) return;
-        fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: newUser }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data);
-                setNewUser("");
-                fetchUsers();
-            })
-            .catch((err) => console.error("Add user error:", err));
+    // 大学选择完成 → 跳登录页面
+    const handleUniversityConfirm = (university) => {
+        alert("University saved successfully! Please log in.");
+        setStep("signin");
     };
 
     return (
-        <div>
-            <h1>Users from DB</h1>
-            <ul>
-                {users.map((u) => (
-                    <li key={u.id}>{u.name}</li>
-                ))}
-            </ul>
-
-            <h2>Add User</h2>
-            <input
-                type="text"
-                value={newUser}
-                onChange={(e) => setNewUser(e.target.value)}
-                placeholder="Enter new user"
-            />
-            <button onClick={addUser}>Add</button>
+        <div className="app-container">
+            {step === "signin" && (
+                <SignInPage
+                    onSignIn={handleSignIn}
+                    onBack={() => setStep("register")}
+                />
+            )}
+            {step === "register" && (
+                <RegisterPage
+                    onRegister={handleRegister}
+                    onBack={() => setStep("signin")}
+                />
+            )}
+            {step === "university" && (
+                <UniversitySelection
+                    userId={userId}
+                    onConfirm={handleUniversityConfirm}
+                />
+            )}
         </div>
     );
 }
