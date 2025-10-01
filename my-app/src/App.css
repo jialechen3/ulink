@@ -1,170 +1,126 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-/* ========== Figma tokens ========== */
+/* ---------- global ---------- */
+* { box-sizing: border-box; }
 :root{
-  --fgm-black: #000000;
-  --fgm-on-surface: #1D1B20;
-  --fgm-primary: #6750A4;           /* purple border/label */
-  --fgm-surface: #FFFFFF;
-  --fgm-surface-container: #F3EDF7; /* dropdown bg */
-  --fgm-button: #4E7BC2;            /* Confirm bg */
-
-  --radius-field: 4px;
-  --radius-card: 28px;
-  --radius-dropdown: 4px;
-  --shadow-dropdown: 0px 1px 2px rgba(0,0,0,0.30), 0px 2px 6px 2px rgba(0,0,0,0.15);
+  --fgm-primary: #6750A4;
+  --on-surface: #1D1B20;
+  --btn: #4E7BC2;
 }
 
-/* ========== Canvas / Card ========== */
+/* ---------- canvas/card ---------- */
 .page.center{
   min-height: 100vh;
   display:flex; align-items:center; justify-content:center;
-  background:#ececec; /* outer grey band like the frame */
+  background:#ececec;
+  padding: 24px;
 }
 .select-card{
-  width:min(1084px, 92vw);           /* matches title width frame */
-  background:var(--fgm-surface);
-  border-radius:var(--radius-card);
+  width:min(1084px, 100%);
+  background:#fff;
+  border-radius:28px;
   box-shadow:0 18px 40px rgba(0,0,0,.10);
-  padding:56px 56px 48px;
+  /* responsive interior padding */
+  padding:clamp(24px, 4vw, 56px);
   text-align:center;
 }
 
-/* Title (Figma: Inter 96/116, bold, black, centered) */
+/* ---------- title (responsive) ---------- */
 .page-title{
-  margin:0 0 48px;
-  font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  margin:0 0 clamp(16px, 3vw, 40px);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   font-weight:700;
-  font-size:96px;
-  line-height:116px;
-  color:var(--fgm-black);
+  /* from 36px up to 64px depending on width */
+  font-size:clamp(36px, 6vw, 64px);
+  line-height:1.15;
+  color:#000;
 }
 
-/* ========== Combobox ========== */
+/* ---------- combobox ---------- */
 .combo{
   position:relative;
-  width:min(327px, 92vw);           /* Figma “327px” */
-  margin:0 auto 24px;
+  /* input width scales: 280px .. 560px */
+  width:clamp(280px, 45vw, 560px);
+  margin:0 auto 20px;
   text-align:left;
-}
-.combo-label{
-  display:block;
-  margin:0 0 8px 0;
-  font: 400 12px/16px 'Roboto', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  letter-spacing:.4px;
-  color:var(--fgm-primary);
-}
-.combo-input-wrap{ position:relative; }
-.combo-input{
-  width:100%;
-  height:56px;                      /* Figma */
-  padding:0 48px 0 16px;            /* trailing icon room */
-  font: 400 16px/24px 'Roboto', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  letter-spacing:.5px;
-  color:var(--fgm-on-surface);
-  background:#fff;
-  border:3px solid var(--fgm-primary); /* Figma: 3px */
-  border-radius:var(--radius-field);
-  outline:none;
-}
-.combo-input:focus{
-  /* Figma material has a focus state-layer; we emulate subtle glow */
-  box-shadow:0 0 0 4px rgba(103,80,164,.12);
+  z-index: 10; /* keep above button */
 }
 
-/* Clear (trailing icon), exactly centered */
+.combo-label{
+  display:block;
+  margin:0 0 6px;
+  font: 400 12px/16px Roboto, system-ui, -apple-system, Segoe UI, sans-serif;
+  color:var(--fgm-primary);
+}
+
+.combo-input-wrap{ position:relative; }
+
+.combo-input{
+  width:100%;
+  height:48px; /* slightly shorter for common laptops */
+  padding:0 44px 0 14px;
+  font: 400 16px/24px Roboto, system-ui, -apple-system, Segoe UI, sans-serif;
+  color:var(--on-surface);
+  background:#fff;
+  border:2px solid var(--fgm-primary);
+  border-radius:8px;
+  outline:none;
+}
+.combo-input:focus{ box-shadow:0 0 0 4px rgba(103,80,164,.12); }
+
 .combo-clear{
   position:absolute; right:8px; top:50%; transform:translateY(-50%);
-  width:40px; height:40px;          /* M3 icon button */
-  display:grid; place-items:center;
-  border:0; border-radius:100px;
-  background:#eee; color:#49454F;
-  cursor:pointer;
+  width:32px; height:32px; display:grid; place-items:center;
+  border:0; border-radius:999px; background:#eee; color:#49454F; cursor:pointer;
 }
 .combo-clear:hover{ background:#e5e5e5; }
 .combo-clear svg{ display:block; }
 
-/* ========== Dropdown (Menu) ========== */
+/* ---------- dropdown ---------- */
 .combo-list{
-  position:absolute; left:0; width:200px; /* Figma width */
-  margin-top:8px; padding:8px 0;
-  max-height:240px; overflow:auto;
-  background:var(--fgm-surface-container);
-  border-radius:var(--radius-dropdown);
-  box-shadow:var(--shadow-dropdown);
-  z-index:20;
+  position:absolute;
+  left:0; right:0;           /* match input width */
+  width:auto;
+  margin-top:8px;
+  max-height:240px;
+  overflow:auto;
+  background:#fff;           /* white looks cleaner */
+  border:1px solid #e7e7e7;
+  border-radius:10px;
+  box-shadow:0 16px 32px rgba(0,0,0,.12);
+  z-index: 50;
 }
-.combo-empty{
-  padding:8px 12px; color:#777; font: 400 14px/20px 'Roboto', sans-serif;
-}
+
 .combo-option{
   list-style:none;
-  height:56px;                      /* Figma item height */
+  min-height:44px;
   display:flex; align-items:center;
-  padding:8px 12px; gap:12px;       /* Figma gap */
-  border-radius:6px;                /* slight rounding */
-  cursor:pointer;
-  font: 400 16px/24px 'Roboto', sans-serif;
-  letter-spacing:.5px;
-  color:var(--fgm-on-surface);
+  padding:10px 12px;
+  border-radius:8px; cursor:pointer;
+  font: 400 15px/22px Roboto, system-ui, -apple-system, Segoe UI, sans-serif;
+  color:var(--on-surface);
 }
-.combo-option:hover,
-.combo-option.active{
-  background:#EDE7F6; /* subtle highlight inside the container */
+.combo-option:hover, .combo-option.active{ background:#f2efff; }
+.combo-empty{ padding:12px; color:#777; }
+
+/* add some breathing room below the combo so dropdown never covers the button */
+.combo::after{
+  content:"";
+  display:block;
+  height:8px;
 }
 
-/* ========== Confirm button (600x100) ========== */
+/* ---------- confirm button (responsive) ---------- */
 .confirm-btn{
-  width:min(600px, 92vw);
-  height:100px;                     /* Figma */
-  border:0; border-radius:8px;      /* Figma */
-  background:var(--fgm-button); color:#fff;
-  font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  font-weight:400; font-size:36px; line-height:44px; /* Figma */
+  margin-top: clamp(8px, 2vw, 16px);
+  width:clamp(280px, 45vw, 600px);
+  height: clamp(48px, 8vw, 100px);
+  border:0; border-radius:8px;
+  background:var(--btn); color:#fff;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  /* font scales 18px .. 36px */
+  font-size: clamp(18px, 2.6vw, 36px);
+  font-weight:600;
+  line-height:1;
   cursor:pointer;
-  box-shadow:0 12px 24px rgba(78,123,194,.25);
+  box-shadow:0 10px 22px rgba(78,123,194,.26);
 }
-.confirm-btn:disabled{ opacity:.55; box-shadow:none; cursor:not-allowed; }
-
-
+.confirm-btn:disabled{ opacity:.55; cursor:not-allowed; box-shadow:none; }
