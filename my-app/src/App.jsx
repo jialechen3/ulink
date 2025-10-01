@@ -1,54 +1,35 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import "./App.css";
+import UniversitySelection from "./UniversitySelect";
 
-function App() {
-    const [users, setUsers] = useState([]);
-    const [newUser, setNewUser] = useState("");
-    const fetchUsers = () => {
-        fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php")
-            .then((res) => res.json())
-            .then((data) => setUsers(data))
-            .catch((err) => console.error("Fetch error:", err));
-    };
+export default function App() {
+  const [showSelect, setShowSelect] = useState(true);     // dev toggle
+  const [lastSaved, setLastSaved] = useState("");
 
-    useEffect(() => {
-        fetchUsers();
-    }, []);
+  // MOCK: succeed after a short delay. Flip to "false" to simulate failure.
+  const mockSave = async (_userId, _universityId) => {
+    await new Promise(r => setTimeout(r, 400));
+    return true; // set to false to test error path
+  };
 
-    const addUser = () => {
-        if (!newUser) return;
-        fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: newUser }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data);
-                setNewUser("");
-                fetchUsers();
-            })
-            .catch((err) => console.error("Add user error:", err));
-    };
-
+  if (showSelect) {
     return (
-        <div>
-            <h1>Users from DB</h1>
-            <ul>
-                {users.map((u) => (
-                    <li key={u.id}>{u.name}</li>
-                ))}
-            </ul>
-
-            <h2>Add User</h2>
-            <input
-                type="text"
-                value={newUser}
-                onChange={(e) => setNewUser(e.target.value)}
-                placeholder="Enter new user"
-            />
-            <button onClick={addUser}>Add</button>
-        </div>
+      <div className="page" style={{ padding: 24 }}>
+        <UniversitySelection
+          userId={1}
+          saveUniversity={mockSave}             // no backend in this task
+          onConfirm={(name)=>{ setLastSaved(name); setShowSelect(false); }}
+        />
+      </div>
     );
-}
+  }
 
-export default App;
+  // simple "next" screen to prove flow worked
+  return (
+    <div className="card" style={{ padding: 24 }}>
+      <h2>Next step → Home/Profile</h2>
+      <p>Saved university: <strong>{lastSaved || "(none)"}</strong></p>
+      <button onClick={()=>setShowSelect(true)}>Back to Select (dev)</button>
+    </div>
+  );
+}
