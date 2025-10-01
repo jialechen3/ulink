@@ -1,53 +1,51 @@
-import { HashRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { useState } from "react";
 import RegisterPage from "./RegisterPage";
+import UniversitySelection from "./UniversitySelection";
+import SignInPage from "./SignInPage";
 
 function App() {
+    const [step, setStep] = useState("signin"); // 默认 Sign In
     const [userId, setUserId] = useState(null);
-    const [username, setUsername] = useState("");
-    const [loggedIn, setLoggedIn] = useState(false);
 
-    const handleRegister = (name) => {
-        setUsername(name);
-        setLoggedIn(true);
+    // 登录成功
+    const handleSignIn = (id) => {
+        setUserId(id);
+        alert("Login successful!");
     };
 
-    const handleLogout = () => {
-        setUserId(null);
-        setUsername("");
-        setLoggedIn(false);
+    // 注册成功 → 跳大学选择页面
+    const handleRegister = (id) => {
+        setUserId(id); // 保存用户ID
+        setStep("university"); // 注册后直接选大学
+    };
+
+    // 大学选择完成 → 跳登录页面
+    const handleUniversityConfirm = (university) => {
+        alert("University saved successfully! Please log in.");
+        setStep("signin");
     };
 
     return (
-        <Router>
-            <div className="app-container">
-                {loggedIn ? (
-                    <div style={{ textAlign: "center", marginTop: "50px" }}>
-                        <h1>You are logged in, {username}!</h1>
-                        <button onClick={handleLogout}>
-                            Log Out
-                        </button>
-                    </div>
-                ) : (
-                    <Routes>
-                        <Route path="/" element={
-                            <div style={{ textAlign: "center", marginTop: "50px" }}>
-                                <h1>Welcome to Our App</h1>
-                                <p>Please register to continue</p>
-                                <Link to="/register">Go to Registration</Link>
-                            </div>
-                        } />
-                        
-                        <Route path="/register" element={
-                            <RegisterPage
-                                onRegister={handleRegister}
-                                onBack={() => window.history.back()}
-                            />
-                        } />
-                    </Routes>
-                )}
-            </div>
-        </Router>
+        <div className="app-container">
+            {step === "signin" && (
+                <SignInPage
+                    onSignIn={handleSignIn}
+                    onBack={() => setStep("register")}
+                />
+            )}
+            {step === "register" && (
+                <RegisterPage
+                    onRegister={handleRegister}
+                    onBack={() => setStep("signin")}
+                />
+            )}
+            {step === "university" && (
+                <UniversitySelection
+                    userId={userId}
+                    onConfirm={handleUniversityConfirm}
+                />
+            )}
+        </div>
     );
 }
 
