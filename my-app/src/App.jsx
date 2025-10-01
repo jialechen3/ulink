@@ -1,52 +1,70 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import RegisterPage from "./RegisterPage";
+import SignInPage from "./SignInPage";
 
 function App() {
-    const [users, setUsers] = useState([]);
-    const [newUser, setNewUser] = useState("");
-    const fetchUsers = () => {
-        fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php")
-            .then((res) => res.json())
-            .then((data) => setUsers(data))
-            .catch((err) => console.error("Fetch error:", err));
+    const [step, setStep] = useState("signin");
+    const [userId, setUserId] = useState(null);
+    const [username, setUsername] = useState(""); 
+    const [loggedIn, setLoggedIn] = useState(false);
+
+    // sigin succseeful
+    const handleSignIn = (id, name) => {
+        setUserId(id);
+        setUsername(name);
+        setLoggedIn(true);
     };
 
-    useEffect(() => {
-        fetchUsers();
-    }, []);
+    // Successful registration → Jump directly to login
+    const handleRegister = (id, name) => {
+        setUserId(id);
+        setUsername(name);
+        setStep("signin"); // Return to login after registration is completed
+    };
 
-    const addUser = () => {
-        if (!newUser) return;
-        fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: newUser }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data);
-                setNewUser("");
-                fetchUsers();
-            })
-            .catch((err) => console.error("Add user error:", err));
+    const handleLogout = () => {
+        setUserId(null);
+        setUsername("");
+        setLoggedIn(false);
+        setStep("signin");
     };
 
     return (
-        <div>
-            <h1>Users from DB</h1>
-            <ul>
-                {users.map((u) => (
-                    <li key={u.id}>{u.name}</li>
-                ))}
-            </ul>
-
-            <h2>Add User</h2>
-            <input
-                type="text"
-                value={newUser}
-                onChange={(e) => setNewUser(e.target.value)}
-                placeholder="Enter new user"
-            />
-            <button onClick={addUser}>Add</button>
+        <div className="app-container">
+            {loggedIn ? (
+                <div style={{ textAlign: "center", marginTop: "50px" }}>
+                    <h1>You are logged in, {username}!</h1>
+                    <button
+                        onClick={handleLogout}
+                        style={{
+                            marginTop: "20px",
+                            padding: "10px 20px",
+                            backgroundColor: "#4a76d9",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "6px",
+                            cursor: "pointer",
+                        }}
+                    >
+                        Log Out
+                    </button>
+                </div>
+            ) : (
+                <>
+                    {step === "signin" && (
+                        <SignInPage
+                            onSignIn={handleSignIn}
+                            onBack={() => setStep("register")}
+                        />
+                    )}
+                    {step === "register" && (
+                        <RegisterPage
+                            onRegister={handleRegister}
+                            onBack={() => setStep("signin")}
+                        />
+                    )}
+                </>
+            )}
         </div>
     );
 }
