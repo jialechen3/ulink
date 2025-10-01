@@ -1,10 +1,14 @@
+html, body, #root { height: 100%; }
+body { margin: 0; }
+
 /* basic layout */
 * { box-sizing: border-box; }
+/* perfectly center the content */
 .page.center{
-  min-height:100vh;
-  display:flex; align-items:center; justify-content:center;
-  background:#FFFFFF;           /* full white background */
-  padding:0;                    /* no extra edge padding */
+  min-height: 100vh;
+  display: grid;
+  place-items: center;      /* centers both directions */
+  background: #FFFFFF;
 }
 .select-card{
   width:min(880px, 96vw);
@@ -14,40 +18,72 @@
   padding:40px 24px 24px;       /* comfortable spacing for content */
   text-align:center;
 }
-.page-title{ margin:0 0 24px; font-size:48px; font-weight:800; line-height:1.15; }
+.page-title{ 
+  margin:0 0 24px; 
+  font-size:48px; 
+  font-weight:800; 
+  line-height:1.15; 
+}
 
 /* combobox */
-.combo{ position:relative; width:min(520px, 92vw); margin:0 auto 16px; text-align:left; }
-.combo-label{ display:block; font-size:12px; color:#6d5bd0; margin:0 0 6px; }
-.combo-input-wrap{ position:relative; }
-.combo-input{
-  width:100%; height:48px; padding:0 44px 0 14px;
-  border:2px solid #6d5bd0; border-radius:10px; outline:none; font-size:16px;
+.combo{
+  position: relative;
+  width: min(520px, 92vw);
+  margin: 0 auto;            /* centered */
+  text-align: left;
 }
-.combo-input:focus{ box-shadow:0 0 0 4px rgba(109,91,208,.12); }
-.combo-clear{
-  position:absolute; right:8px; top:50%; transform:translateY(-50%);
-  width:30px; height:30px; display:grid; place-items:center; border:0; border-radius:999px;
-  background:#eee; color:#333; cursor:pointer;
-}
-.combo-clear:hover{ background:#e5e5e5; }
 
-/* dropdown */
-.combo-list{
-  position:absolute; left:0; right:0; margin-top:8px; max-height:240px; overflow:auto;
-  background:#fff; border:1px solid #e8e8e8; border-radius:10px; box-shadow:0 14px 28px rgba(0,0,0,.12); z-index:20;
+/* leave your label / input / clear styles as-is */
+
+.combo::after{
+  content:"";
+  display:block;
+  height: 16px;              /* extra breathing room above the button */
 }
-.combo-option{ list-style:none; padding:10px 12px; border-radius:8px; cursor:pointer; font-size:15px; }
-.combo-option:hover,.combo-option.active{ background:#f2efff; }
-.combo-empty{ padding:12px; color:#777; }
+
+/* FIX: remove inner padding and clip corners to kill the tiny white gap */
+.combo-list{
+  position: absolute;
+  left: 0; right: 0;
+  margin-top: 8px;
+  max-height: 240px;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  box-shadow: 0 14px 28px rgba(0,0,0,.12);
+  z-index: 20;
+
+  padding: 0;                /* was 6/8px -> causes the notch */
+  overflow: hidden;          /* clip inner corners */
+}
+
+/* no radius on each row to avoid corner seams */
+.combo-option{
+  list-style: none;
+  padding: 12px 14px;
+  border-radius: 0;          /* remove per-item rounding */
+  cursor: pointer;
+  font-size: 15px;
+}
+.combo-option:hover,
+.combo-option.active{ background:#f2efff; }
+.combo-empty{ padding: 12px 14px; color:#777; }
+
 
 /* button */
 .confirm-btn{
-  margin-top:8px; width:min(520px, 92vw); height:52px;
-  border:0; border-radius:12px; background:#4973d2; color:#fff;
-  font-size:20px; font-weight:700; cursor:pointer; box-shadow:0 8px 18px rgba(73,115,210,.25);
+  margin-top: 24px;          /* bigger gap from the combo bar */
+  width: min(520px, 92vw);
+  height: 52px;
+  border: 0; border-radius: 12px;
+  background: #4973d2; color:#fff;
+  font-size: 20px; font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(73,115,210,.25);
 }
 .confirm-btn:disabled{ opacity:.55; cursor:not-allowed; box-shadow:none; }
+
 
 /* errors */
 .error-text{ color:#b00020; margin:6px 0 0; }
