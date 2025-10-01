@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-/** Default options (frontend-only for #52) */
 const DEFAULT_UNIS = [
   { id: 1, name: "University at Buffalo" },
   { id: 2, name: "Cornell University" },
@@ -10,13 +9,12 @@ const DEFAULT_UNIS = [
 
 export default function UniversitySelection({
   userId = 1,
-  onConfirm,
-  saveUniversity,                  // optional mock/injected later
   options = DEFAULT_UNIS,
-  title = "Select Your University"
+  onConfirm,
+  saveUniversity, // optional async (userId, universityId) => boolean
 }) {
-  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
   const [highlight, setHighlight] = useState(-1);
   const [saving, setSaving] = useState(false);
@@ -24,30 +22,24 @@ export default function UniversitySelection({
 
   const rootRef = useRef(null);
   const inputRef = useRef(null);
-  const listRef = useRef(null);
 
-  // filter options live
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return options;
-    return options.filter(o => o.name.toLowerCase().includes(q));
+    return q ? options.filter(o => o.name.toLowerCase().includes(q)) : options;
   }, [query, options]);
 
-  // close on outside click
   useEffect(() => {
-    const onDoc = (e) => {
-      if (!rootRef.current) return;
-      if (!rootRef.current.contains(e.target)) setOpen(false);
+    const closeOnOutside = (e) => {
+      if (!rootRef.current?.contains(e.target)) setOpen(false);
     };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    document.addEventListener("mousedown", closeOnOutside);
+    return () => document.removeEventListener("mousedown", closeOnOutside);
   }, []);
 
-  // keep highlight in range when list changes
   useEffect(() => {
-    if (filtered.length === 0) setHighlight(-1);
-    else if (highlight > filtered.length - 1) setHighlight(filtered.length - 1);
-  }, [filtered, highlight]);
+    if (open && filtered.length > 0 && highlight === -1) setHighlight(0);
+    if (!open) setHighlight(-1);
+  }, [open, filtered.length, highlight]);
 
   const choose = (opt) => {
     setSelected(opt);
@@ -55,19 +47,26 @@ export default function UniversitySelection({
     setOpen(false);
   };
 
+  const clear = () => {
+    setSelected(null);
+    setQuery("");
+    setOpen(true);
+    inputRef.current?.focus();
+  };
+
   const onKeyDown = (e) => {
     if (!open && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
       setOpen(true);
-      e.preventDefault();
       setHighlight(0);
+      e.preventDefault();
       return;
     }
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setHighlight(h => Math.min((h < 0 ? -1 : h) + 1, filtered.length - 1));
+      setHighlight(h => Math.min((h < 0 ? 0 : h) + 1, filtered.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setHighlight(h => Math.max((h < 0 ? 0 : h) - 1, 0));
+      setHighlight(h => Math.max((h <= 0 ? 0 : h - 1), 0));
     } else if (e.key === "Enter") {
       if (open && highlight >= 0 && filtered[highlight]) {
         e.preventDefault();
@@ -97,33 +96,19 @@ export default function UniversitySelection({
     }
   };
 
-  const clear = () => {
-    setSelected(null);
-    setQuery("");
-    inputRef.current?.focus();
-    setOpen(true);
-  };
-
   return (
     <div className="page center">
       <div className="select-card" ref={rootRef}>
-        <h1 className="page-title">{title}</h1>
+        <h1 className="page-title">Select Your University</h1>
 
-        {/* Combobox */}
-        <div
-          className={`combo ${open ? "open" : ""}`}
-          role="combobox"
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          onMouseEnter={() => setOpen(true)}
-        >
-          <label htmlFor="uni-input" className="combo-label">Schools</label>
+        <div className="combo" role="combobox" aria-expanded={open}>
+          <label htmlFor="uni" className="combo-label">Schools</label>
           <div className="combo-input-wrap">
             <input
-              id="uni-input"
+              id="uni"
               ref={inputRef}
               className="combo-input"
-              placeholder="Select Your University"
+              placeholder="Search or select a university"
               value={query}
               onChange={(e) => { setQuery(e.target.value); setOpen(true); setSelected(null); }}
               onFocus={() => setOpen(true)}
@@ -140,21 +125,15 @@ export default function UniversitySelection({
           </div>
 
           {open && (
-            <ul
-              ref={listRef}
-              className="combo-list"
-              role="listbox"
-            >
-              {filtered.length === 0 && (
-                <li className="combo-empty">No matches</li>
-              )}
-              {filtered.map((opt, idx) => (
+            <ul className="combo-list" role="listbox">
+              {filtered.length === 0 && <li className="combo-empty">No matches</li>}
+              {filtered.map((opt, i) => (
                 <li
                   key={opt.id}
+                  className={`combo-option ${i === highlight ? "active" : ""}`}
                   role="option"
                   aria-selected={selected?.id === opt.id}
-                  className={`combo-option ${idx === highlight ? "active" : ""}`}
-                  onMouseEnter={() => setHighlight(idx)}
+                  onMouseEnter={() => setHighlight(i)}
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => choose(opt)}
                 >
@@ -167,11 +146,7 @@ export default function UniversitySelection({
 
         {err && <div className="error-text" role="alert">{err}</div>}
 
-        <button
-          className="confirm-btn"
-          disabled={!selected || saving}
-          onClick={handleConfirm}
-        >
+        <button className="confirm-btn" disabled={!selected || saving} onClick={handleConfirm}>
           {saving ? "Saving…" : "Confirm"}
         </button>
       </div>
