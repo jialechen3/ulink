@@ -3,33 +3,31 @@ import "./App.css";
 import UniversitySelection from "./UniversitySelect";
 
 export default function App() {
-  const [showSelect, setShowSelect] = useState(true);     // dev toggle
-  const [lastSaved, setLastSaved] = useState("");
+  const [done, setDone] = useState(false);
+  const [saved, setSaved] = useState("");
 
-  // MOCK: succeed after a short delay. Flip to "false" to simulate failure.
-  const mockSave = async (_userId, _universityId) => {
+  const mockSave = async () => {
     await new Promise(r => setTimeout(r, 400));
-    return true; // set to false to test error path
+    return true; // set to false to see error state
   };
 
-  if (showSelect) {
+  if (done) {
     return (
-      <div className="page" style={{ padding: 24 }}>
-        <UniversitySelection
-          userId={1}
-          saveUniversity={mockSave}             // no backend in this task
-          onConfirm={(name)=>{ setLastSaved(name); setShowSelect(false); }}
-        />
+      <div className="page center">
+        <div className="select-card">
+          <h2>Next step → Home/Profile</h2>
+          <p>Saved university: <b>{saved}</b></p>
+          <button className="confirm-btn" onClick={()=>setDone(false)}>Back</button>
+        </div>
       </div>
     );
   }
 
-  // simple "next" screen to prove flow worked
   return (
-    <div className="card" style={{ padding: 24 }}>
-      <h2>Next step → Home/Profile</h2>
-      <p>Saved university: <strong>{lastSaved || "(none)"}</strong></p>
-      <button onClick={()=>setShowSelect(true)}>Back to Select (dev)</button>
-    </div>
+    <UniversitySelection
+      userId={1}
+      saveUniversity={mockSave}
+      onConfirm={(name)=>{ setSaved(name); setDone(true); }}
+    />
   );
 }
