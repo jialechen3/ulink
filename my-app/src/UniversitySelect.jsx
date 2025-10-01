@@ -131,12 +131,11 @@ export default function UniversitySelection({
               autoComplete="off"
             />
             {query && (
-              <button
-                type="button"
-                className="combo-clear"
-                aria-label="Clear"
-                onClick={clear}
-              >×</button>
+              <button type="button" className="combo-clear" aria-label="Clear" onClick={clear}>
+                <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </button>
             )}
           </div>
 
