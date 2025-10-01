@@ -1,3 +1,6 @@
+
+
+
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -7,6 +10,7 @@ $servername = "localhost";
 $username = "zzhong5";
 $password = "50457160";
 $dbname = "UlinkDB";
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
