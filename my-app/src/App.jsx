@@ -1,37 +1,48 @@
 import { useState } from "react";
 import RegisterPage from "./RegisterPage";
+import UniversitySelection from "./UniversitySelection";
+import SignInPage from "./SignInPage";
 
 function App() {
-    const [step, setStep] = useState("register"); // Start with register page
+    const [step, setStep] = useState("signin"); // 默认 Sign In
     const [userId, setUserId] = useState(null);
-    const [username, setUsername] = useState("");
-    const [loggedIn, setLoggedIn] = useState(false);
 
-    const handleRegister = (name) => {
-        setUsername(name);
-        setLoggedIn(true);
+    // 登录成功
+    const handleSignIn = (id) => {
+        setUserId(id);
+        alert("Login successful!");
     };
 
-    const handleLogout = () => {
-        setUserId(null);
-        setUsername("");
-        setLoggedIn(false);
-        setStep("register");
+    // 注册成功 → 跳大学选择页面
+    const handleRegister = (id) => {
+        setUserId(id); // 保存用户ID
+        setStep("university"); // 注册后直接选大学
+    };
+
+    // 大学选择完成 → 跳登录页面
+    const handleUniversityConfirm = (university) => {
+        alert("University saved successfully! Please log in.");
+        setStep("signin");
     };
 
     return (
         <div className="app-container">
-            {loggedIn ? (
-                <div style={{ textAlign: "center", marginTop: "50px" }}>
-                    <h1>You are logged in, {username}!</h1>
-                    <button onClick={handleLogout}>
-                        Log Out
-                    </button>
-                </div>
-            ) : (
+            {step === "signin" && (
+                <SignInPage
+                    onSignIn={handleSignIn}
+                    onBack={() => setStep("register")}
+                />
+            )}
+            {step === "register" && (
                 <RegisterPage
                     onRegister={handleRegister}
-                    onBack={() => console.log("Back clicked")}
+                    onBack={() => setStep("signin")}
+                />
+            )}
+            {step === "university" && (
+                <UniversitySelection
+                    userId={userId}
+                    onConfirm={handleUniversityConfirm}
                 />
             )}
         </div>
