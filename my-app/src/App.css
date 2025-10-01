@@ -1,126 +1,47 @@
-/* ---------- global ---------- */
+/* basic layout */
 * { box-sizing: border-box; }
-:root{
-  --fgm-primary: #6750A4;
-  --on-surface: #1D1B20;
-  --btn: #4E7BC2;
-}
-
-/* ---------- canvas/card ---------- */
 .page.center{
-  min-height: 100vh;
-  display:flex; align-items:center; justify-content:center;
-  background:#ececec;
-  padding: 24px;
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background:#f2f2f2; padding:24px;
 }
 .select-card{
-  width:min(1084px, 100%);
-  background:#fff;
-  border-radius:28px;
-  box-shadow:0 18px 40px rgba(0,0,0,.10);
-  /* responsive interior padding */
-  padding:clamp(24px, 4vw, 56px);
-  text-align:center;
+  width:min(880px, 96vw); background:#fff; border-radius:24px;
+  box-shadow:0 12px 30px rgba(0,0,0,.08); padding:40px 32px 32px; text-align:center;
 }
+.page-title{ margin:0 0 24px; font-size:48px; font-weight:800; line-height:1.15; }
 
-/* ---------- title (responsive) ---------- */
-.page-title{
-  margin:0 0 clamp(16px, 3vw, 40px);
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  font-weight:700;
-  /* from 36px up to 64px depending on width */
-  font-size:clamp(36px, 6vw, 64px);
-  line-height:1.15;
-  color:#000;
-}
-
-/* ---------- combobox ---------- */
-.combo{
-  position:relative;
-  /* input width scales: 280px .. 560px */
-  width:clamp(280px, 45vw, 560px);
-  margin:0 auto 20px;
-  text-align:left;
-  z-index: 10; /* keep above button */
-}
-
-.combo-label{
-  display:block;
-  margin:0 0 6px;
-  font: 400 12px/16px Roboto, system-ui, -apple-system, Segoe UI, sans-serif;
-  color:var(--fgm-primary);
-}
-
+/* combobox */
+.combo{ position:relative; width:min(520px, 92vw); margin:0 auto 16px; text-align:left; }
+.combo-label{ display:block; font-size:12px; color:#6d5bd0; margin:0 0 6px; }
 .combo-input-wrap{ position:relative; }
-
 .combo-input{
-  width:100%;
-  height:48px; /* slightly shorter for common laptops */
-  padding:0 44px 0 14px;
-  font: 400 16px/24px Roboto, system-ui, -apple-system, Segoe UI, sans-serif;
-  color:var(--on-surface);
-  background:#fff;
-  border:2px solid var(--fgm-primary);
-  border-radius:8px;
-  outline:none;
+  width:100%; height:48px; padding:0 44px 0 14px;
+  border:2px solid #6d5bd0; border-radius:10px; outline:none; font-size:16px;
 }
-.combo-input:focus{ box-shadow:0 0 0 4px rgba(103,80,164,.12); }
-
+.combo-input:focus{ box-shadow:0 0 0 4px rgba(109,91,208,.12); }
 .combo-clear{
   position:absolute; right:8px; top:50%; transform:translateY(-50%);
-  width:32px; height:32px; display:grid; place-items:center;
-  border:0; border-radius:999px; background:#eee; color:#49454F; cursor:pointer;
+  width:30px; height:30px; display:grid; place-items:center; border:0; border-radius:999px;
+  background:#eee; color:#333; cursor:pointer;
 }
 .combo-clear:hover{ background:#e5e5e5; }
-.combo-clear svg{ display:block; }
 
-/* ---------- dropdown ---------- */
+/* dropdown */
 .combo-list{
-  position:absolute;
-  left:0; right:0;           /* match input width */
-  width:auto;
-  margin-top:8px;
-  max-height:240px;
-  overflow:auto;
-  background:#fff;           /* white looks cleaner */
-  border:1px solid #e7e7e7;
-  border-radius:10px;
-  box-shadow:0 16px 32px rgba(0,0,0,.12);
-  z-index: 50;
+  position:absolute; left:0; right:0; margin-top:8px; max-height:240px; overflow:auto;
+  background:#fff; border:1px solid #e8e8e8; border-radius:10px; box-shadow:0 14px 28px rgba(0,0,0,.12); z-index:20;
 }
-
-.combo-option{
-  list-style:none;
-  min-height:44px;
-  display:flex; align-items:center;
-  padding:10px 12px;
-  border-radius:8px; cursor:pointer;
-  font: 400 15px/22px Roboto, system-ui, -apple-system, Segoe UI, sans-serif;
-  color:var(--on-surface);
-}
-.combo-option:hover, .combo-option.active{ background:#f2efff; }
+.combo-option{ list-style:none; padding:10px 12px; border-radius:8px; cursor:pointer; font-size:15px; }
+.combo-option:hover,.combo-option.active{ background:#f2efff; }
 .combo-empty{ padding:12px; color:#777; }
 
-/* add some breathing room below the combo so dropdown never covers the button */
-.combo::after{
-  content:"";
-  display:block;
-  height:8px;
-}
-
-/* ---------- confirm button (responsive) ---------- */
+/* button */
 .confirm-btn{
-  margin-top: clamp(8px, 2vw, 16px);
-  width:clamp(280px, 45vw, 600px);
-  height: clamp(48px, 8vw, 100px);
-  border:0; border-radius:8px;
-  background:var(--btn); color:#fff;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  /* font scales 18px .. 36px */
-  font-size: clamp(18px, 2.6vw, 36px);
-  font-weight:600;
-  line-height:1;
-  cursor:pointer;
-  box-shadow:0 10px 22px rgba(78,123,194,.26);
+  margin-top:8px; width:min(520px, 92vw); height:52px;
+  border:0; border-radius:12px; background:#4973d2; color:#fff;
+  font-size:20px; font-weight:700; cursor:pointer; box-shadow:0 8px 18px rgba(73,115,210,.25);
 }
 .confirm-btn:disabled{ opacity:.55; cursor:not-allowed; box-shadow:none; }
+
+/* errors */
+.error-text{ color:#b00020; margin:6px 0 0; }
