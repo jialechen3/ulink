@@ -40,3 +40,48 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Layout */
+.page.center { min-height: 100vh; display:flex; align-items:center; justify-content:center; background:#eee; }
+.select-card { width:min(880px, 92vw); background:#fff; border-radius:28px; padding:56px 48px 40px; box-shadow:0 12px 30px rgba(0,0,0,.08); text-align:center; }
+.page-title { font-size:56px; line-height:1.1; font-weight:800; margin:0 0 40px; }
+
+/* Combobox */
+.combo { position:relative; width:min(420px, 92vw); margin:0 auto 28px; text-align:left; }
+.combo-label { display:block; font-size:12px; color:#6d5bd0; margin:0 0 6px 4px; }
+.combo-input-wrap { position:relative; }
+.combo-input {
+  width:100%; padding:12px 40px 12px 14px; font-size:15px;
+  border:2px solid #6d5bd0; border-radius:8px; outline:none;
+}
+.combo-input:focus { box-shadow:0 0 0 4px rgba(109,91,208,.15); }
+.combo-clear {
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  width:26px; height:26px; border:0; border-radius:50%;
+  background:#eee; cursor:pointer; font-size:18px; line-height:26px;
+}
+.combo-clear:hover { background:#e2e2e2; }
+
+/* Dropdown */
+.combo-list {
+  position:absolute; left:0; right:0; margin-top:8px; max-height:240px; overflow:auto;
+  background:#fff; border:1px solid #e7e7e7; border-radius:10px; box-shadow:0 10px 24px rgba(0,0,0,.08); padding:6px;
+  z-index:10;
+}
+.combo-option {
+  list-style:none; padding:10px 12px; border-radius:8px; cursor:pointer; font-size:14px;
+}
+.combo-option:hover, .combo-option.active { background:#f2efff; }
+.combo-empty { padding:12px; color:#777; }
+
+/* Confirm button */
+.confirm-btn {
+  margin-top:20px; width:min(420px, 92vw); height:58px; border:0; border-radius:14px;
+  font-size:22px; font-weight:600; color:#fff; background:#4973d2; cursor:pointer;
+  box-shadow:0 8px 16px rgba(73,115,210,.25);
+}
+.confirm-btn:disabled { opacity:.55; cursor:not-allowed; box-shadow:none; }
+
+/* Errors */
+.error-text { color:#b00020; margin-top:6px; }
+
