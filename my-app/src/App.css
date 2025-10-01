@@ -41,47 +41,130 @@
   color: #888;
 }
 
-/* Layout */
-.page.center { min-height: 100vh; display:flex; align-items:center; justify-content:center; background:#eee; }
-.select-card { width:min(880px, 92vw); background:#fff; border-radius:28px; padding:56px 48px 40px; box-shadow:0 12px 30px rgba(0,0,0,.08); text-align:center; }
-.page-title { font-size:56px; line-height:1.1; font-weight:800; margin:0 0 40px; }
+/* ========== Figma tokens ========== */
+:root{
+  --fgm-black: #000000;
+  --fgm-on-surface: #1D1B20;
+  --fgm-primary: #6750A4;           /* purple border/label */
+  --fgm-surface: #FFFFFF;
+  --fgm-surface-container: #F3EDF7; /* dropdown bg */
+  --fgm-button: #4E7BC2;            /* Confirm bg */
 
-/* Combobox */
-.combo { position:relative; width:min(420px, 92vw); margin:0 auto 28px; text-align:left; }
-.combo-label { display:block; font-size:12px; color:#6d5bd0; margin:0 0 6px 4px; }
-.combo-input-wrap { position:relative; }
-.combo-input {
-  width:100%; padding:12px 40px 12px 14px; font-size:15px;
-  border:2px solid #6d5bd0; border-radius:8px; outline:none;
+  --radius-field: 4px;
+  --radius-card: 28px;
+  --radius-dropdown: 4px;
+  --shadow-dropdown: 0px 1px 2px rgba(0,0,0,0.30), 0px 2px 6px 2px rgba(0,0,0,0.15);
 }
-.combo-input:focus { box-shadow:0 0 0 4px rgba(109,91,208,.15); }
-.combo-clear {
+
+/* ========== Canvas / Card ========== */
+.page.center{
+  min-height: 100vh;
+  display:flex; align-items:center; justify-content:center;
+  background:#ececec; /* outer grey band like the frame */
+}
+.select-card{
+  width:min(1084px, 92vw);           /* matches title width frame */
+  background:var(--fgm-surface);
+  border-radius:var(--radius-card);
+  box-shadow:0 18px 40px rgba(0,0,0,.10);
+  padding:56px 56px 48px;
+  text-align:center;
+}
+
+/* Title (Figma: Inter 96/116, bold, black, centered) */
+.page-title{
+  margin:0 0 48px;
+  font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-weight:700;
+  font-size:96px;
+  line-height:116px;
+  color:var(--fgm-black);
+}
+
+/* ========== Combobox ========== */
+.combo{
+  position:relative;
+  width:min(327px, 92vw);           /* Figma “327px” */
+  margin:0 auto 24px;
+  text-align:left;
+}
+.combo-label{
+  display:block;
+  margin:0 0 8px 0;
+  font: 400 12px/16px 'Roboto', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  letter-spacing:.4px;
+  color:var(--fgm-primary);
+}
+.combo-input-wrap{ position:relative; }
+.combo-input{
+  width:100%;
+  height:56px;                      /* Figma */
+  padding:0 48px 0 16px;            /* trailing icon room */
+  font: 400 16px/24px 'Roboto', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  letter-spacing:.5px;
+  color:var(--fgm-on-surface);
+  background:#fff;
+  border:3px solid var(--fgm-primary); /* Figma: 3px */
+  border-radius:var(--radius-field);
+  outline:none;
+}
+.combo-input:focus{
+  /* Figma material has a focus state-layer; we emulate subtle glow */
+  box-shadow:0 0 0 4px rgba(103,80,164,.12);
+}
+
+/* Clear (trailing icon), exactly centered */
+.combo-clear{
   position:absolute; right:8px; top:50%; transform:translateY(-50%);
-  width:26px; height:26px; border:0; border-radius:50%;
-  background:#eee; cursor:pointer; font-size:18px; line-height:26px;
+  width:40px; height:40px;          /* M3 icon button */
+  display:grid; place-items:center;
+  border:0; border-radius:100px;
+  background:#eee; color:#49454F;
+  cursor:pointer;
 }
-.combo-clear:hover { background:#e2e2e2; }
+.combo-clear:hover{ background:#e5e5e5; }
+.combo-clear svg{ display:block; }
 
-/* Dropdown */
-.combo-list {
-  position:absolute; left:0; right:0; margin-top:8px; max-height:240px; overflow:auto;
-  background:#fff; border:1px solid #e7e7e7; border-radius:10px; box-shadow:0 10px 24px rgba(0,0,0,.08); padding:6px;
-  z-index:10;
+/* ========== Dropdown (Menu) ========== */
+.combo-list{
+  position:absolute; left:0; width:200px; /* Figma width */
+  margin-top:8px; padding:8px 0;
+  max-height:240px; overflow:auto;
+  background:var(--fgm-surface-container);
+  border-radius:var(--radius-dropdown);
+  box-shadow:var(--shadow-dropdown);
+  z-index:20;
 }
-.combo-option {
-  list-style:none; padding:10px 12px; border-radius:8px; cursor:pointer; font-size:14px;
+.combo-empty{
+  padding:8px 12px; color:#777; font: 400 14px/20px 'Roboto', sans-serif;
 }
-.combo-option:hover, .combo-option.active { background:#f2efff; }
-.combo-empty { padding:12px; color:#777; }
+.combo-option{
+  list-style:none;
+  height:56px;                      /* Figma item height */
+  display:flex; align-items:center;
+  padding:8px 12px; gap:12px;       /* Figma gap */
+  border-radius:6px;                /* slight rounding */
+  cursor:pointer;
+  font: 400 16px/24px 'Roboto', sans-serif;
+  letter-spacing:.5px;
+  color:var(--fgm-on-surface);
+}
+.combo-option:hover,
+.combo-option.active{
+  background:#EDE7F6; /* subtle highlight inside the container */
+}
 
-/* Confirm button */
-.confirm-btn {
-  margin-top:20px; width:min(420px, 92vw); height:58px; border:0; border-radius:14px;
-  font-size:22px; font-weight:600; color:#fff; background:#4973d2; cursor:pointer;
-  box-shadow:0 8px 16px rgba(73,115,210,.25);
+/* ========== Confirm button (600x100) ========== */
+.confirm-btn{
+  width:min(600px, 92vw);
+  height:100px;                     /* Figma */
+  border:0; border-radius:8px;      /* Figma */
+  background:var(--fgm-button); color:#fff;
+  font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-weight:400; font-size:36px; line-height:44px; /* Figma */
+  cursor:pointer;
+  box-shadow:0 12px 24px rgba(78,123,194,.25);
 }
-.confirm-btn:disabled { opacity:.55; cursor:not-allowed; box-shadow:none; }
+.confirm-btn:disabled{ opacity:.55; box-shadow:none; cursor:not-allowed; }
 
-/* Errors */
-.error-text { color:#b00020; margin-top:6px; }
 
