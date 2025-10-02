@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] !== "GET") {
 }
 
 // DB connect (adjust only if your local creds differ)
-$mysqli = @new mysqli("127.0.0.1", "root", "", "testdb", 3306);
+$mysqli = @new mysqli("localhost", "zzhong5", "50457160", "cse442_2025_fall_team_z_db");
 if ($mysqli->connect_errno) {
   http_response_code(500);
   echo json_encode(["error" => "DB connection failed"]);
