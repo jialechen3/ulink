@@ -11,21 +11,17 @@ function SignInPage({ onSignIn, onBack }) {
         setError("");
 
         try {
-            const res = await fetch(
-                //"https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php" // 远程测试用
-                "http://localhost/Ulink/db.php", // 本地开发用
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "login", name: username, password })
-                }
-            );
+            const res = await fetch("http://localhost/Ulink/db.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "login", username, password })
+            });
 
             const data = await res.json();
 
             if (data.success) {
                 alert("Login successful!");
-                if (onSignIn) onSignIn(data.id,username); // 把用户ID传给 App.jsx
+                if (onSignIn) onSignIn(data.id); 
             } else {
                 setError(data.message || "Login failed");
             }
@@ -38,7 +34,7 @@ function SignInPage({ onSignIn, onBack }) {
     return (
         <div className="register-container">
             <div className="register-header">
-                <button className="icon-btn" onClick={onBack}>←</button>
+                <button className="signup-btn" onClick={onBack}>Sign Up</button>
                 <div className="spacer" />
                 <button className="icon-btn">⋮</button>
             </div>
