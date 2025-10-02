@@ -1,69 +1,49 @@
 import { useState } from "react";
 import RegisterPage from "./RegisterPage";
+import UniversitySelection from "./UniversitySelection";
 import SignInPage from "./SignInPage";
 
 function App() {
-    const [step, setStep] = useState("signin");
+    const [step, setStep] = useState("signin"); // 默认 Sign In
     const [userId, setUserId] = useState(null);
-    const [username, setUsername] = useState(""); 
-    const [loggedIn, setLoggedIn] = useState(false);
 
-    // sigin succseeful
-    const handleSignIn = (id, name) => {
+    // 登录成功
+    const handleSignIn = (id) => {
         setUserId(id);
-        setUsername(name);
-        setLoggedIn(true);
+        alert("Login successful!");
     };
 
-    // Successful registration → Jump directly to login
-    const handleRegister = (id, name) => {
-        setUserId(id);
-        setUsername(name);
-        setStep("signin"); // Return to login after registration is completed
+    // 注册成功 → 跳大学选择页面
+    const handleRegister = (id) => {
+        setUserId(id); // 保存用户ID
+        setStep("university"); // 注册后直接选大学
     };
 
-    const handleLogout = () => {
-        setUserId(null);
-        setUsername("");
-        setLoggedIn(false);
+    // 大学选择完成 → 跳登录页面
+    const handleUniversityConfirm = (university) => {
+        alert("University saved successfully! Please log in.");
         setStep("signin");
     };
 
     return (
         <div className="app-container">
-            {loggedIn ? (
-                <div style={{ textAlign: "center", marginTop: "50px" }}>
-                    <h1>You are logged in, {username}!</h1>
-                    <button
-                        onClick={handleLogout}
-                        style={{
-                            marginTop: "20px",
-                            padding: "10px 20px",
-                            backgroundColor: "#4a76d9",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "6px",
-                            cursor: "pointer",
-                        }}
-                    >
-                        Log Out
-                    </button>
-                </div>
-            ) : (
-                <>
-                    {step === "signin" && (
-                        <SignInPage
-                            onSignIn={handleSignIn}
-                            onBack={() => setStep("register")}
-                        />
-                    )}
-                    {step === "register" && (
-                        <RegisterPage
-                            onRegister={handleRegister}
-                            onBack={() => setStep("signin")}
-                        />
-                    )}
-                </>
+            {step === "signin" && (
+                <SignInPage
+                    onSignIn={handleSignIn}
+                    onBack={() => setStep("register")}
+                />
+            )}
+            {step === "register" && (
+                <RegisterPage
+                    onRegister={handleRegister}
+                    onBack={() => setStep("signin")}
+                />
+            )}
+            {step === "university" && (
+                <UniversitySelection
+                    userId={userId}
+                    onConfirm={handleUniversityConfirm}
+                />
             )}
         </div>
     );

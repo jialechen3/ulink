@@ -14,12 +14,12 @@ if ($conn->connect_error) {
     die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
 }
 
-
+/** ✅ 用户名验证：3-20位，字母数字下划线 */
 function validate_username($name) {
     return (bool) preg_match('/^[A-Za-z0-9_]{3,20}$/', $name);
 }
 
-
+/** ✅ 密码验证：至少8位，含大小写字母+特殊字符 */
 function validate_password($pwd) {
     if (strlen($pwd) < 8) return false;
     if (!preg_match('/[a-z]/', $pwd)) return false;
@@ -28,7 +28,17 @@ function validate_password($pwd) {
     return true;
 }
 
-
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // ✅ 查询用户 + 大学名称（JOIN universities 表）
+    $result = $conn->query("SELECT u.id, u.username, uni.name AS university 
+                            FROM users u 
+                            LEFT JOIN universities uni ON u.university_id = uni.id");
+    $users = [];
+    while ($row = $result->fetch_assoc()) {
+        $users[] = $row;
+    }
+    echo json_encode($users);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents("php://input"), true);
@@ -43,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        
+        // ✅ 注册时验证
         if (!validate_username($username)) {
             echo json_encode(["success" => false, "message" => "Invalid username. Must be 3-20 characters: letters, numbers, or underscore."]);
             exit;
@@ -76,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        
+        // ✅ 登录时验证用户名格式
         if (!validate_username($username)) {
             echo json_encode(["success" => false, "message" => "Invalid username format"]);
             exit;
@@ -100,6 +110,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             echo json_encode(["success" => false, "message" => "User not found"]);
         }
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $id = $data['id'] ?? '';
+    $university_id = $data['university_id'] ?? '';
+
+    // ✅ 存储的是 university_id 而不是 name
+    if ($id && $university_id) {
+        $stmt = $conn->prepare("UPDATE users SET university_id = ? WHERE id = ?");
+        $stmt->bind_param("ii", $university_id, $id);
+        if ($stmt->execute() && $stmt->affected_rows > 0) {
+            echo json_encode(["success" => true, "message" => "University updated"]);
+        } else {
+            echo json_encode(["success" => false, "message" => "Update failed"]);
+        }
+    } else {
+        echo json_encode(["success" => false, "message" => "Missing id or university_id"]);
     }
 }
 
