@@ -4,9 +4,9 @@ header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: GET, POST, PATCH, OPTIONS");
 
 $servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "testdb";
+$username = "zzhong5";
+$password = "50457160";
+$dbname = "cse442_2025_fall_team_z_db";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
