@@ -29,7 +29,8 @@ function UniversitySelection({ userId, onConfirm }) {
         }
 
         // PATCH 请求，保存 university_id
-        const res = await fetch("http://localhost/Ulink/db.php", {
+        //const res = await fetch("http://localhost/Ulink/db.php", {
+        const res = await fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php", {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: userId, university_id: university }),

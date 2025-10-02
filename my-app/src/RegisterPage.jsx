@@ -31,7 +31,8 @@ function RegisterPage({ onRegister, onBack }) {
         }
 
         try {
-            const res = await fetch("http://localhost/Ulink/db.php", {
+            //const res = await fetch("http://localhost/Ulink/db.php", {
+            const res = await fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "register", username, password })
