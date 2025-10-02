@@ -1,35 +1,52 @@
 import { useState } from "react";
-import "./App.css";
-import UniversitySelection from "./UniversitySelect";
+import RegisterPage from "./RegisterPage";
+import UniversitySelection from "./UniversitySelection";
+import SignInPage from "./SignInPage";
 
-export default function App() {
-  const [showSelect, setShowSelect] = useState(true);     // dev toggle
-  const [lastSaved, setLastSaved] = useState("");
+function App() {
+    const [step, setStep] = useState("signin"); // 默认 Sign In
+    const [userId, setUserId] = useState(null);
 
-  // MOCK: succeed after a short delay. Flip to "false" to simulate failure.
-  const mockSave = async (_userId, _universityId) => {
-    await new Promise(r => setTimeout(r, 400));
-    return true; // set to false to test error path
-  };
+    // 登录成功
+    const handleSignIn = (id) => {
+        setUserId(id);
+        alert("Login successful!");
+    };
 
-  if (showSelect) {
+    // 注册成功 → 跳大学选择页面
+    const handleRegister = (id) => {
+        setUserId(id); // 保存用户ID
+        setStep("university"); // 注册后直接选大学
+    };
+
+    // 大学选择完成 → 跳登录页面
+    const handleUniversityConfirm = (university) => {
+        alert("University saved successfully! Please log in.");
+        setStep("signin");
+    };
+
     return (
-      <div className="page" style={{ padding: 24 }}>
-        <UniversitySelection
-          userId={1}
-          saveUniversity={mockSave}             // no backend in this task
-          onConfirm={(name)=>{ setLastSaved(name); setShowSelect(false); }}
-        />
-      </div>
+        <div className="app-container">
+            {step === "signin" && (
+                <SignInPage
+                    onSignIn={handleSignIn}
+                    onBack={() => setStep("register")}
+                />
+            )}
+            {step === "register" && (
+                <RegisterPage
+                    onRegister={handleRegister}
+                    onBack={() => setStep("signin")}
+                />
+            )}
+            {step === "university" && (
+                <UniversitySelection
+                    userId={userId}
+                    onConfirm={handleUniversityConfirm}
+                />
+            )}
+        </div>
     );
-  }
-
-  // simple "next" screen to prove flow worked
-  return (
-    <div className="card" style={{ padding: 24 }}>
-      <h2>Next step → Home/Profile</h2>
-      <p>Saved university: <strong>{lastSaved || "(none)"}</strong></p>
-      <button onClick={()=>setShowSelect(true)}>Back to Select (dev)</button>
-    </div>
-  );
 }
+
+export default App;
