@@ -21,7 +21,7 @@ function SignInPage({ onSignIn, onBack }) {
 
             if (data.success) {
                 alert("Login successful!");
-                if (onSignIn) onSignIn(data.id); 
+                if (onSignIn) onSignIn(data.id); // ✅ 用 id
             } else {
                 setError(data.message || "Login failed");
             }

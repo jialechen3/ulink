@@ -3,45 +3,36 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: GET, POST, PATCH, OPTIONS");
 
-
-header("Content-Type: application/json; charset=utf-8"); // new
-
-
 $servername = "localhost";
-//$username = "zzhong5";
 $username = "root";
-//$password = "50457160";
 $password = "";
 $dbname = "testdb";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 if ($conn->connect_error) {
-
-    http_response_code(500); // new
-
     die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
 }
 
-mysqli_set_charset($conn, 'utf8mb4'); // new 
-
-//--- new funcion to validate_username and password-------
-
+/** ✅ 用户名验证：3-20位，字母数字下划线 */
 function validate_username($name) {
-    return (bool) preg_match('/^[A-Za-z0-9_]{3,20}$/', $name); // 3-20 alphanumeric characters with underscore
+    return (bool) preg_match('/^[A-Za-z0-9_]{3,20}$/', $name);
 }
+
+/** ✅ 密码验证：至少8位，含大小写字母+特殊字符 */
 function validate_password($pwd) {
     if (strlen($pwd) < 8) return false;
     if (!preg_match('/[a-z]/', $pwd)) return false;
     if (!preg_match('/[A-Z]/', $pwd)) return false;
-    if (!preg_match('/[^a-zA-Z0-9]/', $pwd)) return false; // At least one special character
+    if (!preg_match('/[^a-zA-Z0-9]/', $pwd)) return false;
     return true;
 }
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Get all users (does not return passwords)
-    $result = $conn->query("SELECT id, name, university FROM users");
+    // ✅ 查询用户 + 大学名称（JOIN universities 表）
+    $result = $conn->query("SELECT u.id, u.username, uni.name AS university 
+                            FROM users u 
+                            LEFT JOIN universities uni ON u.university_id = uni.id");
     $users = [];
     while ($row = $result->fetch_assoc()) {
         $users[] = $row;
@@ -50,81 +41,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Distinguish between registration and login
     $data = json_decode(file_get_contents("php://input"), true);
     $action = $data['action'] ?? '';
 
-//---------------------new register--------
     if ($action === 'register') {
-    $name = trim($data['name'] ?? '');
-    $password = $data['password'] ?? '';
+        $username = $data['username'] ?? '';
+        $password = $data['password'] ?? '';
 
-    // Required check
-    if ($name === '' || $password === '') {
-        echo json_encode(["success" => false, "message" => "Missing name or password"]);
-        exit;
-    }
+        if (!$username || !$password) {
+            echo json_encode(["success" => false, "message" => "Missing username or password"]);
+            exit;
+        }
 
-    // Username cannot have leading and trailing spaces
-    if ($name !== ($data['name'] ?? '')) {
-        echo json_encode(["success" => false, "message" => "Username cannot contain leading or trailing spaces"]);
-        exit;
-    }
+        // ✅ 注册时验证
+        if (!validate_username($username)) {
+            echo json_encode(["success" => false, "message" => "Invalid username. Must be 3-20 characters: letters, numbers, or underscore."]);
+            exit;
+        }
+        if (!validate_password($password)) {
+            echo json_encode(["success" => false, "message" => "Invalid password. Must be at least 8 characters, include uppercase, lowercase, and a special character."]);
+            exit;
+        }
 
-
-    
-
-    // Server verification (calling the function defined above)
-    if (!validate_username($name)) {
-        echo json_encode(["success" => false, "message" => "Invalid username (3–20 letters/numbers/_)"]);
-        exit;
-    }
-    if (!validate_password($password)) {
-        echo json_encode(["success" => false, "message" => "Password does not meet complexity requirements"]);
-        exit;
-    }
-
-    // put into database
-    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-    $stmt = $conn->prepare("INSERT INTO users (name, password) VALUES (?, ?)");
-    $stmt->bind_param("ss", $name, $hashedPassword);
-
-    if ($stmt->execute()) {
-        echo json_encode(["success" => true, "message" => "User registered"]);
-    } else {
-        
-        if ($conn->errno === 1062) {
-            echo json_encode(["success" => false, "message" => "Username already exists"]);
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        $stmt = $conn->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
+        $stmt->bind_param("ss", $username, $hashedPassword);
+        if ($stmt->execute()) {
+            echo json_encode([
+                "success" => true,
+                "message" => "User registered",
+                "id" => $conn->insert_id
+            ]);
         } else {
             echo json_encode(["success" => false, "message" => "Registration failed"]);
         }
     }
-}
-
-//------------------------Login-----------------------------------------------------
 
     if ($action === 'login') {
-        $name = $data['name'] ?? '';
+        $username = $data['username'] ?? '';
         $password = $data['password'] ?? '';
 
-        if ($name && $password) {
-            $stmt = $conn->prepare("SELECT id, password FROM users WHERE name = ?");
-            $stmt->bind_param("s", $name);
-            $stmt->execute();
-            $result = $stmt->get_result();
+        if (!$username || !$password) {
+            echo json_encode(["success" => false, "message" => "Missing username or password"]);
+            exit;
+        }
 
-            if ($row = $result->fetch_assoc()) {
-                if (password_verify($password, $row['password'])) {
-                    echo json_encode(["success" => true, "message" => "Login successful", "id" => $row['id']]);
-                } else {
-                    echo json_encode(["success" => false, "message" => "Invalid password"]);
-                }
+        // ✅ 登录时验证用户名格式
+        if (!validate_username($username)) {
+            echo json_encode(["success" => false, "message" => "Invalid username format"]);
+            exit;
+        }
+
+        $stmt = $conn->prepare("SELECT id, password_hash FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($row = $result->fetch_assoc()) {
+            if (password_verify($password, $row['password_hash'])) {
+                echo json_encode([
+                    "success" => true,
+                    "message" => "Login successful",
+                    "id" => $row['id']
+                ]);
             } else {
-                echo json_encode(["success" => false, "message" => "User not found"]);
+                echo json_encode(["success" => false, "message" => "Invalid password"]);
             }
         } else {
-            echo json_encode(["success" => false, "message" => "Missing name or password"]);
+            echo json_encode(["success" => false, "message" => "User not found"]);
         }
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $id = $data['id'] ?? '';
+    $university_id = $data['university_id'] ?? '';
+
+    // ✅ 存储的是 university_id 而不是 name
+    if ($id && $university_id) {
+        $stmt = $conn->prepare("UPDATE users SET university_id = ? WHERE id = ?");
+        $stmt->bind_param("ii", $university_id, $id);
+        if ($stmt->execute() && $stmt->affected_rows > 0) {
+            echo json_encode(["success" => true, "message" => "University updated"]);
+        } else {
+            echo json_encode(["success" => false, "message" => "Update failed"]);
+        }
+    } else {
+        echo json_encode(["success" => false, "message" => "Missing id or university_id"]);
     }
 }
 
