@@ -34,7 +34,7 @@ function SignInPage({ onSignIn, onBack }) {
     return (
         <div className="register-container">
             <div className="register-header">
-                <button className="icon-btn" onClick={onBack}>←</button>
+                <button className="signup-btn" onClick={onBack}>Sign Up</button>
                 <div className="spacer" />
                 <button className="icon-btn">⋮</button>
             </div>

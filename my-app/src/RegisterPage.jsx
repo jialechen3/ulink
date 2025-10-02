@@ -6,7 +6,6 @@ function RegisterPage({ onRegister, onBack }) {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
 
     // 密码规则
     const rules = {
@@ -18,36 +17,9 @@ function RegisterPage({ onRegister, onBack }) {
 
     const allValid = Object.values(rules).every(Boolean);
 
-    // HTML Injection Prevention
-    const containsHTML = (text) => {
-        return /<[^>]*>|&[^;]+;|javascript:|on\w+\s*=/.test(text);
-    };
-
-    // SQL Injection Prevention
-    const containsSQLInjection = (text) => {
-        const sqlPatterns = [
-            /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|OR|AND)\b)/i,
-            /('|"|;|--|\/\*|\*\/|\\\\)/,
-            /(\b(1=1|0=0)\b)/i
-        ];
-        return sqlPatterns.some(pattern => pattern.test(text));
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
-
-        // HTML Injection Check
-        if (containsHTML(username)) {
-            setError("Invalid characters in username - HTML tags not allowed");
-            return;
-        }
-
-        // SQL Injection Check
-        if (containsSQLInjection(username)) {
-            setError("Invalid characters in username - SQL injection detected");
-            return;
-        }
 
         if (!allValid) {
             setError("Password does not meet requirements.");
@@ -58,42 +30,33 @@ function RegisterPage({ onRegister, onBack }) {
             return;
         }
 
-        setLoading(true);
         try {
-            const res = await fetch("./db.php", {
+            const res = await fetch("http://localhost/Ulink/db.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "register", name: username, password })
+                body: JSON.stringify({ action: "register", username, password })
             });
-
-            // Handle 409 (duplicate username) specifically
-            if (res.status === 409) {
-                setError("Username already taken.");
-                return;
-            }
 
             const data = await res.json();
 
-            if (res.ok && data.ok) {
+            if (data.success) {
                 alert("Registered successfully!");
-                if (onRegister) onRegister(data.id);
+                if (onRegister) onRegister(data.id); // ✅ 用 id
             } else {
-                setError(data?.message || "Registration failed.");
+                setError(data.message || "Registration failed.");
             }
         } catch (err) {
             console.error(err);
             setError("Something went wrong. Please try again.");
-        } finally {
-            setLoading(false);
         }
     };
 
     return (
         <div className="register-container">
             <div className="register-header">
-                <button className="icon-btn" onClick={onBack} disabled={loading}>←</button>
+                <button className="icon-btn" onClick={onBack}>←</button>
                 <div className="spacer" />
-                <button className="icon-btn" disabled>⋮</button>
+                <button className="icon-btn">⋮</button>
             </div>
 
             <h1 className="register-title">Create Account</h1>
@@ -106,9 +69,6 @@ function RegisterPage({ onRegister, onBack }) {
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
-                        disabled={loading}
-                        pattern="[A-Za-z0-9_]{3,20}"
-                        title="3-20 characters, only letters, numbers, and underscores"
                     />
                 </div>
 
@@ -119,7 +79,6 @@ function RegisterPage({ onRegister, onBack }) {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        disabled={loading}
                     />
                 </div>
 
@@ -145,15 +104,12 @@ function RegisterPage({ onRegister, onBack }) {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
-                        disabled={loading}
                     />
                 </div>
 
                 {error && <div className="error-text">{error}</div>}
 
-                <button type="submit" className="signup-btn" disabled={loading || !allValid}>
-                    {loading ? "Signing up..." : "Sign Up"}
-                </button>
+                <button type="submit" className="signup-btn">Sign Up</button>
             </form>
         </div>
     );
