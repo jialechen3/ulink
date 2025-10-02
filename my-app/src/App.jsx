@@ -1,4 +1,3 @@
-import { useState } from "react";
 import RegisterPage from "./RegisterPage";
 import UniversitySelection from "./UniversitySelection";
 import SignInPage from "./SignInPage";
