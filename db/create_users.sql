@@ -1,7 +1,7 @@
-CREATE DATABASE IF NOT EXISTS testdb
+CREATE DATABASE IF NOT EXISTS cse442_2025_fall_team_z_db
   DEFAULT CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
-USE testdb;
+USE cse442_2025_fall_team_z_db;
 
 CREATE TABLE IF NOT EXISTS users (
   id            INT UNSIGNED NOT NULL AUTO_INCREMENT,
