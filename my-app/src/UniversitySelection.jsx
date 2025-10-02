@@ -9,7 +9,9 @@ function UniversitySelection({ userId, onConfirm }) {
         const fetchUniversities = async () => {
             try {
                 // 拉取 universities.php
-                const res = await fetch("http://localhost/Ulink/universities.php");
+                //const res = await fetch("http://localhost/Ulink/universities.php");
+                const res = await fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/universities.php");
+
                 const data = await res.json();
                 if (data.items) {
                     setUniversities(data.items);
