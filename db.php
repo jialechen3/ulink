@@ -1,6 +1,3 @@
-
-
-
 <?php
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -9,7 +6,7 @@ header("Access-Control-Allow-Methods: GET, POST, PATCH, OPTIONS");
 $servername = "localhost";
 $username = "zzhong5";
 $password = "50457160";
-$dbname = "UlinkDB";
+$dbname = "cse442_2025_fall_team_z_db";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -32,7 +29,10 @@ function validate_password($pwd) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $result = $conn->query("SELECT id, username, university FROM users");
+    // ✅ 查询用户 + 大学名称（JOIN universities 表）
+    $result = $conn->query("SELECT u.id, u.username, uni.name AS university 
+                            FROM users u 
+                            LEFT JOIN universities uni ON u.university_id = uni.id");
     $users = [];
     while ($row = $result->fetch_assoc()) {
         $users[] = $row;
@@ -116,18 +116,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
     $data = json_decode(file_get_contents("php://input"), true);
     $id = $data['id'] ?? '';
-    $university = $data['university'] ?? '';
+    $university_id = $data['university_id'] ?? '';
 
-    if ($id && $university) {
-        $stmt = $conn->prepare("UPDATE users SET university = ? WHERE id = ?");
-        $stmt->bind_param("si", $university, $id);
+    // ✅ 存储的是 university_id 而不是 name
+    if ($id && $university_id) {
+        $stmt = $conn->prepare("UPDATE users SET university_id = ? WHERE id = ?");
+        $stmt->bind_param("ii", $university_id, $id);
         if ($stmt->execute() && $stmt->affected_rows > 0) {
             echo json_encode(["success" => true, "message" => "University updated"]);
         } else {
             echo json_encode(["success" => false, "message" => "Update failed"]);
         }
     } else {
-        echo json_encode(["success" => false, "message" => "Missing id or university"]);
+        echo json_encode(["success" => false, "message" => "Missing id or university_id"]);
     }
 }
 
