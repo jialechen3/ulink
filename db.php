@@ -45,37 +45,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $data['action'] ?? '';
 
     if ($action === 'register') {
-        $username = $data['username'] ?? '';
-        $password = $data['password'] ?? '';
+    $username = $data['username'] ?? '';
+    $password = $data['password'] ?? '';
 
-        if (!$username || !$password) {
-            echo json_encode(["success" => false, "message" => "Missing username or password"]);
-            exit;
-        }
+    if (!$username || !$password) {
+        echo json_encode(["success" => false, "message" => "Missing username or password"]);
+        exit;
+    }
 
-        // ✅ 注册时验证
-        if (!validate_username($username)) {
-            echo json_encode(["success" => false, "message" => "Invalid username. Must be 3-20 characters: letters, numbers, or underscore."]);
-            exit;
-        }
-        if (!validate_password($password)) {
-            echo json_encode(["success" => false, "message" => "Invalid password. Must be at least 8 characters, include uppercase, lowercase, and a special character."]);
-            exit;
-        }
+    // ✅ 注册时验证
+    if (!validate_username($username)) {
+        echo json_encode(["success" => false, "message" => "Invalid username. Must be 3-20 characters: letters, numbers, or underscore."]);
+        exit;
+    }
+    if (!validate_password($password)) {
+        echo json_encode(["success" => false, "message" => "Invalid password. Must be at least 8 characters, include uppercase, lowercase, and a special character."]);
+        exit;
+    }
 
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = $conn->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
-        $stmt->bind_param("ss", $username, $hashedPassword);
-        if ($stmt->execute()) {
-            echo json_encode([
-                "success" => true,
-                "message" => "User registered",
-                "id" => $conn->insert_id
-            ]);
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    $stmt = $conn->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
+    $stmt->bind_param("ss", $username, $hashedPassword);
+    
+    if ($stmt->execute()) {
+        echo json_encode([
+            "success" => true,
+            "message" => "User registered",
+            "id" => $conn->insert_id
+        ]);
+    } else {
+        // ✅ Check for duplicate username error (MySQL error code 1062)
+        if ($stmt->errno === 1062) {
+            echo json_encode(["success" => false, "message" => "Username already taken"]);
         } else {
-            echo json_encode(["success" => false, "message" => "Registration failed"]);
+            echo json_encode(["success" => false, "message" => "Registration failed: " . $stmt->error]);
         }
     }
+}
 
     if ($action === 'login') {
         $username = $data['username'] ?? '';

@@ -6,6 +6,7 @@ function RegisterPage({ onRegister, onBack }) {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     // 密码规则
     const rules = {
@@ -20,18 +21,20 @@ function RegisterPage({ onRegister, onBack }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
+        setLoading(true);
 
         if (!allValid) {
             setError("Password does not meet requirements.");
+            setLoading(false);
             return;
         }
         if (password !== confirmPassword) {
             setError("Passwords do not match!");
+            setLoading(false);
             return;
         }
 
         try {
-            //const res = await fetch("http://localhost/Ulink/db.php", {
             const res = await fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -42,22 +45,29 @@ function RegisterPage({ onRegister, onBack }) {
 
             if (data.success) {
                 alert("Registered successfully!");
-                if (onRegister) onRegister(data.id); // ✅ 用 id
+                if (onRegister) onRegister(data.id);
             } else {
-                setError(data.message || "Registration failed.");
+                // Handle specific error cases
+                if (data.message === "Username already taken") {
+                    setError("Username already taken. Please choose a different username.");
+                } else {
+                    setError(data.message || "Registration failed.");
+                }
             }
         } catch (err) {
             console.error(err);
             setError("Something went wrong. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="register-container">
             <div className="register-header">
-                <button className="icon-btn" onClick={onBack}>←</button>
+                <button className="icon-btn" onClick={onBack} disabled={loading}>←</button>
                 <div className="spacer" />
-                <button className="icon-btn">⋮</button>
+                <button className="icon-btn" disabled>⋮</button>
             </div>
 
             <h1 className="register-title">Create Account</h1>
@@ -70,6 +80,9 @@ function RegisterPage({ onRegister, onBack }) {
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
+                        disabled={loading}
+                        pattern="[A-Za-z0-9_]{3,20}"
+                        title="3-20 characters, only letters, numbers, and underscores"
                     />
                 </div>
 
@@ -80,6 +93,7 @@ function RegisterPage({ onRegister, onBack }) {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        disabled={loading}
                     />
                 </div>
 
@@ -105,12 +119,15 @@ function RegisterPage({ onRegister, onBack }) {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
+                        disabled={loading}
                     />
                 </div>
 
                 {error && <div className="error-text">{error}</div>}
 
-                <button type="submit" className="signup-btn">Sign Up</button>
+                <button type="submit" className="signup-btn" disabled={loading || !allValid}>
+                    {loading ? "Signing up..." : "Sign Up"}
+                </button>
             </form>
         </div>
     );
