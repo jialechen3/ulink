@@ -1,5 +1,11 @@
 import { useState } from "react";
 import "./App.css";
+import { API_BASE } from "./config";
+
+
+
+import KebabMenu from "./KebabMenu";
+import BugReportModal from "./BugReportModal";
 
 function RegisterPage({ onRegister, onBack }) {
     const [username, setUsername] = useState("");
@@ -7,6 +13,9 @@ function RegisterPage({ onRegister, onBack }) {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+
+    const [showReport, setShowReport] = useState(false);
 
     // 密码规则
     const rules = {
@@ -35,7 +44,7 @@ function RegisterPage({ onRegister, onBack }) {
         }
 
         try {
-            const res = await fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php", {
+            const res = await fetch(`${API_BASE}/db.php`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "register", username, password })
@@ -64,10 +73,10 @@ function RegisterPage({ onRegister, onBack }) {
 
     return (
         <div className="register-container">
-            <div className="register-header">
+            <div className="register-header header-without-search">
                 <button className="icon-btn" onClick={onBack} disabled={loading}>←</button>
                 <div className="spacer" />
-                <button className="icon-btn" disabled>⋮</button>
+                <KebabMenu onReport={() => setShowReport(true)} />
             </div>
 
             <h1 className="register-title">Create Account</h1>
@@ -129,6 +138,9 @@ function RegisterPage({ onRegister, onBack }) {
                     {loading ? "Signing up..." : "Sign Up"}
                 </button>
             </form>
+
+            <BugReportModal isOpen={showReport} onClose={() => setShowReport(false)} />
+
         </div>
     );
 }

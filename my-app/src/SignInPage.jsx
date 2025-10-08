@@ -1,10 +1,20 @@
 import { useState } from "react";
 import "./App.css";
+import { API_BASE } from "./config";
+
+
+import KebabMenu from "./KebabMenu";
+import BugReportModal from "./BugReportModal";
+
+
 
 function SignInPage({ onSignIn, onBack }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+
+
+    const [showReport, setShowReport] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -12,7 +22,7 @@ function SignInPage({ onSignIn, onBack }) {
 
         try {
             //const res = await fetch("http://localhost/Ulink/db.php", {
-            const res = await fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php", {
+            const res = await fetch(`${API_BASE}/db.php`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "login", username, password })
@@ -34,10 +44,10 @@ function SignInPage({ onSignIn, onBack }) {
 
     return (
         <div className="register-container">
-            <div className="register-header">
+            <div className="register-header header-without-search">
                 <button className="signup-btn" onClick={onBack}>Sign Up</button>
                 <div className="spacer" />
-                <button className="icon-btn">⋮</button>
+                <KebabMenu onReport={() => setShowReport(true)} />
             </div>
 
             <h1 className="register-title">Sign In</h1>
@@ -66,6 +76,7 @@ function SignInPage({ onSignIn, onBack }) {
                 {error && <div className="error-text">{error}</div>}
                 <button type="submit" className="signup-btn">Log In</button>
             </form>
+            <BugReportModal isOpen={showReport} onClose={() => setShowReport(false)} />
         </div>
     );
 }
