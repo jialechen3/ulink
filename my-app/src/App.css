@@ -148,6 +148,12 @@
   margin-top: 64px;
 }
 
+
+/* 给主内容加顶部留白，避免被header遮住 */
+.mp-feed {
+  margin-top: 64px;
+}
+
 .mp-left { display: flex; align-items: center; gap: 10px; }
 .mp-right { display: flex; justify-content: flex-end; padding-right: 6px; }
 
@@ -523,12 +529,20 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   justify-content: center;
   height: 100vh;
   background: #ffffff; /* ✅ 纯白背景 */
+  padding: 1rem; /* ✅ 为小屏留边距 */
+  box-sizing: border-box;
+
 }
 
 .uni-card {
   background: #ffffff;
   border: 1px solid #e5e8eb;
   border-radius: 18px;
+  padding: 2rem 2rem 3rem;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  width: 360px;
+  text-align: center;
+  box-sizing: border-box;
   padding: 2rem 6rem 6rem;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
   width: 360px;
@@ -540,6 +554,12 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   display: flex;
   justify-content: center;   /* ✅ 居中 Logo */
   align-items: center;
+  margin-bottom: 0.8rem;
+  transform: translateY(-6px); /* ✅ 整体上移一点 */
+}
+
+.uni-header .logo {
+  font-size: 1.8rem;
   margin-bottom: 0.6rem;
   transform: translateY(-8px); /* ✅ 整体上移一点 */
 }
@@ -558,6 +578,8 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
 /* ✅ 保持右上角菜单 */
 .uni-header .kebab-wrapper {
   position: absolute;
+  right: 0.4rem;
+  top: 0.4rem;
   right: 0.1;
   top: 0.-2rem;
 }
@@ -565,6 +587,9 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
 
 
 .uni-title {
+  font-size: 1.4rem;
+  color: #1b1f24;
+  margin-bottom: 1.4rem;
   font-size: 1.5rem;
   color: #1b1f24;
   margin-bottom: 1.6rem;
@@ -579,6 +604,10 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   font-size: 1rem;
   margin-bottom: 0.8rem;
   transition: border 0.2s ease;
+  box-sizing: border-box;
+
+}
+
 }
 .uni-search:focus {
   border-color: #57a9ff;
@@ -610,6 +639,7 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease;
+   margin-top: 2rem; /* ✅ 下移一点，与输入框拉开距离 */
    margin-top: 5rem; /* ✅ 下移一点，与输入框拉开距离 */
 }
 .uni-btn:hover {
@@ -621,6 +651,19 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   cursor: not-allowed;
 }
 
+/* ✅ Mobile-specific tweak */
+@media (max-width: 480px) {
+  .uni-card {
+    padding: 1.4rem 1.2rem 2rem;
+    border-radius: 14px;
+  }
+  .uni-title {
+    font-size: 1.2rem;
+  }
+  .uni-btn {
+    margin-top: 1.2rem;
+  }
+}
 .mp-post-price {
   font-weight: bold;
   color: #2a9d8f;
