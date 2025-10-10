@@ -4,6 +4,8 @@ import { API_BASE } from "./config";
 import KebabMenu from "./KebabMenu";
 import BugReportModal from "./BugReportModal";
 import Logo from "./Logo"; // ✅ 你已有 Logo.jsx 或可用文字替代
+import { API_BASE } from "./config";
+
 
 export default function UniversitySelection({ userId, onConfirm }) {
   const [universities, setUniversities] = useState([]);
@@ -28,6 +30,13 @@ export default function UniversitySelection({ userId, onConfirm }) {
   const filtered = universities.filter((u) =>
     u.name.toLowerCase().includes(filter.toLowerCase())
   );
+    // ✅ 组件加载时获取大学列表
+    useEffect(() => {
+        const fetchUniversities = async () => {
+            try {
+                // 拉取 universities.php
+                //const res = await fetch("http://localhost/Ulink/universities.php");
+                const res = await fetch(`${API_BASE}/universities.php`);
 
   const handleConfirm = async () => {
     if (!university) return;
@@ -61,6 +70,13 @@ export default function UniversitySelection({ userId, onConfirm }) {
         </div>
 
         <h2 className="uni-title">Choose Your University</h2>
+        // PATCH 请求，保存 university_id
+        //const res = await fetch("http://localhost/Ulink/db.php", {
+        const res = await fetch(`${API_BASE}/db.php`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: userId, university_id: university }),
+        });
 
         {/* ✅ 搜索 + 选择合并组件 */}
             <div className="search-select">

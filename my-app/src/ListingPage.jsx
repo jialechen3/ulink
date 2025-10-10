@@ -128,17 +128,11 @@ export default function ListingPage({
                                 onKeyDown={(e) => e.key === "Enter" && onOpenPost && onOpenPost(item)}
                                 title="Open post"
                             >
-                                <div className="mp-post-head">
-                                    <div className="mp-avatar sm">👩‍🎓</div>
-                                    <div className="mp-post-texts">
-                                        {item.title?.trim() ? (
-                                            <div className="mp-post-title">{item.title}</div>
-                                        ) : null}
-                                        {item.description?.trim() ? (
-                                            <div className="mp-post-desc">{item.description}</div>
-                                        ) : null}
-                                    </div>
-                                </div>
+                                <div className="mp-post-texts">
+  {item.title?.trim() && <div className="mp-post-title">{item.title}</div>}
+  {item.description?.trim() && <div className="mp-post-desc">{item.description}</div>}
+  {item.price !== undefined && <div className="mp-post-price">${item.price}</div>}
+</div>
 
                                 <div className="mp-post-media">
                                     <div className="mp-imgbox">
