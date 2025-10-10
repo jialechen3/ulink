@@ -4,277 +4,252 @@ header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: GET, POST, PATCH, OPTIONS");
 header("Content-Type: application/json; charset=utf-8");
 
-// ---- DB 连接：本地与学校服务器自动切换 ----
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
+
+// —— 让 mysqli 抛异常，便于捕获并以 JSON 返回 —— //
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+// —— 小工具：统一 JSON 错误 —— //
+function fail($code, $msg, $extra = []) {
+    http_response_code($code);
+    echo json_encode(array_merge(["success"=>false, "message"=>$msg], $extra), JSON_UNESCAPED_UNICODE);
+    exit;
+}
+function ok($payload = []) {
+    echo json_encode(array_merge(["success"=>true], $payload), JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// —— 连接数据库：本地/学校自动切换 —— //
 $host = $_SERVER['HTTP_HOST'] ?? '';
 if (strpos($host, 'localhost') !== false) {
-    // 本地 XAMPP
-    $servername = "localhost";
-    $username   = "root";
-    $password   = "";
-    $dbname     = "testdb";
+    $DB_HOST = "127.0.0.1";  // 用 127.0.0.1 强制 TCP
+    $DB_USER = "root";
+    $DB_PASS = "";
+    $DB_NAME = "testdb";
 } else {
-    // 学校服务器
-    $servername = "localhost";
-    $username   = "zzhong5";
-    $password   = "50457160";
-    $dbname     = "cse442_2025_fall_team_z_db";
+    $DB_HOST = "127.0.0.1";
+    $DB_USER = "zzhong5";
+    $DB_PASS = "50457160";
+    $DB_NAME = "cse442_2025_fall_team_z_db";
 }
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    http_response_code(500);
-    die(json_encode(["success" => false, "message" => "Connection failed: " . $conn->connect_error]));
-}
-$conn->set_charset("utf8mb4");
-
-// ---- 工具函数：用户名/密码校验 ----
-function validate_username($name) {
-    return (bool) preg_match('/^[A-Za-z0-9_]{3,20}$/', $name);
-}
-function validate_password($pwd) {
-    if (strlen($pwd) < 8) return false;
-    if (!preg_match('/[a-z]/', $pwd)) return false;
-    if (!preg_match('/[A-Z]/', $pwd)) return false;
-    if (!preg_match('/[^a-zA-Z0-9]/', $pwd)) return false;
-    return true;
+try {
+    $conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
+    $conn->set_charset("utf8mb4");
+} catch (Throwable $e) {
+    fail(500, "Database connection failed", ["error"=>$e->getMessage()]);
 }
 
-// ------------- GET -------------
-// 0) 默认：返回所有用户 + 大学名称
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
-    $result = $conn->query("SELECT u.id, u.username, u.university_id, uni.name AS university
-                            FROM users u
-                            LEFT JOIN universities uni ON u.university_id = uni.id");
-    $users = [];
-    while ($row = $result->fetch_assoc()) {
-        $users[] = $row;
+// —— 内置迁移（首次部署自动建表） —— //
+function ensure_schema(mysqli $conn) {
+    // users
+    $conn->query("
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(64) NOT NULL UNIQUE,
+            password_hash VARCHAR(255) NOT NULL,
+            created_at DATETIME NOT NULL,
+            university_id INT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ");
+    // universities
+    $conn->query("
+        CREATE TABLE IF NOT EXISTS universities (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(128) NOT NULL UNIQUE,
+            is_active TINYINT(1) NOT NULL DEFAULT 1
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ");
+    // listings
+    $conn->query("
+        CREATE TABLE IF NOT EXISTS listings (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            university_id INT NOT NULL,
+            title VARCHAR(200) NOT NULL,
+            description TEXT NULL,
+            pictures JSON NULL,
+            comments JSON NULL,
+            views INT NOT NULL DEFAULT 0,
+            created_at DATETIME NOT NULL,
+            INDEX idx_listings_university_created_at (university_id, created_at DESC)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ");
+
+    // 种子数据：universities 至少有一条，避免选择页空
+    $res = $conn->query("SELECT COUNT(*) AS c FROM universities");
+    $row = $res->fetch_assoc();
+    if ((int)$row['c'] === 0) {
+        $conn->query("INSERT INTO universities (name, is_active) VALUES
+            ('University at Buffalo', 1),
+            ('Cornell University', 1),
+            ('Rochester Institute of Technology', 1)
+        ");
     }
-    echo json_encode($users);
-    exit;
 }
 
-// 1) 按大学读取 listing
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['listings_by_university'])) {
-    $uni = intval($_GET['listings_by_university']);
-
-    $stmt = $conn->prepare("
-    SELECT 
-        l.id,
-        l.user_id,
-        l.university_id,
-        l.title,
-        l.description,
-        l.pictures,
-        l.comments,
-        l.price,
-        l.category,
-        l.location,
-        l.contact,
-        l.views,
-        l.created_at,
-        u.username
-    FROM listings l
-    LEFT JOIN users u ON u.id = l.user_id
-    WHERE l.university_id = ?
-    ORDER BY l.created_at DESC
-    LIMIT 100
-");
-
-    $stmt->bind_param("i", $uni);
-
-    if ($stmt->execute()) {
-        $res = $stmt->get_result();
-        $items = [];
-        while ($row = $res->fetch_assoc()) {
-            $row['pictures'] = $row['pictures'] ? json_decode($row['pictures'], true) : [];
-            $row['comments'] = $row['comments'] ? json_decode($row['comments'], true) : [];
-            $items[] = $row;
-        }
-        echo json_encode(["success" => true, "items" => $items]);
-    } else {
-        echo json_encode(["success" => false, "message" => "Query failed"]);
-    }
-    exit;
+try { ensure_schema($conn); } catch (Throwable $e) {
+    fail(500, "Schema migration failed", ["error"=>$e->getMessage()]);
 }
 
-// 2) 查询单个用户（登录后获取其 university_id）
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['user'])) {
-    $uid = intval($_GET['user']);
-    $stmt = $conn->prepare("SELECT id, username, university_id FROM users WHERE id = ?");
-    $stmt->bind_param("i", $uid);
-    if ($stmt->execute()) {
-        $res = $stmt->get_result();
-        if ($row = $res->fetch_assoc()) {
-            echo json_encode(["success" => true, "user" => $row]);
-        } else {
-            echo json_encode(["success" => false, "message" => "User not found"]);
-        }
-    } else {
-        echo json_encode(["success" => false, "message" => "Query failed"]);
+// —— 自检接口：访问 db.php?diag=1 查看服务端真实状态 —— //
+if (isset($_GET['diag'])) {
+    try {
+        $u = $conn->query("SHOW TABLES")->fetch_all();
+        ok([
+            "env" => $host ?: "cli",
+            "php" => PHP_VERSION,
+            "db_host" => $DB_HOST,
+            "db_name" => $DB_NAME,
+            "tables" => $u,
+            "mysqli_client" => mysqli_get_client_info()
+        ]);
+    } catch (Throwable $e) {
+        fail(500, "Diag failed", ["error"=>$e->getMessage()]);
     }
-    exit;
 }
 
-// ------------- POST -------------
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents("php://input"), true);
-    $action = $data['action'] ?? '';
+// —— 读取 JSON body —— //
+$raw = file_get_contents("php://input");
+$body = json_decode($raw, true);
+if (!is_array($body)) $body = [];
 
-    // register
-    if ($action === 'register') {
-        $username = $data['username'] ?? '';
-        $password = $data['password'] ?? '';
+// =============== 注册 ================== //
+if (($body['action'] ?? '') === 'register') {
+    try {
+        $username = trim($body['username'] ?? '');
+        $password = $body['password'] ?? '';
 
-        if (!$username || !$password) {
-            echo json_encode(["success" => false, "message" => "Missing username or password"]);
-            exit;
-        }
-        if (!validate_username($username)) {
-            echo json_encode(["success" => false, "message" => "Invalid username. Must be 3-20 characters: letters, numbers, or underscore."]);
-            exit;
-        }
-        if (!validate_password($password)) {
-            echo json_encode(["success" => false, "message" => "Invalid password. Must be at least 8 characters, include uppercase, lowercase, and a special character."]);
-            exit;
-        }
+        if (!$username || !$password) fail(400, "Missing username or password.");
+        if (!preg_match('/^[A-Za-z0-9_]{3,20}$/', $username)) fail(400, "Invalid username.");
+        if (
+            strlen($password) < 8 ||
+            !preg_match('/[A-Z]/', $password) ||
+            !preg_match('/[a-z]/', $password) ||
+            !preg_match('/[^a-zA-Z0-9]/', $password)
+        ) fail(400, "Invalid password.");
 
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = $conn->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
-        $stmt->bind_param("ss", $username, $hashedPassword);
-        if ($stmt->execute()) {
-            echo json_encode(["success" => true, "message" => "User registered", "id" => $conn->insert_id]);
-        } else {
-            if ($stmt->errno === 1062) {
-                echo json_encode(["success" => false, "message" => "Username already taken"]);
-            } else {
-                echo json_encode(["success" => false, "message" => "Registration failed: " . $stmt->error]);
-            }
-        }
-        exit;
-    }
-
-    // login
-    if ($action === 'login') {
-        $username = $data['username'] ?? '';
-        $password = $data['password'] ?? '';
-
-        if (!$username || !$password) {
-            echo json_encode(["success" => false, "message" => "Missing username or password"]);
-            exit;
-        }
-        if (!validate_username($username)) {
-            echo json_encode(["success" => false, "message" => "Invalid username format"]);
-            exit;
-        }
-
-        $stmt = $conn->prepare("SELECT id, password_hash FROM users WHERE username = ?");
+        $stmt = $conn->prepare("SELECT id FROM users WHERE username=?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
-        $result = $stmt->get_result();
-        if ($row = $result->fetch_assoc()) {
-            if (password_verify($password, $row['password_hash'])) {
-                echo json_encode(["success" => true, "message" => "Login successful", "id" => $row['id']]);
-            } else {
-                echo json_encode(["success" => false, "message" => "Invalid password"]);
-            }
-        } else {
-            echo json_encode(["success" => false, "message" => "User not found"]);
-        }
-        exit;
-    }
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) { http_response_code(409); ok(["success"=>false, "message"=>"Username already taken"]); }
+        $stmt->close();
 
-    // create_listing（允许无图片）
-    if ($action === 'create_listing') {
-        $user_id       = intval($data['user_id'] ?? 0);
-        $university_id = intval($data['university_id'] ?? 0);
-        $title         = trim((string)($data['title'] ?? ''));
-        $description   = trim((string)($data['description'] ?? ''));
-
-        // pictures：可能是数组、字符串 JSON，或未提供
-        $pictures_input = $data['pictures'] ?? [];
-        if (is_string($pictures_input)) {
-            $tmp = json_decode($pictures_input, true);
-            $pictures = is_array($tmp) ? $tmp : [];
-        } elseif (is_array($pictures_input)) {
-            $pictures = array_values(array_filter($pictures_input, function ($u) {
-                return is_string($u) && trim($u) !== '';
-            }));
-        } else {
-            $pictures = [];
-        }
-
-        // comments：缺省为空数组
-        $comments_input = $data['comments'] ?? [];
-        $comments = is_array($comments_input) ? $comments_input : [];
-
-        // 必填校验：不强制图片
-        if ($user_id <= 0 || $university_id <= 0 || $title === '') {
-            echo json_encode(["success" => false, "message" => "Missing required fields"]);
-            exit;
-        }
-
-        $pictures_json = json_encode($pictures, JSON_UNESCAPED_UNICODE);
-        $comments_json = json_encode($comments, JSON_UNESCAPED_UNICODE);
-
-       // ✅ Extract additional fields
-$price      = floatval($data['price'] ?? 0);
-$category   = trim((string)($data['category'] ?? ''));
-$location   = trim((string)($data['location'] ?? ''));
-$contact    = trim((string)($data['contact'] ?? ''));
-
-// ✅ Insert all fields, including price/category/location/contact
-$stmt = $conn->prepare("
-    INSERT INTO listings 
-        (user_id, university_id, title, description, pictures, comments, price, category, location, contact, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
-");
-if (!$stmt) {
-    echo json_encode(["success" => false, "message" => "Prepare failed: " . $conn->error]);
-    exit;
-}
-
-$stmt->bind_param(
-    "iissssdsss",
-    $user_id,
-    $university_id,
-    $title,
-    $description,
-    $pictures_json,
-    $comments_json,
-    $price,
-    $category,
-    $location,
-    $contact
-);
-        if ($stmt->execute()) {
-            echo json_encode(["success" => true, "id" => $conn->insert_id]);
-        } else {
-            echo json_encode(["success" => false, "message" => "Insert failed"]);
-        }
-        exit;
+        $hash = password_hash($password, PASSWORD_BCRYPT);
+        $stmt = $conn->prepare("INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, NOW())");
+        $stmt->bind_param("ss", $username, $hash);
+        $stmt->execute();
+        ok(["id"=>$stmt->insert_id]);
+    } catch (Throwable $e) {
+        fail(500, "Register failed", ["error"=>$e->getMessage()]);
     }
 }
 
-// ------------- PATCH -------------
-// 更新用户的 university_id
+// =============== 登录 ================== //
+if (($body['action'] ?? '') === 'login') {
+    try {
+        $username = trim($body['username'] ?? '');
+        $password = $body['password'] ?? '';
+        if (!$username || !$password) fail(400, "Missing username or password.");
+
+        $stmt = $conn->prepare("SELECT id, password_hash FROM users WHERE username=?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->bind_result($uid, $hash);
+        if ($stmt->fetch() && password_verify($password, $hash)) {
+            ok(["id"=>$uid]);
+        } else {
+            fail(401, "Invalid username or password.");
+        }
+        $stmt->close();
+    } catch (Throwable $e) {
+        fail(500, "Login failed", ["error"=>$e->getMessage()]);
+    }
+}
+
+// =============== PATCH: 保存用户 university_id ================== //
 if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
-    $data = json_decode(file_get_contents("php://input"), true);
-    $id = intval($data['id'] ?? 0);
-    $university_id = intval($data['university_id'] ?? 0);
+    try {
+        $id = intval($body['id'] ?? 0);
+        $university_id = intval($body['university_id'] ?? 0);
+        if (!$id || !$university_id) fail(400, "Missing id or university_id.");
 
-    if ($id && $university_id) {
-        $stmt = $conn->prepare("UPDATE users SET university_id = ? WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE users SET university_id=? WHERE id=?");
         $stmt->bind_param("ii", $university_id, $id);
-        if ($stmt->execute() && $stmt->affected_rows > 0) {
-            echo json_encode(["success" => true, "message" => "University updated"]);
-        } else {
-            echo json_encode(["success" => false, "message" => "Update failed"]);
-        }
-    } else {
-        echo json_encode(["success" => false, "message" => "Missing id or university_id"]);
+        $stmt->execute();
+        ok();
+    } catch (Throwable $e) {
+        fail(500, "Update university_id failed", ["error"=>$e->getMessage()]);
     }
-    exit;
 }
 
-echo json_encode(["success" => false, "message" => "Unsupported request"]);
-$conn->close();
+// =============== GET: 查询某大学的 listings ================== //
+if (isset($_GET['listings_by_university'])) {
+    try {
+        $uni = intval($_GET['listings_by_university']);
+        $stmt = $conn->prepare("
+            SELECT id, user_id, university_id, title, description, pictures, comments, views, created_at
+            FROM listings
+            WHERE university_id=?
+            ORDER BY created_at DESC
+        ");
+        $stmt->bind_param("i", $uni);
+        $stmt->execute();
+        $res = $stmt->get_result();
+
+        $items = [];
+        while ($row = $res->fetch_assoc()) {
+            $row['pictures'] = json_decode($row['pictures'] ?? '[]', true);
+            $row['comments'] = json_decode($row['comments'] ?? '[]', true);
+            $items[] = $row;
+        }
+        ok(["items"=>$items]);
+    } catch (Throwable $e) {
+        fail(500, "Fetch listings failed", ["error"=>$e->getMessage()]);
+    }
+}
+
+// =============== POST: 创建 listing（存 URL JSON） ================== //
+if (($body['action'] ?? '') === 'create_listing') {
+    try {
+        $user_id       = intval($body['user_id'] ?? 0);
+        $university_id = intval($body['university_id'] ?? 0);
+        $title         = trim($body['title'] ?? '');
+        $description   = trim($body['description'] ?? '');
+        $pictures      = json_encode($body['pictures'] ?? []);
+        $comments      = json_encode($body['comments'] ?? []);
+        $views         = intval($body['views'] ?? 0);
+
+        if (!$user_id || !$university_id || !$title) fail(400, "Missing required fields.");
+
+        $stmt = $conn->prepare("
+            INSERT INTO listings (user_id, university_id, title, description, pictures, comments, views, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+        ");
+        $stmt->bind_param("iissssi", $user_id, $university_id, $title, $description, $pictures, $comments, $views);
+        $stmt->execute();
+        ok(["id"=>$stmt->insert_id]);
+    } catch (Throwable $e) {
+        fail(500, "Create listing failed", ["error"=>$e->getMessage()]);
+    }
+}
+
+// =============== GET: 读取单个用户（App.jsx 用） ================== //
+if (isset($_GET['user'])) {
+    try {
+        $id = intval($_GET['user']);
+        $stmt = $conn->prepare("SELECT id, username, university_id, created_at FROM users WHERE id=?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $res = $stmt->get_result()->fetch_assoc();
+        if ($res) ok(["user"=>$res]);
+        fail(404, "User not found");
+    } catch (Throwable $e) {
+        fail(500, "Fetch user failed", ["error"=>$e->getMessage()]);
+    }
+}
+
+// 未匹配：返回 400
+fail(400, "Invalid request.");
