@@ -1,4 +1,4 @@
-/* === 以下为你项目原有 App.css，原样保留 === */
+/* =================== Global / Vite defaults (保留) =================== */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -12,18 +12,13 @@
   will-change: filter;
   transition: filter 300ms;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+.logo:hover { filter: drop-shadow(0 0 2em #646cffaa); }
+.logo.react:hover { filter: drop-shadow(0 0 2em #61dafbaa); }
 
 @keyframes logo-spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
-
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo { animation: logo-spin infinite 20s linear; }
 }
@@ -31,7 +26,7 @@
 .card { padding: 2em; }
 .read-the-docs { color: #888; }
 
-/* Light mode styles (default) */
+/* =================== Register Page (保留) =================== */
 .register-container {
   background: white;
   padding: 40px;
@@ -66,7 +61,7 @@
 
 .error-text { color: #d32f2f; background-color: #ffebee; border: 1px solid #ffcdd2; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 14px; }
 
-/* Dark mode styles */
+/* Dark mode for register */
 @media (prefers-color-scheme: dark) {
   .register-container { background: #1e1e1e; color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
   .register-title { color: #ffffff; }
@@ -81,13 +76,13 @@
   .error-text { color: #ff6b6b; background-color: rgba(211, 47, 47, 0.1); border: 1px solid rgba(211, 47, 47, 0.3); }
 }
 
-/* Base dark mode */
+/* Base dark mode background */
 @media (prefers-color-scheme: dark) {
   body { background-color: #121212; color: #ffffff; }
   #root { background-color: #121212; }
 }
 
-/* Kebab & Bug Modal */
+/* =================== Kebab & Bug Modal (保留) =================== */
 .kebab-wrapper { position: relative; }
 .kebab-menu {
   position: absolute;
@@ -121,27 +116,43 @@
 }
 .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
 
-/* Header layout variants */
 .header-without-search { position: relative; }
 .header-with-search { position: relative; padding-bottom: 36px; }
 .header-with-search .kebab-wrapper { position: absolute; right: 12px; bottom: 6px; }
 
-/* Mobile tweaks */
 @media (max-width: 420px) {
   .kebab-menu { right: 6px; }
   .modal { width: 94vw; }
 }
 
-/* === 追加：Marketplace / Listing 样式 === */
+/* =================== Marketplace / Listing (保留) =================== */
 .mp-root { display: grid; grid-template-rows: auto 1fr auto; height: 100vh; background: #fff; color: #111; }
-.mp-header { display: grid; grid-template-columns: 1fr minmax(180px, 520px) 1fr; align-items: center; padding: 8px 10px; border-bottom: 1px solid #e5e7eb; gap: 8px; }
-.mp-left { display: flex; align-items: center; gap: 10px; } /* 10.07 13.02 fix the ui  for <- and home button location */
+.mp-header {
+  position: fixed;              /* 固定顶部 */
+  top: 0;
+  left: 0;
+  right: 0;                     /* ✅ 拉伸全屏宽度 */
+  height: 64px;
+  background: #fff;             /* 保证背景不透明 */
+  border-bottom: 1px solid #e5e7eb;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: 1fr minmax(180px, 520px) 1fr;
+  align-items: center;
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
+
+/* 给主内容加顶部留白，避免被header遮住 */
+.mp-feed {
+  margin-top: 64px;
+}
+
+.mp-left { display: flex; align-items: center; gap: 10px; }
 .mp-right { display: flex; justify-content: flex-end; padding-right: 6px; }
 
-/* 10.07 13.02 fix the ui  for <- and home button location */
-
 .mp-icon {
-  display: flex; /* 居中对齐图标 */
+  display: flex;
   align-items: center;
   justify-content: center;
   background: #f9fafb;
@@ -152,12 +163,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-
-/* 10.07 13.02 fix the ui  for <- and home button location */
-
-.mp-icon:hover {
-  background-color: #f0f0f0;
-}
+.mp-icon:hover { background-color: #f0f0f0; }
 
 .mp-round { border-radius: 999px; }
 .mp-user { display: flex; align-items: center; gap: 6px; margin-left: 6px; }
@@ -187,12 +193,46 @@
 .mp-divider { height: 1px; background: #e5e7eb; margin-left: 14px; }
 .mp-empty { padding: 24px; text-align: center; color: #666; }
 
-.mp-tabs { position: relative; border-top: 1px solid #e5e7eb; display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; }
+/* --- Fix footer tabs to always stay visible --- */
+.mp-tabs {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  z-index: 1000;
+}
+
+.mp-feed {
+  padding-bottom: 80px; /* ✅ 底部留白给 tabs */
+}
+
 .mp-tabs .tab { background: none; border: none; padding: 10px 0; cursor: pointer; color: #666; }
 .mp-tabs .tab.active { color: #6a5acd; font-weight: 700; }
 .mp-fab { position: absolute; right: 14px; top: -20px; width: 44px; height: 44px; border-radius: 999px; background: #57a9ff; color: #fff; border: none; font-size: 26px; line-height: 44px; text-align: center; cursor: pointer; box-shadow: 0 6px 14px rgba(0,0,0,.18); }
 
-/* 暗色模式 */
+
+/* ✅ Mobile 优化：隐藏用户名文字，避免 Header 挤压 */
+@media (max-width: 480px) {
+  .mp-username {
+    display: none; /* 隐藏 “User name” */
+  }
+
+  /* 如果想稍微拉近头像和搜索框的距离，可以再加 */
+  .mp-user {
+    margin-left: 0;
+  }
+
+  /* 搜索框可适当加宽一点 */
+  .mp-search-wrap {
+    flex: 1;
+  }
+}
+
+
 @media (prefers-color-scheme: dark) {
   .mp-root { background: #121212; color: #e8e8e8; }
   .mp-header, .mp-tabs { border-color: #2a2a2a; }
@@ -204,33 +244,58 @@
   .mp-tabs .tab { color:#aaa; }
 }
 
-/* ===== Right-bottom Floating Action Button ===== */
+/* FAB */
+
+:root {
+  --fab-blue: #57a9ff;
+  --fab-size: 64px;
+}
+
+
 .mp-fab-right {
   position: fixed;
-  bottom: 70px;
-  right: 30px;
-  width: 64px;
-  height: 64px;
+  right: 40px;
+  bottom: 80px;
+
+  width: var(--fab-size);
+  height: var(--fab-size);
   border-radius: 50%;
-  background: rgba(87, 169, 255, 0.35); /* 半透明蓝 */
-  color: #fff;
-  border: 2px solid rgba(255,255,255,0.6);
-  font-size: 34px;
+  box-sizing: border-box;
+
+  /* ✅ 蓝色描边圈 */
+  border: 6px solid var(--fab-blue);
+  background: #ffffff;
+
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 20px;              /* ✅ 加号大小适中 */
+  color: var(--fab-blue);       /* ✅ 蓝色加号 */
+
   cursor: pointer;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 22px rgba(87,169,255,.28);
   transition: all 0.25s ease;
-  z-index: 50;
+  z-index: 100;
 }
 
-.mp-fab-right:hover {
-  background: rgba(87, 169, 255, 0.5);
-  transform: translateY(-3px);
+/* --- SVG 加号图标（取代文字 +，防偏移） --- */
+.mp-fab-right svg path {
+  stroke: var(--fab-blue);
+  transition: stroke 0.25s ease;
 }
+
+/* --- Hover 效果 --- */
+.mp-fab-right:hover {
+  background: var(--fab-blue);     /* 悬停变实心蓝 */
+  color: #fff;                     /* 加号变白色 */
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(87,169,255,.4);
+}
+
+.mp-fab-right:hover svg path {
+  stroke: #ffffff;
+}
+.mp-fab-right:active { transform: scale(.97); }
 
 /* FAB */
 
@@ -390,6 +455,35 @@
 @media (min-width: 1200px) {
   .cl-main { max-width: 75vw; }
 }
+}
+.cl-round:hover { background-color: #f1f1f1; }
+
+/* 如果 header 中放 Logo，这里禁止它拦截点击，并保证居中对齐 */
+.auth-logo-spot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;         /* ← 关键：不拦截点击 */
+  height: 100%;
+}
+
+/* 主内容为 Title/Input 预留顶部空间：Header 高度 + 额外 16px 呼吸 */
+.cl-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: calc(var(--cl-header-h) + 16px) 24px 160px;  /* ← 修复遮挡的核心 */
+  background: #fff;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1200px) {
+  .cl-main { max-width: 75vw; }
+}
 
 .cl-brand {
   flex: 1; text-align: center; font-family: 'Georgia', serif;
@@ -453,23 +547,17 @@
   .cl-btn.ghost { background:#2a2a2a; color:#eee; }
 }
 
-/* ===== Create Group Placeholder ===== */
+/* =================== Create Group Placeholder (保留) =================== */
 .cg-root { display:grid; grid-template-rows:auto 1fr; height:100vh; }
 .cg-main { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; }
 
-/* Logout 按钮样式 */
+/* Logout */
 .mp-logout {
   margin-left: 8px;
-  background: #ef4444; /* 红色 */
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 12px;
-  cursor: pointer;
+  background: #ef4444; color: #fff; border: none; border-radius: 8px;
+  padding: 6px 10px; font-size: 12px; cursor: pointer;
 }
 .mp-logout:hover { opacity: .9; }
-
 @media (prefers-color-scheme: dark) {
   .mp-logout { background: #dc2626; color: #fff; }
 }
@@ -477,6 +565,11 @@
 .mp-post-desc { white-space: pre-wrap; }
 
 /* ===== ULink Logo Risque 风格 ===== */
+/* 全局防横向滚动（保留） */
+html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-behavior-x: none; }
+#root { width: 100%; overflow-x: hidden; }
+
+/* =================== ULink Logo 风格（保留） =================== */
 .ulink-logo {
   display: inline-block;
   font-family: 'Risque', cursive;
@@ -492,6 +585,10 @@
   user-select: none;
 }
 /* */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(90, 90, 255, 0.25);
+  animation: logo-pop 3s ease-in-out infinite;
+  user-select: none;
+}
 .ulink-u {
   font-size: 1.15em;
   background: linear-gradient(135deg, #ffb347 0%, #ffcc33 100%);
@@ -518,4 +615,125 @@
   align-items: center;
   margin-top: 10px;
   margin-bottom: 10px;
+}
+@keyframes logo-pop {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50%      { transform: scale(1.05); filter: brightness(1.15); }
+}
+
+/* 如果 Logo 也会单独用于认证页的顶部区域，可复用该容器 */
+.auth-logo-spot--standalone {
+  display: flex; justify-content: center; align-items: center;
+  margin: 10px 0;
+}
+
+/* ===== University Selection (White clean UI) ===== */
+.uni-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #ffffff; /* ✅ 纯白背景 */
+}
+
+.uni-card {
+  background: #ffffff;
+  border: 1px solid #e5e8eb;
+  border-radius: 18px;
+  padding: 2rem 6rem 6rem;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  width: 360px;
+  text-align: center;
+}
+
+.uni-header {
+  position: relative;
+  display: flex;
+  justify-content: center;   /* ✅ 居中 Logo */
+  align-items: center;
+  margin-bottom: 0.6rem;
+  transform: translateY(-8px); /* ✅ 整体上移一点 */
+}
+
+.uni-header .cl-brand,
+.uni-header .logo {
+  font-size: rem;
+  font-weight: 700;
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(90deg, #ffb347, #845ec2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
+/* ✅ 保持右上角菜单 */
+.uni-header .kebab-wrapper {
+  position: absolute;
+  right: 0.1;
+  top: 0.-2rem;
+}
+
+
+
+.uni-title {
+  font-size: 1.5rem;
+  color: #1b1f24;
+  margin-bottom: 1.6rem;
+  font-weight: 600;
+}
+
+.uni-search {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #cfd3d7;
+  border-radius: 10px;
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+  transition: border 0.2s ease;
+}
+.uni-search:focus {
+  border-color: #57a9ff;
+  outline: none;
+}
+
+.uni-select {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #cfd3d7;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 1rem;
+  margin-bottom: 1.4rem;
+  cursor: pointer;
+  transition: border 0.2s ease;
+}
+.uni-select:hover {
+  border-color: #57a9ff;
+}
+
+.uni-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #57a9ff;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+   margin-top: 5rem; /* ✅ 下移一点，与输入框拉开距离 */
+}
+.uni-btn:hover {
+  background: #3497ff;
+  transform: translateY(-1px);
+}
+.uni-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mp-post-price {
+  font-weight: bold;
+  color: #2a9d8f;
+  margin-top: 4px;
 }

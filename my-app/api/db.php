@@ -58,16 +58,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['listings_by_university'
     $uni = intval($_GET['listings_by_university']);
 
     $stmt = $conn->prepare("
-        SELECT 
-            l.id, l.user_id, l.university_id, l.title, l.description,
-            l.pictures, l.comments, l.created_at,
-            u.username
-        FROM listings l
-        LEFT JOIN users u ON u.id = l.user_id
-        WHERE l.university_id = ?
-        ORDER BY l.created_at DESC
-        LIMIT 100
-    ");
+    SELECT 
+        l.id,
+        l.user_id,
+        l.university_id,
+        l.title,
+        l.description,
+        l.pictures,
+        l.comments,
+        l.price,
+        l.category,
+        l.location,
+        l.contact,
+        l.views,
+        l.created_at,
+        u.username
+    FROM listings l
+    LEFT JOIN users u ON u.id = l.user_id
+    WHERE l.university_id = ?
+    ORDER BY l.created_at DESC
+    LIMIT 100
+");
+
     $stmt->bind_param("i", $uni);
 
     if ($stmt->execute()) {
@@ -204,16 +216,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pictures_json = json_encode($pictures, JSON_UNESCAPED_UNICODE);
         $comments_json = json_encode($comments, JSON_UNESCAPED_UNICODE);
 
-        $stmt = $conn->prepare("
-            INSERT INTO listings (user_id, university_id, title, description, pictures, comments, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, NOW())
-        ");
-        if (!$stmt) {
-            echo json_encode(["success" => false, "message" => "Prepare failed"]);
-            exit;
-        }
-        $stmt->bind_param("iissss", $user_id, $university_id, $title, $description, $pictures_json, $comments_json);
+       // ✅ Extract additional fields
+$price      = floatval($data['price'] ?? 0);
+$category   = trim((string)($data['category'] ?? ''));
+$location   = trim((string)($data['location'] ?? ''));
+$contact    = trim((string)($data['contact'] ?? ''));
 
+// ✅ Insert all fields, including price/category/location/contact
+$stmt = $conn->prepare("
+    INSERT INTO listings 
+        (user_id, university_id, title, description, pictures, comments, price, category, location, contact, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+");
+if (!$stmt) {
+    echo json_encode(["success" => false, "message" => "Prepare failed: " . $conn->error]);
+    exit;
+}
+
+$stmt->bind_param(
+    "iissssdsss",
+    $user_id,
+    $university_id,
+    $title,
+    $description,
+    $pictures_json,
+    $comments_json,
+    $price,
+    $category,
+    $location,
+    $contact
+);
         if ($stmt->execute()) {
             echo json_encode(["success" => true, "id" => $conn->insert_id]);
         } else {
