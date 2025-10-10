@@ -1,6 +1,6 @@
-import "../../../Ulink/my-app/src/App.css";
-import KebabMenu from "../../../Ulink/my-app/src/KebabMenu.jsx";
-import BugReportModal from "../../../Ulink/my-app/src/BugReportModal.jsx";
+import "./App.css";
+import KebabMenu from "./KebabMenu.jsx";
+import BugReportModal from "./BugReportModal.jsx";
 import { useState } from "react";
 
 export default function MessagesPage({ onBack, onHome }) {
