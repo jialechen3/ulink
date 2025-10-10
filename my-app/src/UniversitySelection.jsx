@@ -4,7 +4,6 @@ import { API_BASE } from "./config";
 import KebabMenu from "./KebabMenu";
 import BugReportModal from "./BugReportModal";
 import Logo from "./Logo"; // ✅ 你已有 Logo.jsx 或可用文字替代
-import { API_BASE } from "./config";
 
 
 export default function UniversitySelection({ userId, onConfirm }) {
