@@ -402,3 +402,47 @@
 }
 
 .mp-post-desc { white-space: pre-wrap; }
+
+/* ===== ULink Logo Risque 风格 ===== */
+.ulink-logo {
+  display: inline-block;
+  font-family: 'Risque', cursive;
+  font-size: 44px;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #ff7eb3 0%, #6a5acd 60%, #57a9ff 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow:
+          0 2px 4px rgba(0, 0, 0, 0.15),
+          0 4px 12px rgba(90, 90, 255, 0.25);
+  animation: logo-pop 3s ease-in-out infinite;
+  user-select: none;
+}
+/* */
+.ulink-u {
+  font-size: 1.15em;
+  background: linear-gradient(135deg, #ffb347 0%, #ffcc33 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* 轻微呼吸动效 */
+@keyframes logo-pop {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: brightness(1.15);
+  }
+}
+
+/* 居中容器 */
+.auth-logo-spot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
