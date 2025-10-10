@@ -1,3 +1,4 @@
+/* =================== Global / Vite defaults (保留) =================== */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -11,36 +12,21 @@
   will-change: filter;
   transition: filter 300ms;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+.logo:hover { filter: drop-shadow(0 0 2em #646cffaa); }
+.logo.react:hover { filter: drop-shadow(0 0 2em #61dafbaa); }
 
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
-
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+  a:nth-of-type(2) .logo { animation: logo-spin infinite 20s linear; }
 }
 
-.card {
-  padding: 2em;
-}
+.card { padding: 2em; }
+.read-the-docs { color: #888; }
 
-.read-the-docs {
-  color: #888;
-}
-
+/* =================== Register Page (保留) =================== */
 .register-container {
   background: white;
   padding: 40px;
@@ -49,147 +35,486 @@
   border-radius: 8px;
   text-align: center;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  color: #333;
+}
+.register-title { font-size: 28px; font-weight: bold; margin-bottom: 30px; color: #333; }
+.register-form { display: flex; flex-direction: column; gap: 20px; }
+.form-group { display: flex; justify-content: space-between; align-items: center; }
+.form-group label { font-size: 14px; margin-right: 10px; flex: 1; text-align: left; color: #333; }
+.form-group input { flex: 2; padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: white; color: #333; }
+.form-group input:focus { outline: none; border-color: #4a76d9; }
+.form-group input:disabled { background-color: #f5f5f5; color: #999; }
+.signup-btn { background-color: #4a76d9; color: white; padding: 12px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; transition: background-color 0.2s; }
+.signup-btn:hover:not(:disabled) { background-color: #3b63b3; }
+.signup-btn:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
+
+.register-header { display: flex; justify-content: space-between; align-items: center; }
+.icon-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #333; padding: 5px 10px; border-radius: 4px; }
+.icon-btn:hover:not(:disabled) { background-color: #f0f0f0; }
+.icon-btn:disabled { color: #999; cursor: not-allowed; }
+.spacer { flex: 1; }
+
+.password-rules { font-size: 12px; list-style: none; padding-left: 0; margin: 10px 0 20px 0; text-align: left; color: #666; }
+.password-rules li { margin: 4px 0; }
+.password-rules .valid { color: green; }
+.password-rules .invalid { color: red; }
+
+.error-text { color: #d32f2f; background-color: #ffebee; border: 1px solid #ffcdd2; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 14px; }
+
+/* Dark mode for register */
+@media (prefers-color-scheme: dark) {
+  .register-container { background: #1e1e1e; color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+  .register-title { color: #ffffff; }
+  .form-group label { color: #e0e0e0; }
+  .form-group input { background: #2d2d2d; border: 1px solid #444; color: #ffffff; }
+  .form-group input:focus { border-color: #4a76d9; }
+  .form-group input:disabled { background-color: #3a3a3a; color: #888; }
+  .icon-btn { color: #ffffff; }
+  .icon-btn:hover:not(:disabled) { background-color: #333; }
+  .icon-btn:disabled { color: #666; }
+  .password-rules { color: #ccc; }
+  .error-text { color: #ff6b6b; background-color: rgba(211, 47, 47, 0.1); border: 1px solid rgba(211, 47, 47, 0.3); }
 }
 
-.register-title {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 30px;
+/* Base dark mode background */
+@media (prefers-color-scheme: dark) {
+  body { background-color: #121212; color: #ffffff; }
+  #root { background-color: #121212; }
 }
 
-.register-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.form-group {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.form-group label {
-  font-size: 14px;
-  margin-right: 10px;
-  flex: 1;
-  text-align: left;
-}
-
-.form-group input {
-  flex: 2;
-  padding: 6px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.signup-btn {
-  background-color: #4a76d9;
-  color: white;
-  padding: 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.signup-btn:hover {
-  background-color: #3b63b3;
-}
-
-.register-container {
-  background: white;
-  padding: 30px;
-  max-width: 400px;
-  width: 100%;
+/* =================== Kebab & Bug Modal (保留) =================== */
+.kebab-wrapper { position: relative; }
+.kebab-menu {
+  position: absolute;
+  top: 36px; right: 0;
+  min-width: 160px;
+  background: #fff;
+  color: #213547;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+  padding: 6px;
+  z-index: 30;
+}
+.kebab-item { width: 100%; text-align: left; background: transparent; border: none; padding: 10px 12px; border-radius: 6px; cursor: pointer; }
+.kebab-item:focus, .kebab-item:hover { background: #f3f4f6; }
+
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.38); display: flex; align-items: center; justify-content: center; z-index: 40; }
+.modal {
+  width: min(640px, 92vw);
+  background: #fff; color: #213547; border-radius: 12px; padding: 20px;
+  box-shadow: 0 20px 48px rgba(0,0,0,0.24);
+}
+.modal h2 { margin: 0 0 10px 0; }
+.modal-meta { font-size: 12px; color: #555; margin-bottom: 12px; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.modal-form { display: grid; gap: 12px; }
+.modal-row { display: grid; gap: 6px; }
+.modal-row span { font-size: 14px; }
+.modal textarea, .modal input, .modal select {
+  width: 100%; padding: 8px; border: 1px solid #e5e7eb; border-radius: 8px; font: inherit; background: #fff; color: #213547;
+}
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+
+.header-without-search { position: relative; }
+.header-with-search { position: relative; padding-bottom: 36px; }
+.header-with-search .kebab-wrapper { position: absolute; right: 12px; bottom: 6px; }
+
+@media (max-width: 420px) {
+  .kebab-menu { right: 6px; }
+  .modal { width: 94vw; }
 }
 
-.register-header {
-  display: flex;
-  justify-content: space-between;
+/* =================== Marketplace / Listing (保留) =================== */
+.mp-root { display: grid; grid-template-rows: auto 1fr auto; height: 100vh; background: #fff; color: #111; }
+.mp-header {
+  position: fixed;              /* 固定顶部 */
+  top: 0;
+  left: 0;
+  right: 0;                     /* ✅ 拉伸全屏宽度 */
+  height: 64px;
+  background: #fff;             /* 保证背景不透明 */
+  border-bottom: 1px solid #e5e7eb;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: 1fr minmax(180px, 520px) 1fr;
   align-items: center;
+  padding: 8px 10px;
+  box-sizing: border-box;
 }
 
-.icon-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
+/* 给主内容加顶部留白，避免被header遮住 */
+.mp-feed {
+  margin-top: 64px;
+}
+
+.mp-left { display: flex; align-items: center; gap: 10px; }
+.mp-right { display: flex; justify-content: flex-end; padding-right: 6px; }
+
+.mp-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  height: 34px;
+  width: 34px;
+  border-radius: 50%;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.mp-icon:hover { background-color: #f0f0f0; }
+
+.mp-round { border-radius: 999px; }
+.mp-user { display: flex; align-items: center; gap: 6px; margin-left: 6px; }
+.mp-avatar { width: 28px; height: 28px; border-radius: 999px; display:flex; align-items:center; justify-content:center; background:#f3f4f6; }
+.mp-avatar.sm { width: 24px; height: 24px; }
+.mp-username { font-weight: 600; font-size: 14px; }
+.mp-search-wrap { display: flex; justify-content: center; }
+.mp-search { width: 100%; max-width: 520px; height: 34px; border-radius: 18px; border: 1px solid #e5e7eb; padding: 0 14px; font-size: 14px; outline: none; }
+.mp-search:focus { border-color: #c7c9d1; }
+
+.mp-feed { overflow-y: auto; padding: 10px 0; }
+.mp-post { padding: 6px 14px 0 14px; }
+.mp-post-head { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
+.mp-post-texts { display: grid; gap: 2px; }
+.mp-post-title { font-weight: 700; font-size: 14px; }
+.mp-post-desc { font-size: 12px; color: #666; }
+
+.mp-post-media { padding-left: 38px; margin-top: 6px; }
+.mp-imgbox { width: 64px; height: 64px; background: #f3f4f6; border-radius: 8px; display:flex; align-items:center; justify-content:center; border: 1px solid #e5e7eb; overflow: hidden; }
+.mp-img-ic { font-size: 18px; opacity: .6; }
+
+.mp-post-meta { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #444; padding-left: 38px; margin: 8px 0; }
+.mp-dot { width: 3px; height: 3px; background:#999; border-radius:999px; display:inline-block; }
+.mp-eye { line-height: 1; }
+.mp-cmt { margin-left: auto; background: none; border: none; cursor: pointer; font-size: 14px; }
+
+.mp-divider { height: 1px; background: #e5e7eb; margin-left: 14px; }
+.mp-empty { padding: 24px; text-align: center; color: #666; }
+
+/* --- Fix footer tabs to always stay visible --- */
+.mp-tabs {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  z-index: 1000;
 }
 
-.spacer {
-  flex: 1;
+.mp-feed {
+  padding-bottom: 80px; /* ✅ 底部留白给 tabs */
 }
 
-.register-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin: 20px 0;
-  text-align: center;
+.mp-tabs .tab { background: none; border: none; padding: 10px 0; cursor: pointer; color: #666; }
+.mp-tabs .tab.active { color: #6a5acd; font-weight: 700; }
+.mp-fab { position: absolute; right: 14px; top: -20px; width: 44px; height: 44px; border-radius: 999px; background: #57a9ff; color: #fff; border: none; font-size: 26px; line-height: 44px; text-align: center; cursor: pointer; box-shadow: 0 6px 14px rgba(0,0,0,.18); }
+
+
+/* ✅ Mobile 优化：隐藏用户名文字，避免 Header 挤压 */
+@media (max-width: 480px) {
+  .mp-username {
+    display: none; /* 隐藏 “User name” */
+  }
+
+  /* 如果想稍微拉近头像和搜索框的距离，可以再加 */
+  .mp-user {
+    margin-left: 0;
+  }
+
+  /* 搜索框可适当加宽一点 */
+  .mp-search-wrap {
+    flex: 1;
+  }
 }
 
-.register-form {
+
+@media (prefers-color-scheme: dark) {
+  .mp-root { background: #121212; color: #e8e8e8; }
+  .mp-header, .mp-tabs { border-color: #2a2a2a; }
+  .mp-icon { border-color: #2a2a2a; color: #eee; }
+  .mp-search { background:#1b1b1b; border-color:#2a2a2a; color:#eee; }
+  .mp-avatar { background:#1f1f1f; }
+  .mp-imgbox { background:#1b1b1b; border-color:#2a2a2a; }
+  .mp-divider { background:#2a2a2a; }
+  .mp-tabs .tab { color:#aaa; }
+}
+
+/* FAB */
+
+:root {
+  --fab-blue: #57a9ff;
+  --fab-size: 64px;
+}
+
+
+.mp-fab-right {
+  position: fixed;
+  right: 40px;
+  bottom: 80px;
+
+  width: var(--fab-size);
+  height: var(--fab-size);
+  border-radius: 50%;
+  box-sizing: border-box;
+
+  /* ✅ 蓝色描边圈 */
+  border: 6px solid var(--fab-blue);
+  background: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;              /* ✅ 加号大小适中 */
+  color: var(--fab-blue);       /* ✅ 蓝色加号 */
+
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(87,169,255,.28);
+  transition: all 0.25s ease;
+  z-index: 100;
+}
+
+/* --- SVG 加号图标（取代文字 +，防偏移） --- */
+.mp-fab-right svg path {
+  stroke: var(--fab-blue);
+  transition: stroke 0.25s ease;
+}
+
+/* --- Hover 效果 --- */
+.mp-fab-right:hover {
+  background: var(--fab-blue);     /* 悬停变实心蓝 */
+  color: #fff;                     /* 加号变白色 */
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(87,169,255,.4);
+}
+
+.mp-fab-right:hover svg path {
+  stroke: #ffffff;
+}
+.mp-fab-right:active { transform: scale(.97); }
+
+
+.fab-menu {
+  position: fixed;
+  right: 40px;
+  bottom: 146px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
+  animation: fadeInUp 0.25s ease-out;
+  z-index: 49;
 }
 
-.form-group {
+
+.fab-item {
+  background: #fff;
+  border: 1px solid #eef1f5;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;}
+  
+.fab-item:hover { background: #f6f8fb; }
+
+
+
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (prefers-color-scheme: dark) {
+  .fab-menu { background:#1b1b1b; border-color:#2a2a2a; color:#eee; }
+  .fab-item:hover { background:#2a2a2a; }
+}
+
+/* =================== Create Listing Page (修复遮挡) =================== */
+/* 用变量统一 Header 高度，主内容按此留白，避免被固定 Header 遮挡 */
+.cl-root {
+  --cl-header-h: 64px;          /* ← 统一高度 */
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100vh;
+  background: #fff;
+  color: #111;
+}
+
+/* 固定在顶部，但有明确高度；去掉 100vw 防止溢出导致横向滚动 */
+.cl-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;                     /* ← 替代 width:100vw，避免溢出 */
+  height: var(--cl-header-h);   /* ← 明确高度 */
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 18px;              /* 垂直方向改为 0，依赖 height 居中 */
+  box-sizing: border-box;
+  z-index: 1000;                /* 提升层级，确保在最上 */
 }
 
-.form-group label {
-  font-size: 14px;
+.cl-left { display: flex; align-items: center; gap: 10px; }
+.cl-right { display: flex; align-items: center; justify-content: flex-end; }
+
+.cl-round {
+  display: flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: #f9fafb; border: 1px solid #e5e7eb;
+  cursor: pointer; transition: background-color 0.2s ease; box-sizing: border-box;
+}
+.cl-round:hover { background-color: #f1f1f1; }
+
+/* 如果 header 中放 Logo，这里禁止它拦截点击，并保证居中对齐 */
+.auth-logo-spot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;         /* ← 关键：不拦截点击 */
+  height: 100%;
+}
+
+/* 主内容为 Title/Input 预留顶部空间：Header 高度 + 额外 16px 呼吸 */
+.cl-main {
   flex: 1;
-  text-align: left;
-  margin-right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: calc(var(--cl-header-h) + 16px) 24px 160px;  /* ← 修复遮挡的核心 */
+  background: #fff;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
-.form-group input {
-  flex: 2;
-  padding: 6px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+@media (min-width: 1200px) {
+  .cl-main { max-width: 75vw; }
 }
 
-.signup-btn {
-  background-color: #4a76d9;
-  color: white;
-  padding: 12px;
+.cl-brand {
+  flex: 1; text-align: center; font-family: 'Georgia', serif;
+  font-size: 26px; font-weight: 700; color: #111; letter-spacing: 0.5px;
+}
+
+.cl-input,
+.cl-textarea,
+.cl-select {
+  width: 100%;
+  background: #e9e9e9;
   border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
+  border-radius: 8px;
+  padding: 30px 20px;
+  font-size: 25px;
+  color: #111;
+  box-sizing: border-box;
+}
+.cl-select { appearance: none; -webkit-appearance: none; -moz-appearance: none; }
+.cl-textarea { resize: vertical; }
+
+/* 上传区：修正了 margin-top 的空格错误（10 px -> 10px） */
+.cl-upload {
+  width: 100%;
+  height: 220px;
+  background: #e9e9e9;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  position: relative;
+  margin-top: 10px;             /* ← 修正 */
+}
+.cl-upload-col { text-align: center; }
+.cl-upload-ic { font-size: 40px; opacity: .8; }
+.cl-hint { font-size: 12px; color: #666; margin-top: 6px; }
+.cl-file { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+.cl-previews { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.cl-thumb { width: 86px; height: 86px; border-radius: 8px; overflow: hidden; background:#f3f4f6; border:1px solid #e5e7eb; }
+.cl-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* 底部操作栏固定不遮内容（主内容已预留 160px 下内边距） */
+.cl-actions {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex; justify-content: flex-end; gap: 12px;
+  background: #fff; border-top: 1px solid #e5e7eb;
+  padding: 10px 24px; box-sizing: border-box; z-index: 999;
+}
+.cl-btn { background: #4a76d9; color: #fff; border: none; border-radius: 18px; padding: 8px 16px; cursor: pointer; }
+.cl-btn.primary { background: #4a90e2; color: #fff; }
+.cl-btn.ghost { background: #e5e7eb; color: #333; }
+
+@media (prefers-color-scheme: dark) {
+  .cl-root { background:#121212; color:#e8e8e8; }
+  .cl-header, .cl-actions { border-color:#2a2a2a; }
+  .cl-round { border-color:#2a2a2a; color:#eee; }
+  .cl-input, .cl-textarea, .cl-upload { background:#1b1b1b; color:#eee; }
+  .cl-thumb { background:#1b1b1b; border-color:#2a2a2a; }
+  .cl-btn.ghost { background:#2a2a2a; color:#eee; }
 }
 
-.signup-btn:hover {
-  background-color: #3b63b3;
+/* =================== Create Group Placeholder (保留) =================== */
+.cg-root { display:grid; grid-template-rows:auto 1fr; height:100vh; }
+.cg-main { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; }
+
+/* Logout */
+.mp-logout {
+  margin-left: 8px;
+  background: #ef4444; color: #fff; border: none; border-radius: 8px;
+  padding: 6px 10px; font-size: 12px; cursor: pointer;
+}
+.mp-logout:hover { opacity: .9; }
+@media (prefers-color-scheme: dark) {
+  .mp-logout { background: #dc2626; color: #fff; }
 }
 
-.password-rules {
-  font-size: 12px;
-  list-style: none;
-  padding-left: 0;
-  margin: 10px 0 20px 0;
-  text-align: left;
+.mp-post-desc { white-space: pre-wrap; }
+
+/* 全局防横向滚动（保留） */
+html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-behavior-x: none; }
+#root { width: 100%; overflow-x: hidden; }
+
+/* =================== ULink Logo 风格（保留） =================== */
+.ulink-logo {
+  display: inline-block;
+  font-family: 'Risque', cursive;
+  font-size: 44px;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #ff7eb3 0%, #6a5acd 60%, #57a9ff 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(90, 90, 255, 0.25);
+  animation: logo-pop 3s ease-in-out infinite;
+  user-select: none;
+}
+.ulink-u {
+  font-size: 1.15em;
+  background: linear-gradient(135deg, #ffb347 0%, #ffcc33 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+@keyframes logo-pop {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50%      { transform: scale(1.05); filter: brightness(1.15); }
 }
 
-.password-rules li {
-  margin: 4px 0;
+/* 如果 Logo 也会单独用于认证页的顶部区域，可复用该容器 */
+.auth-logo-spot--standalone {
+  display: flex; justify-content: center; align-items: center;
+  margin: 10px 0;
 }
-
-.password-rules .valid {
-  color: green;
-}
-
-.password-rules .invalid {
-  color: red;
-}
-
 /* ===== University Selection (White clean UI) ===== */
 .uni-page {
   display: flex;
