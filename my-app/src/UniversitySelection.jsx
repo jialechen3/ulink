@@ -1,72 +1,105 @@
 import { useState, useEffect } from "react";
+import "./App.css";
+import { API_BASE } from "./config";
+import KebabMenu from "./KebabMenu";
+import BugReportModal from "./BugReportModal";
+import Logo from "./Logo"; // ✅ 你已有 Logo.jsx 或可用文字替代
 
-function UniversitySelection({ userId, onConfirm }) {
-    const [university, setUniversity] = useState(""); // 保存选择的大学 ID
-    const [universities, setUniversities] = useState([]); // 保存大学列表
+export default function UniversitySelection({ userId, onConfirm }) {
+  const [universities, setUniversities] = useState([]);
+  const [filter, setFilter] = useState("");
+  const [university, setUniversity] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showReport, setShowReport] = useState(false);
 
-    // ✅ 组件加载时获取大学列表
-    useEffect(() => {
-        const fetchUniversities = async () => {
-            try {
-                // 拉取 universities.php
-                //const res = await fetch("http://localhost/Ulink/universities.php");
-                const res = await fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/universities.php");
-
-                const data = await res.json();
-                if (data.items) {
-                    setUniversities(data.items);
-                }
-            } catch (err) {
-                console.error("Failed to load universities:", err);
-            }
-        };
-        fetchUniversities();
-    }, []);
-
-    // ✅ 点击确认，提交选择
-    const handleConfirm = async () => {
-        if (!university) {
-            alert("Please select a university");
-            return;
-        }
-
-        // PATCH 请求，保存 university_id
-        //const res = await fetch("http://localhost/Ulink/db.php", {
-        const res = await fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: userId, university_id: university }),
-        });
-
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/universities.php`);
         const data = await res.json();
-        if (data.success) {
-            alert("University saved!");
-            if (onConfirm) onConfirm(university);
-        } else {
-            alert(data.message);
-        }
+        if (data.items) setUniversities(data.items);
+      } catch (err) {
+        console.error("Failed to load universities:", err);
+      }
     };
+    fetchUniversities();
+  }, []);
 
-    return (
-        <div className="card">
-            <h1>Select Your University</h1>
-            <select
-                value={university}
-                onChange={(e) => setUniversity(e.target.value)}
-                style={{ padding: "0.5rem", fontSize: "1rem", margin: "1rem 0" }}
-            >
-                <option value="">Select Your University</option>
-                {/* ✅ 动态渲染 */}
-                {universities.map((u) => (
-                    <option key={u.id} value={u.id}>
-                        {u.name}
-                    </option>
-                ))}
-            </select>
-            <br />
-            <button onClick={handleConfirm}>Confirm</button>
+  const filtered = universities.filter((u) =>
+    u.name.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  const handleConfirm = async () => {
+    if (!university) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/db.php`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: userId, university_id: university }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("University saved!");
+        onConfirm && onConfirm(university);
+      } else {
+        alert(data.message || "Failed to save.");
+      }
+    } catch (err) {
+      alert("Network error.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="uni-page">
+      <div className="uni-card">
+        <div className="uni-header">
+          <Logo />
+          <KebabMenu onReport={() => setShowReport(true)} />
         </div>
-    );
-}
 
-export default UniversitySelection;
+        <h2 className="uni-title">Choose Your University</h2>
+
+        {/* ✅ 搜索 + 选择合并组件 */}
+            <div className="search-select">
+            <input
+                    type="text"
+                    value={filter}
+                    placeholder="🔍 Search or select university..."
+                    onChange={(e) => {
+                        const val = e.target.value;
+                        setFilter(val);
+                        // ✅ 检查是否匹配某个大学名，匹配则设置 ID
+                        const match = universities.find(
+                        (u) => u.name.toLowerCase() === val.toLowerCase()
+                        );
+                        setUniversity(match ? match.id : "");
+                    }}
+                    className="uni-search"
+                    list="uni-list"
+                    />
+
+            <datalist id="uni-list">
+                {filtered.map((u) => (
+                <option key={u.id} value={u.name} />
+                ))}
+            </datalist>
+            </div>
+
+
+
+        <button
+          className="uni-btn"
+          onClick={handleConfirm}
+          disabled={!university || loading}
+        >
+          {loading ? "Saving..." : "Confirm"}
+        </button>
+      </div>
+
+      <BugReportModal isOpen={showReport} onClose={() => setShowReport(false)} />
+    </div>
+  );
+}
