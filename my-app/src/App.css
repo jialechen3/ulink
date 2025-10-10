@@ -132,16 +132,34 @@
   .modal { width: 94vw; }
 }
 
-/* === 追加：Marketplace / Listing 样式 === */
+/* =================== Marketplace / Listing (保留) =================== */
 .mp-root { display: grid; grid-template-rows: auto 1fr auto; height: 100vh; background: #fff; color: #111; }
-.mp-header { display: grid; grid-template-columns: 1fr minmax(180px, 520px) 1fr; align-items: center; padding: 8px 10px; border-bottom: 1px solid #e5e7eb; gap: 8px; }
-.mp-left { display: flex; align-items: center; gap: 10px; } /* 10.07 13.02 fix the ui  for <- and home button location */
+.mp-header {
+  position: fixed;              /* 固定顶部 */
+  top: 0;
+  left: 0;
+  right: 0;                     /* ✅ 拉伸全屏宽度 */
+  height: 64px;
+  background: #fff;             /* 保证背景不透明 */
+  border-bottom: 1px solid #e5e7eb;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: 1fr minmax(180px, 520px) 1fr;
+  align-items: center;
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
+
+/* 给主内容加顶部留白，避免被header遮住 */
+.mp-feed {
+  margin-top: 64px;
+}
+
+.mp-left { display: flex; align-items: center; gap: 10px; }
 .mp-right { display: flex; justify-content: flex-end; padding-right: 6px; }
 
-/* 10.07 13.02 fix the ui  for <- and home button location */
-
 .mp-icon {
-  display: flex; /* 居中对齐图标 */
+  display: flex;
   align-items: center;
   justify-content: center;
   background: #f9fafb;
@@ -152,12 +170,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-
-/* 10.07 13.02 fix the ui  for <- and home button location */
-
-.mp-icon:hover {
-  background-color: #f0f0f0;
-}
+.mp-icon:hover { background-color: #f0f0f0; }
 
 .mp-round { border-radius: 999px; }
 .mp-user { display: flex; align-items: center; gap: 6px; margin-left: 6px; }
@@ -187,12 +200,46 @@
 .mp-divider { height: 1px; background: #e5e7eb; margin-left: 14px; }
 .mp-empty { padding: 24px; text-align: center; color: #666; }
 
-.mp-tabs { position: relative; border-top: 1px solid #e5e7eb; display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; }
+/* --- Fix footer tabs to always stay visible --- */
+.mp-tabs {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  z-index: 1000;
+}
+
+.mp-feed {
+  padding-bottom: 80px; /* ✅ 底部留白给 tabs */
+}
+
 .mp-tabs .tab { background: none; border: none; padding: 10px 0; cursor: pointer; color: #666; }
 .mp-tabs .tab.active { color: #6a5acd; font-weight: 700; }
 .mp-fab { position: absolute; right: 14px; top: -20px; width: 44px; height: 44px; border-radius: 999px; background: #57a9ff; color: #fff; border: none; font-size: 26px; line-height: 44px; text-align: center; cursor: pointer; box-shadow: 0 6px 14px rgba(0,0,0,.18); }
 
-/* 暗色模式 */
+
+/* ✅ Mobile 优化：隐藏用户名文字，避免 Header 挤压 */
+@media (max-width: 480px) {
+  .mp-username {
+    display: none; /* 隐藏 “User name” */
+  }
+
+  /* 如果想稍微拉近头像和搜索框的距离，可以再加 */
+  .mp-user {
+    margin-left: 0;
+  }
+
+  /* 搜索框可适当加宽一点 */
+  .mp-search-wrap {
+    flex: 1;
+  }
+}
+
+
 @media (prefers-color-scheme: dark) {
   .mp-root { background: #121212; color: #e8e8e8; }
   .mp-header, .mp-tabs { border-color: #2a2a2a; }
@@ -202,34 +249,6 @@
   .mp-imgbox { background:#1b1b1b; border-color:#2a2a2a; }
   .mp-divider { background:#2a2a2a; }
   .mp-tabs .tab { color:#aaa; }
-}
-
-/* ===== Right-bottom Floating Action Button ===== */
-.mp-fab-right {
-  position: fixed;
-  bottom: 70px;
-  right: 30px;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: rgba(87, 169, 255, 0.35); /* 半透明蓝 */
-  color: #fff;
-  border: 2px solid rgba(255,255,255,0.6);
-  font-size: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-  transition: all 0.25s ease;
-  z-index: 50;
-}
-
-.mp-fab-right:hover {
-  background: rgba(87, 169, 255, 0.5);
-  transform: translateY(-3px);
 }
 
 
