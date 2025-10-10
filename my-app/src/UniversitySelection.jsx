@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { API_BASE } from "./config";
+
 
 function UniversitySelection({ userId, onConfirm }) {
     const [university, setUniversity] = useState(""); // 保存选择的大学 ID
@@ -10,7 +12,7 @@ function UniversitySelection({ userId, onConfirm }) {
             try {
                 // 拉取 universities.php
                 //const res = await fetch("http://localhost/Ulink/universities.php");
-                const res = await fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/universities.php");
+                const res = await fetch(`${API_BASE}/universities.php`);
 
                 const data = await res.json();
                 if (data.items) {
@@ -32,7 +34,7 @@ function UniversitySelection({ userId, onConfirm }) {
 
         // PATCH 请求，保存 university_id
         //const res = await fetch("http://localhost/Ulink/db.php", {
-        const res = await fetch("https://aptitude.cse.buffalo.edu/CSE442/2025-Fall/cse-442z/db.php", {
+        const res = await fetch(`${API_BASE}/db.php`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ id: userId, university_id: university }),
