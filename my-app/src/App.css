@@ -232,13 +232,65 @@
   transform: translateY(-3px);
 }
 
+/* FAB */
 
-/* ===== Floating Action Menu (透明玻璃风格) ===== */
+:root {
+  --fab-blue: #57a9ff;
+  --fab-size: 64px;
+}
+
+
+.mp-fab-right {
+  position: fixed;
+  right: 40px;
+  bottom: 80px;
+
+  width: var(--fab-size);
+  height: var(--fab-size);
+  border-radius: 50%;
+  box-sizing: border-box;
+
+  /* ✅ 蓝色描边圈 */
+  border: 6px solid var(--fab-blue);
+  background: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;              /* ✅ 加号大小适中 */
+  color: var(--fab-blue);       /* ✅ 蓝色加号 */
+
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(87,169,255,.28);
+  transition: all 0.25s ease;
+  z-index: 100;
+}
+
+/* --- SVG 加号图标（取代文字 +，防偏移） --- */
+.mp-fab-right svg path {
+  stroke: var(--fab-blue);
+  transition: stroke 0.25s ease;
+}
+
+/* --- Hover 效果 --- */
+.mp-fab-right:hover {
+  background: var(--fab-blue);     /* 悬停变实心蓝 */
+  color: #fff;                     /* 加号变白色 */
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(87,169,255,.4);
+}
+
+.mp-fab-right:hover svg path {
+  stroke: #ffffff;
+}
+.mp-fab-right:active { transform: scale(.97); }
+
+
 .fab-menu {
   position: fixed;
-  right: 30px;
-  bottom: 120px; /* 按钮上方 */
-  background: rgba(255, 255, 255, 0.25); /* 半透明白 */
+  right: 40px;
+  bottom: 146px;
+  background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.4);
@@ -252,124 +304,145 @@
   z-index: 49;
 }
 
-/* 内部按钮（半透明柔色） */
+
 .fab-item {
-  background: rgba(255, 255, 255, 0.6);
-  color: #222;
-  border: none;
-  padding: 10px 18px;
+  background: #fff;
+  border: 1px solid #eef1f5;
+  padding: 10px 16px;
   border-radius: 12px;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  text-align: center;
-  min-width: 150px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.fab-item:hover {
-  background: rgba(255, 255, 255, 0.8);
-  transform: translateY(-1px);
-}
-
-/* 弹出动画 */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+  white-space: nowrap;
+  cursor: pointer;}
+  
+.fab-item:hover { background: #f6f8fb; }
 
 
+
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (prefers-color-scheme: dark) {
   .fab-menu { background:#1b1b1b; border-color:#2a2a2a; color:#eee; }
   .fab-item:hover { background:#2a2a2a; }
 }
 
-/* ===== Create Listing Page ===== */
+/* =================== Create Listing Page (修复遮挡) =================== */
+/* 用变量统一 Header 高度，主内容按此留白，避免被固定 Header 遮挡 */
 .cl-root {
+  --cl-header-h: 64px;          /* ← 统一高度 */
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 100vh;
   background: #fff;
   color: #111;
 }
+
+/* 固定在顶部，但有明确高度；去掉 100vw 防止溢出导致横向滚动 */
 .cl-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;                     /* ← 替代 width:100vw，避免溢出 */
+  height: var(--cl-header-h);   /* ← 明确高度 */
+  display: flex;
   align-items: center;
-  padding: 8px 10px;
+  justify-content: space-between;
+  background: #fff;
   border-bottom: 1px solid #e5e7eb;
-}
-.cl-left { display: flex; gap: 8px; }
-.cl-right { display: flex; justify-content: flex-end; }
-.cl-round {
-  width: 32px; height: 32px; border-radius: 999px;
-  border: 1px solid #e5e7eb; background: none; cursor: pointer;
-}
-.cl-brand {
-  font-size: 24px; font-weight: 700; letter-spacing: 1px;
+  padding: 0 18px;              /* 垂直方向改为 0，依赖 height 居中 */
+  box-sizing: border-box;
+  z-index: 1000;                /* 提升层级，确保在最上 */
 }
 
-.cl-main { padding: 14px; display: grid; gap: 10px; }
-.cl-input, .cl-textarea {
-  width: 100%;
-  border: none;
-  background: #e9e9e9;
-  border-radius: 6px;
-  padding: 10px 12px;
-  font: inherit;
-  color: #222;
+.cl-left { display: flex; align-items: center; gap: 10px; }
+.cl-right { display: flex; align-items: center; justify-content: flex-end; }
+
+.cl-round {
+  display: flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: #f9fafb; border: 1px solid #e5e7eb;
+  cursor: pointer; transition: background-color 0.2s ease; box-sizing: border-box;
 }
+.cl-round:hover { background-color: #f1f1f1; }
+
+/* 如果 header 中放 Logo，这里禁止它拦截点击，并保证居中对齐 */
+.auth-logo-spot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;         /* ← 关键：不拦截点击 */
+  height: 100%;
+}
+
+/* 主内容为 Title/Input 预留顶部空间：Header 高度 + 额外 16px 呼吸 */
+.cl-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: calc(var(--cl-header-h) + 16px) 24px 160px;  /* ← 修复遮挡的核心 */
+  background: #fff;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1200px) {
+  .cl-main { max-width: 75vw; }
+}
+
+.cl-brand {
+  flex: 1; text-align: center; font-family: 'Georgia', serif;
+  font-size: 26px; font-weight: 700; color: #111; letter-spacing: 0.5px;
+}
+
+.cl-input,
+.cl-textarea,
+.cl-select {
+  width: 100%;
+  background: #e9e9e9;
+  border: none;
+  border-radius: 8px;
+  padding: 30px 20px;
+  font-size: 25px;
+  color: #111;
+  box-sizing: border-box;
+}
+.cl-select { appearance: none; -webkit-appearance: none; -moz-appearance: none; }
 .cl-textarea { resize: vertical; }
 
+/* 上传区：修正了 margin-top 的空格错误（10 px -> 10px） */
 .cl-upload {
-  margin-top: 6px;
+  width: 100%;
+  height: 220px;
   background: #e9e9e9;
-  border-radius: 6px;
-  padding: 18px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 160px;
+  border-radius: 10px;
+  display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-evenly;
   position: relative;
+  margin-top: 10px;             /* ← 修正 */
 }
 .cl-upload-col { text-align: center; }
 .cl-upload-ic { font-size: 40px; opacity: .8; }
 .cl-hint { font-size: 12px; color: #666; margin-top: 6px; }
-.cl-file {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-}
+.cl-file { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
-.cl-previews {
-  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px;
-}
+.cl-previews { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .cl-thumb { width: 86px; height: 86px; border-radius: 8px; overflow: hidden; background:#f3f4f6; border:1px solid #e5e7eb; }
 .cl-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
+/* 底部操作栏固定不遮内容（主内容已预留 160px 下内边距） */
 .cl-actions {
-  border-top: 1px solid #e5e7eb;
-  padding: 8px 12px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex; justify-content: flex-end; gap: 12px;
+  background: #fff; border-top: 1px solid #e5e7eb;
+  padding: 10px 24px; box-sizing: border-box; z-index: 999;
 }
-.cl-btn {
-  background: #4a76d9; color: #fff; border: none; border-radius: 18px;
-  padding: 8px 16px; cursor: pointer;
-}
-.cl-btn.ghost {
-  background: #e5e7eb; color: #333;
-}
+.cl-btn { background: #4a76d9; color: #fff; border: none; border-radius: 18px; padding: 8px 16px; cursor: pointer; }
+.cl-btn.primary { background: #4a90e2; color: #fff; }
+.cl-btn.ghost { background: #e5e7eb; color: #333; }
 
 @media (prefers-color-scheme: dark) {
   .cl-root { background:#121212; color:#e8e8e8; }
