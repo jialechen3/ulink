@@ -2,22 +2,25 @@ import "./App.css";
 import KebabMenu from "./KebabMenu";
 import BugReportModal from "./BugReportModal";
 import { useState } from "react";
+import AppHeader from "./AppHeader.jsx";
 
-export default function ProfilePage({ onBack, onHome }) {
+export default function ProfilePage({ username,
+                                        onBack,
+                                        onHome,
+                                        onGoProfile,
+                                        onLogout, }) {
     const [showReport, setShowReport] = useState(false);
 
     return (
         <div className="cg-root">
-            <header className="cl-header">
-                <div className="cl-left">
-                    <button className="cl-round" onClick={onBack} aria-label="Back">←</button>
-                    <button className="cl-round" aria-label="Home" onClick={onHome}>🏠</button>
-                </div>
-                <div className="cl-brand">Ulink</div>
-                <div className="cl-right">
-                    <KebabMenu onReport={() => setShowReport(true)} />
-                </div>
-            </header>
+            <AppHeader
+                username={username}
+                onBack={onBack}
+                onHome={onHome}
+                onGoProfile={onGoProfile}
+                onLogout={onLogout}
+                onReport={() => setShowReport(true)}
+            />
 
             <main className="cg-main">
                 <h2>Profile</h2>

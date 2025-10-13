@@ -2,22 +2,30 @@ import "./App.css";
 import KebabMenu from "./KebabMenu";
 import BugReportModal from "./BugReportModal";
 import { useState } from "react";
+import AppHeader from "./AppHeader.jsx"; // ✅ 改这里
 
-export default function PostDetailPage({ post, onBack, onHome }) {
+export default function PostDetailPage({
+                                           username,
+                                           post,            // ✅ 新增
+                                           onBack,
+                                           onHome,
+                                           onGoProfile,
+                                           onLogout,
+                                       }) {
     const [showReport, setShowReport] = useState(false);
 
     return (
         <div className="cg-root">
-            <header className="cl-header">
-                <div className="cl-left">
-                    <button className="cl-round" onClick={onBack} aria-label="Back">←</button>
-                    <button className="cl-round" aria-label="Home" onClick={onHome}>🏠</button>
-                </div>
-                <div className="cl-brand">Ulink</div>
-                <div className="cl-right">
-                    <KebabMenu onReport={() => setShowReport(true)} />
-                </div>
-            </header>
+            {/* ✅ 通用 Header */}
+            <AppHeader
+                username={username}
+                onBack={onBack}
+                onHome={onHome}
+                onGoProfile={onGoProfile}
+                onLogout={onLogout}
+                onReport={() => setShowReport(true)}
+                showSearch={false}
+            />
 
             <main className="cg-main">
                 <h2>Post detail</h2>
