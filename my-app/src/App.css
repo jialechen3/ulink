@@ -608,7 +608,6 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
 
 }
 
-}
 .uni-search:focus {
   border-color: #57a9ff;
   outline: none;
@@ -651,21 +650,87 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   cursor: not-allowed;
 }
 
-/* ✅ Mobile-specific tweak */
+/* ===== UniversitySelection Page Scoped Mobile Adaptation ===== */
+.screen-university {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  box-sizing: border-box;
+  background: transparent;
+}
+
+/* 仅影响此页的 card */
+.screen-university .card {
+  width: 360px;
+  max-width: 92vw;
+  padding: 1.6rem 1.2rem 2rem;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+  border: 1px solid #e5e8eb;
+  text-align: center;
+}
+
+.screen-university h1 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: #1b1f24;
+}
+
+/* 表单和按钮 */
+.screen-university select,
+.screen-university button {
+  width: 100%;
+  min-height: 44px;
+  font-size: 1rem;
+}
+
+.screen-university button {
+  margin-top: 12px;
+  background: #57a9ff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+.screen-university button:hover {
+  background: #3497ff;
+  transform: translateY(-1px);
+}
+.screen-university button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 小屏优化 */
 @media (max-width: 480px) {
-  .uni-card {
-    padding: 1.4rem 1.2rem 2rem;
+  .screen-university .card {
+    padding: 1.2rem 1rem 1.6rem;
     border-radius: 14px;
   }
-  .uni-title {
-    font-size: 1.2rem;
-  }
-  .uni-btn {
-    margin-top: 1.2rem;
+  .screen-university h1 {
+    font-size: 1.25rem;
+    margin-bottom: 0.9rem;
   }
 }
-.mp-post-price {
-  font-weight: bold;
-  color: #2a9d8f;
-  margin-top: 4px;
+
+/* 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  .screen-university .card {
+    background: #1e1e1e;
+    color: #e8e8e8;
+    border-color: #2a2a2a;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+  }
+  .screen-university select {
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    color: #e8e8e8;
+  }
+  .screen-university button {
+    background: #4a90e2;
+  }
 }
