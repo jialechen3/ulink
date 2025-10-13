@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 import { API_BASE } from "./config";
 import KebabMenu from "./KebabMenu";
 import BugReportModal from "./BugReportModal";
-import Logo from "./Logo"; // ✅ 你已有 Logo.jsx 或可用文字替代
+import Logo from "./Logo";
 
 export default function UniversitySelection({ userId, onConfirm }) {
   const [universities, setUniversities] = useState([]);
@@ -11,6 +11,8 @@ export default function UniversitySelection({ userId, onConfirm }) {
   const [university, setUniversity] = useState("");
   const [loading, setLoading] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [open, setOpen] = useState(false);
+  const boxRef = useRef(null);
 
   useEffect(() => {
     const fetchUniversities = async () => {
@@ -23,6 +25,14 @@ export default function UniversitySelection({ userId, onConfirm }) {
       }
     };
     fetchUniversities();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (boxRef.current && !boxRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const filtered = universities.filter((u) =>
@@ -45,7 +55,7 @@ export default function UniversitySelection({ userId, onConfirm }) {
       } else {
         alert(data.message || "Failed to save.");
       }
-    } catch (err) {
+    } catch {
       alert("Network error.");
     } finally {
       setLoading(false);
@@ -62,33 +72,43 @@ export default function UniversitySelection({ userId, onConfirm }) {
 
         <h2 className="uni-title">Choose Your University</h2>
 
-        {/* ✅ 搜索 + 选择合并组件 */}
-            <div className="search-select">
-            <input
-                    type="text"
-                    value={filter}
-                    placeholder="🔍 Search or select university..."
-                    onChange={(e) => {
-                        const val = e.target.value;
-                        setFilter(val);
-                        // ✅ 检查是否匹配某个大学名，匹配则设置 ID
-                        const match = universities.find(
-                        (u) => u.name.toLowerCase() === val.toLowerCase()
-                        );
-                        setUniversity(match ? match.id : "");
-                    }}
-                    className="uni-search"
-                    list="uni-list"
-                    />
-
-            <datalist id="uni-list">
-                {filtered.map((u) => (
-                <option key={u.id} value={u.name} />
-                ))}
-            </datalist>
+        {/* ✅ 自定义可控 Select */}
+        <div className="uni-select-box" ref={boxRef}>
+          <input
+            type="text"
+            className="uni-dropdown"
+            placeholder="Search or select university"
+            value={filter}
+            onFocus={() => setOpen(true)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setFilter(val);
+              const match = universities.find(
+                (u) => u.name.toLowerCase() === val.toLowerCase()
+              );
+              setUniversity(match ? match.id : "");
+            }}
+          />
+          {open && filtered.length > 0 && (
+            <div className="uni-dropdown-menu">
+              {filtered.map((u) => (
+                <div
+                  key={u.id}
+                  className={`uni-option ${
+                    university === u.id ? "selected" : ""
+                  }`}
+                  onClick={() => {
+                    setUniversity(u.id);
+                    setFilter(u.name);
+                    setOpen(false);
+                  }}
+                >
+                  {u.name}
+                </div>
+              ))}
             </div>
-
-
+          )}
+        </div>
 
         <button
           className="uni-btn"
