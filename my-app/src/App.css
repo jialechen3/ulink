@@ -148,6 +148,12 @@
   margin-top: 64px;
 }
 
+
+/* 给主内容加顶部留白，避免被header遮住 */
+.mp-feed {
+  margin-top: 64px;
+}
+
 .mp-left { display: flex; align-items: center; gap: 10px; }
 .mp-right { display: flex; justify-content: flex-end; padding-right: 6px; }
 
@@ -515,6 +521,7 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   display: flex; justify-content: center; align-items: center;
   margin: 10px 0;
 }
+
 /* ===== University Selection (White clean UI) ===== */
 .uni-page {
   display: flex;
@@ -536,6 +543,10 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   width: 360px;
   text-align: center;
   box-sizing: border-box;
+  padding: 2rem 6rem 6rem;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  width: 360px;
+  text-align: center;
 }
 
 .uni-header {
@@ -549,6 +560,12 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
 
 .uni-header .logo {
   font-size: 1.8rem;
+  margin-bottom: 0.6rem;
+  transform: translateY(-8px); /* ✅ 整体上移一点 */
+}
+
+.uni-header .cl-brand,
+.uni-header .logo {
   font-size: rem;
   font-weight: 700;
   font-family: "Inter", sans-serif;
@@ -563,6 +580,8 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   position: absolute;
   right: 0.4rem;
   top: 0.4rem;
+  right: 0.1;
+  top: 0.-2rem;
 }
 
 
@@ -571,6 +590,9 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   font-size: 1.4rem;
   color: #1b1f24;
   margin-bottom: 1.4rem;
+  font-size: 1.5rem;
+  color: #1b1f24;
+  margin-bottom: 1.6rem;
   font-weight: 600;
 }
 
@@ -586,6 +608,7 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
 
 }
 
+}
 .uni-search:focus {
   border-color: #57a9ff;
   outline: none;
@@ -617,6 +640,7 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease;
    margin-top: 2rem; /* ✅ 下移一点，与输入框拉开距离 */
+   margin-top: 5rem; /* ✅ 下移一点，与输入框拉开距离 */
 }
 .uni-btn:hover {
   background: #3497ff;
@@ -639,4 +663,9 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   .uni-btn {
     margin-top: 1.2rem;
   }
+}
+.mp-post-price {
+  font-weight: bold;
+  color: #2a9d8f;
+  margin-top: 4px;
 }
