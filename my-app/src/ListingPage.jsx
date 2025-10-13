@@ -4,6 +4,7 @@ import "./App.css";
 import KebabMenu from "./KebabMenu";
 import BugReportModal from "./BugReportModal";
 
+
 function timeAgo(ts) {
     const d = new Date(ts);
     const diff = Math.max(0, Date.now() - d.getTime());
