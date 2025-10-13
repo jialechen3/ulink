@@ -788,3 +788,31 @@ select.cl-input {
 .modal-backdrop { z-index: 40; }
 /* Tabs 在底部，保持 1000 即可 */
 .mp-tabs { z-index: 1000; }
+
+/* ===== Password eye toggle (for RegisterPage & LoginPage) ===== */
+.eye-wrap {
+  position: relative;
+}
+.eye-wrap input.password-input {
+  padding-right: 42px; /* 留出眼睛按钮空间 */
+}
+.eye-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px;
+  color: #333;
+}
+.eye-btn:hover { opacity: 0.85; }
+.eye-btn:focus { outline: 2px solid #4a76d9; border-radius: 6px; }
+
+@media (prefers-color-scheme: dark) {
+  .eye-btn { color: #eee; }
+}
+
