@@ -170,7 +170,6 @@ function App() {
                     onBack={() => setStep("listing")}
                     onCreated={() => setStep("listing")}
                     onHome={goHomeToListing}
-                    // ✅ 关键：给 Header 用
                     onGoProfile={() => setStep("profile")}
                     onLogout={handleLogout}
                     username={username}
@@ -181,10 +180,9 @@ function App() {
                 <CreateGroupPage
                     onBack={() => setStep("listing")}
                     onHome={goHomeToListing}
-                    // 如果也用了统一 Header，这里同理可传：
-                    // onGoProfile={() => setStep("profile")}
-                    // onLogout={handleLogout}
-                    // username={username}
+                    onGoProfile={() => setStep("profile")}
+                    onLogout={handleLogout}
+                    username={username}
                 />
             )}
 
@@ -192,10 +190,9 @@ function App() {
                 <ProfilePage
                     onBack={() => setStep("listing")}
                     onHome={goHomeToListing}
-                    // 如果 Profile 里也显示 Header，可以把下面也传入：
-                    // onLogout={handleLogout}
-                    // onGoProfile={() => setStep("profile")}
-                    // username={username}
+                    onLogout={handleLogout}
+                    onGoProfile={() => setStep("profile")}
+                    username={username}
                 />
             )}
 
@@ -203,7 +200,6 @@ function App() {
                 <MessagesPage
                     onBack={() => setStep("listing")}
                     onHome={goHomeToListing}
-                    // ✅ 关键：给 Header 用
                     onGoProfile={() => setStep("profile")}
                     onLogout={handleLogout}
                     username={username}
@@ -215,10 +211,9 @@ function App() {
                     post={currentPost}
                     onBack={() => setStep("listing")}
                     onHome={goHomeToListing}
-                    // 若也统一 header，同样传：
-                    // onGoProfile={() => setStep("profile")}
-                    // onLogout={handleLogout}
-                    // username={username}
+                    onGoProfile={() => setStep("profile")}
+                    onLogout={handleLogout}
+                    username={username}
                 />
             )}
         </div>
