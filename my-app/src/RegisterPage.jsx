@@ -4,6 +4,8 @@ import { API_BASE } from "./config";
 import KebabMenu from "./KebabMenu";
 import BugReportModal from "./BugReportModal";
 import Logo from "./Logo";
+import PasswordField from "./PasswordField";
+
 
 /** ✅ 统一的本地校验规则（与后端保持一致） */
 function usernameIssues(name) {
@@ -138,12 +140,12 @@ export default function RegisterPage({ onRegister, onBack }) {
                 {/* Password */}
                 <div className="form-group">
                     <label>Password:</label>
-                    <input
-                        type="password"
+                    <PasswordField
+                        label="Password"
                         value={password}
-                        disabled={loading}
                         onChange={(e) => setPassword(e.target.value)}
-                        required
+                        disabled={loading}
+                        name="new-password"
                     />
                 </div>
 
@@ -166,12 +168,12 @@ export default function RegisterPage({ onRegister, onBack }) {
                 {/* Confirm Password */}
                 <div className="form-group">
                     <label>Confirm Password:</label>
-                    <input
-                        type="password"
+                    <PasswordField
+                        label="Confirm Password"
                         value={confirmPassword}
-                        disabled={loading}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
+                        disabled={loading}
+                        name="confirm-password"
                     />
                 </div>
 
