@@ -127,34 +127,49 @@
 
 /* =================== Marketplace / Listing (保留) =================== */
 .mp-root { display: grid; grid-template-rows: auto 1fr auto; height: 100vh; background: #fff; color: #111; }
+/* === Header Layout Override for Ulink Logo === */
 .mp-header {
-  position: fixed;              /* 固定顶部 */
-  top: 0;
-  left: 0;
-  right: 0;                     /* ✅ 拉伸全屏宽度 */
+  position: fixed;
+  top: 0; left: 0; right: 0;
   height: 64px;
-  background: #fff;             /* 保证背景不透明 */
+  background: #fff;
   border-bottom: 1px solid #e5e7eb;
   z-index: 1000;
-  display: grid;
-  grid-template-columns: 1fr minmax(180px, 520px) 1fr;
+  display: flex;
   align-items: center;
-  padding: 8px 10px;
+  justify-content: space-between;
+  padding: 0 1rem;
   box-sizing: border-box;
 }
 
-/* 给主内容加顶部留白，避免被header遮住 */
-.mp-feed {
-  margin-top: 64px;
-}
-
 
 /* 给主内容加顶部留白，避免被header遮住 */
 .mp-feed {
   margin-top: 64px;
 }
 
-.mp-left { display: flex; align-items: center; gap: 10px; }
+/* 左边按钮区放大 */
+.mp-left {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.mp-icon.large {
+  width: 42px;
+  height: 42px;
+  font-size: 1.3rem;
+}
+
+.mp-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
 .mp-right { display: flex; justify-content: flex-end; padding-right: 6px; }
 
 .mp-icon {
@@ -172,13 +187,56 @@
 .mp-icon:hover { background-color: #f0f0f0; }
 
 .mp-round { border-radius: 999px; }
-.mp-user { display: flex; align-items: center; gap: 6px; margin-left: 6px; }
-.mp-avatar { width: 28px; height: 28px; border-radius: 999px; display:flex; align-items:center; justify-content:center; background:#f3f4f6; }
+
+.mp-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;      /* 原本是 6px，这样更自然 */
+  margin-left: 6px;
+}
+
+.mp-avatar {
+  width: 45px;         /* ✅ 放大 */
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  font-size: 18px;     /* ✅ 内部表情或首字母也更大 */
+}
+
+
 .mp-avatar.sm { width: 24px; height: 24px; }
-.mp-username { font-weight: 600; font-size: 14px; }
-.mp-search-wrap { display: flex; justify-content: center; }
-.mp-search { width: 100%; max-width: 520px; height: 34px; border-radius: 18px; border: 1px solid #e5e7eb; padding: 0 14px; font-size: 14px; outline: none; }
-.mp-search:focus { border-color: #c7c9d1; }
+
+.mp-username {
+  font-weight: 700;         /* ✅ 加粗一点 */
+  font-size: 22px;          /* ✅ 比原来大一些 */
+  color: #1b1f24;           /* ✅ 深一点的灰黑色 */
+  letter-spacing: 0.3px;
+  margin-left: 2px;
+}
+
+.mp-search-wrap.spaced {
+  margin-left: auto;
+  margin-right: 3rem;   /* 搜索栏整体右移 */
+  flex-shrink: 0;
+}
+.mp-search {
+  max-width: 280px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 18px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  background: #f9fafb;
+  transition: 0.2s;
+}
+
+.mp-search:focus {
+  border-color: #57a9ff;
+  background: #fff;
+}
+
 
 .mp-feed { overflow-y: auto; padding: 10px 0; }
 .mp-post { padding: 6px 14px 0 14px; }
@@ -221,22 +279,108 @@
 .mp-fab { position: absolute; right: 14px; top: -20px; width: 44px; height: 44px; border-radius: 999px; background: #57a9ff; color: #fff; border: none; font-size: 26px; line-height: 44px; text-align: center; cursor: pointer; box-shadow: 0 6px 14px rgba(0,0,0,.18); }
 
 
-/* ✅ Mobile 优化：隐藏用户名文字，避免 Header 挤压 */
-@media (max-width: 480px) {
-  .mp-username {
-    display: none; /* 隐藏 “User name” */
-  }
 
-  /* 如果想稍微拉近头像和搜索框的距离，可以再加 */
-  .mp-user {
-    margin-left: 0;
-  }
-
-  /* 搜索框可适当加宽一点 */
-  .mp-search-wrap {
-    flex: 1;
-  }
+/* 桌面版默认显示输入框 */
+.desktop-only {
+  display: block;
 }
+.mobile-only {
+  display: none;
+}
+
+
+/* ✅ Mobile 优化：隐藏用户名文字，避免 Header 挤压 */
+  @media (max-width: 480px) {
+
+    .kebab-wrapper {
+    position: relative;
+    right: -20px;     /* ✅ 向右移动 6px，可以按视觉微调成 -8px */
+  }
+    .mp-username {
+      display: none; /* 隐藏 “User name” */
+    }
+    
+    
+     /* 左边按钮区域稍靠左 */
+    .mp-left {
+      gap: 6px;
+      margin-left: 1px;
+    }
+      
+
+    /* 如果想稍微拉近头像和搜索框的距离，可以再加 */
+    .mp-user {
+      margin-left: 1px;
+    }
+
+     /* ✅ 搜索框微缩并右移 */
+  .mp-search-wrap.spaced {
+    display: flex !important;
+    justify-content: flex-end;
+    margin-left: auto;
+    margin-right: 60px;     /* ✅ 稍微右移，不遮 Logo */
+    flex: 0 0 20px;        /* ✅ 宽度自适应，不超出 */
+  }
+
+
+    .mp-search {
+    position: absolute;
+    left: 56%;
+    top: 26%;
+    height: 30px;
+    width: 80px;              /* ✅ 固定宽度，防止被字体撑开 */
+    height: 26px; 
+    font-size: 13px;
+    padding: 0 10px;
+    border-radius: 16px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+  }
+  
+  
+
+    
+
+    .mp-logo {
+    position: absolute;
+    left: 34%;
+    top: 14%;
+    transform: translate(-50%, -50%); /* ✅ 比 -52% 稍低，更对齐左右按钮 */
+    font-size: 2.2rem !important;  
+    line-height: 1;
+    z-index: 2; 
+  }
+
+    .mp-icon.large {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+  }
+
+    .mp-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+   .mp-right {
+    padding-right: 6px;
+    gap: 6px;
+  }
+
+   .mp-logout {
+    padding: 4px 8px;
+    font-size: 6px;
+    border-radius: 6px;
+  }
+
+  .mp-header {
+    height: 58px;
+    padding: 0 6px;
+  }
+
+
+
+  }
 
 
 @media (prefers-color-scheme: dark) {
