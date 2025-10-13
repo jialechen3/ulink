@@ -734,3 +734,80 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
     background: #4a90e2;
   }
 }
+.cl-input,
+.cl-textarea,
+.cl-select,
+select.cl-input {
+  font-family: "Risque", cursive !important;
+}
+
+/* 占位符也使用 Risque，保持一致 */
+.cl-input::placeholder,
+.cl-textarea::placeholder {
+  font-family: "Risque", cursive !important;
+}
+
+.mp-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* 居中 Logo 区不拦截点击，避免覆盖左侧用户名点击 */
+.mp-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* 关键 */
+}
+
+/* 明确用户区可点（确保优先级） */
+.mp-user {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+/* ===== Header Clickability Fix Pack ===== */
+
+/* 让 Header 永远在最上且能接收点击 */
+.mp-header,
+.mp-header.mp-header--safe {
+  position: fixed;    /* 你的样式里本来就是 fixed，这里明确一下 */
+  top: 0; left: 0; right: 0;
+  z-index: 10000;     /* 提升到足够高，压过任何上传/蒙层等 */
+  pointer-events: auto;
+}
+
+/* 三个区域都明确可点击 */
+.mp-left,
+.mp-right,
+.mp-user,
+.mp-icon,
+.mp-logout {
+  pointer-events: auto;
+}
+
+/* 居中区不要盖住点击（有些容器可能撑满列导致遮挡） */
+.mp-search-wrap {
+  pointer-events: auto;   /* 搜索框需要正常交互 */
+}
+.mp-center {               /* 如果你在别处有中间 Logo 容器也套这个类 */
+  pointer-events: none;    /* 不要拦截左右侧的点击 */
+  flex: 0 0 auto;
+}
+
+/* 防止其他元素越界到 Header 顶部：常见是绝对定位的 file input */
+.cl-upload { position: relative; z-index: 1; }
+.cl-upload .cl-file { z-index: 1; }
+
+/* 确保主内容不会覆盖 Header（Header 是 fixed） */
+.mp-feed, .cl-main, .cg-main {
+  padding-top: 64px;       /* 与 header 高度一致 */
+}
+
+/* 如果你有全屏蒙层类（例如 modal/backdrop），确保 z-index < 10000 */
+.modal-backdrop { z-index: 40; }
+/* Tabs 在底部，保持 1000 即可 */
+.mp-tabs { z-index: 1000; }

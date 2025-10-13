@@ -28,11 +28,12 @@ export default function ListingPage({
                                         onLogout,
                                         onGoCreateListing,
                                         onGoCreateGroup,
-                                        onGoProfile,         // 👈 新增
-                                        onGoMessages,        // 👈 新增
-                                        onOpenPost,          // 👈 新增
-                                        reloadTick = 0,      // 👈 接收“刷新信号”
-                                        onRequestRefresh,    // 👈 本页 Home 调用以刷新
+                                        onGoProfile,        // ✅ 点击用户名跳转
+                                        onGoMessages,
+                                        onOpenPost,
+                                        reloadTick = 0,
+                                        onRequestRefresh,
+                                        username = "User name",   // ✅ 新增：从外部传入要显示的用户名
                                     }) {
     const [listings, setListings] = useState([]);
     const [q, setQ] = useState("");
@@ -95,7 +96,7 @@ export default function ListingPage({
                         title="Go to profile"
                     >
                         <div className="mp-avatar">🐧</div>
-                        <span className="mp-username">User name</span>
+                        <span className="mp-username">{username}</span> {/* ✅ 这里展示传入的用户名 */}
                     </div>
                 </div>
 
@@ -129,10 +130,10 @@ export default function ListingPage({
                                 title="Open post"
                             >
                                 <div className="mp-post-texts">
-  {item.title?.trim() && <div className="mp-post-title">{item.title}</div>}
-  {item.description?.trim() && <div className="mp-post-desc">{item.description}</div>}
-  {item.price !== undefined && <div className="mp-post-price">${item.price}</div>}
-</div>
+                                    {item.title?.trim() && <div className="mp-post-title">{item.title}</div>}
+                                    {item.description?.trim() && <div className="mp-post-desc">{item.description}</div>}
+                                    {item.price !== undefined && <div className="mp-post-price">${item.price}</div>}
+                                </div>
 
                                 <div className="mp-post-media">
                                     <div className="mp-imgbox">
