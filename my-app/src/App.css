@@ -127,34 +127,49 @@
 
 /* =================== Marketplace / Listing (保留) =================== */
 .mp-root { display: grid; grid-template-rows: auto 1fr auto; height: 100vh; background: #fff; color: #111; }
+/* === Header Layout Override for Ulink Logo === */
 .mp-header {
-  position: fixed;              /* 固定顶部 */
-  top: 0;
-  left: 0;
-  right: 0;                     /* ✅ 拉伸全屏宽度 */
+  position: fixed;
+  top: 0; left: 0; right: 0;
   height: 64px;
-  background: #fff;             /* 保证背景不透明 */
+  background: #fff;
   border-bottom: 1px solid #e5e7eb;
   z-index: 1000;
-  display: grid;
-  grid-template-columns: 1fr minmax(180px, 520px) 1fr;
+  display: flex;
   align-items: center;
-  padding: 8px 10px;
+  justify-content: space-between;
+  padding: 0 1rem;
   box-sizing: border-box;
 }
 
-/* 给主内容加顶部留白，避免被header遮住 */
-.mp-feed {
-  margin-top: 64px;
-}
-
 
 /* 给主内容加顶部留白，避免被header遮住 */
 .mp-feed {
   margin-top: 64px;
 }
 
-.mp-left { display: flex; align-items: center; gap: 10px; }
+/* 左边按钮区放大 */
+.mp-left {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.mp-icon.large {
+  width: 42px;
+  height: 42px;
+  font-size: 1.3rem;
+}
+
+.mp-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
 .mp-right { display: flex; justify-content: flex-end; padding-right: 6px; }
 
 .mp-icon {
@@ -172,13 +187,56 @@
 .mp-icon:hover { background-color: #f0f0f0; }
 
 .mp-round { border-radius: 999px; }
-.mp-user { display: flex; align-items: center; gap: 6px; margin-left: 6px; }
-.mp-avatar { width: 28px; height: 28px; border-radius: 999px; display:flex; align-items:center; justify-content:center; background:#f3f4f6; }
+
+.mp-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;      /* 原本是 6px，这样更自然 */
+  margin-left: 6px;
+}
+
+.mp-avatar {
+  width: 45px;         /* ✅ 放大 */
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  font-size: 18px;     /* ✅ 内部表情或首字母也更大 */
+}
+
+
 .mp-avatar.sm { width: 24px; height: 24px; }
-.mp-username { font-weight: 600; font-size: 14px; }
-.mp-search-wrap { display: flex; justify-content: center; }
-.mp-search { width: 100%; max-width: 520px; height: 34px; border-radius: 18px; border: 1px solid #e5e7eb; padding: 0 14px; font-size: 14px; outline: none; }
-.mp-search:focus { border-color: #c7c9d1; }
+
+.mp-username {
+  font-weight: 700;         /* ✅ 加粗一点 */
+  font-size: 22px;          /* ✅ 比原来大一些 */
+  color: #1b1f24;           /* ✅ 深一点的灰黑色 */
+  letter-spacing: 0.3px;
+  margin-left: 2px;
+}
+
+.mp-search-wrap.spaced {
+  margin-left: auto;
+  margin-right: 3rem;   /* 搜索栏整体右移 */
+  flex-shrink: 0;
+}
+.mp-search {
+  max-width: 280px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 18px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  background: #f9fafb;
+  transition: 0.2s;
+}
+
+.mp-search:focus {
+  border-color: #57a9ff;
+  background: #fff;
+}
+
 
 .mp-feed { overflow-y: auto; padding: 10px 0; }
 .mp-post { padding: 6px 14px 0 14px; }
@@ -221,22 +279,108 @@
 .mp-fab { position: absolute; right: 14px; top: -20px; width: 44px; height: 44px; border-radius: 999px; background: #57a9ff; color: #fff; border: none; font-size: 26px; line-height: 44px; text-align: center; cursor: pointer; box-shadow: 0 6px 14px rgba(0,0,0,.18); }
 
 
-/* ✅ Mobile 优化：隐藏用户名文字，避免 Header 挤压 */
-@media (max-width: 480px) {
-  .mp-username {
-    display: none; /* 隐藏 “User name” */
-  }
 
-  /* 如果想稍微拉近头像和搜索框的距离，可以再加 */
-  .mp-user {
-    margin-left: 0;
-  }
-
-  /* 搜索框可适当加宽一点 */
-  .mp-search-wrap {
-    flex: 1;
-  }
+/* 桌面版默认显示输入框 */
+.desktop-only {
+  display: block;
 }
+.mobile-only {
+  display: none;
+}
+
+
+/* ✅ Mobile 优化：隐藏用户名文字，避免 Header 挤压 */
+  @media (max-width: 480px) {
+
+    .kebab-wrapper {
+    position: relative;
+    right: -20px;     /* ✅ 向右移动 6px，可以按视觉微调成 -8px */
+  }
+    .mp-username {
+      display: none; /* 隐藏 “User name” */
+    }
+
+
+     /* 左边按钮区域稍靠左 */
+    .mp-left {
+      gap: 6px;
+      margin-left: 1px;
+    }
+
+
+    /* 如果想稍微拉近头像和搜索框的距离，可以再加 */
+    .mp-user {
+      margin-left: 1px;
+    }
+
+     /* ✅ 搜索框微缩并右移 */
+  .mp-search-wrap.spaced {
+    display: flex !important;
+    justify-content: flex-end;
+    margin-left: auto;
+    margin-right: 60px;     /* ✅ 稍微右移，不遮 Logo */
+    flex: 0 0 20px;        /* ✅ 宽度自适应，不超出 */
+  }
+
+
+    .mp-search {
+    position: absolute;
+    left: 56%;
+    top: 26%;
+    height: 30px;
+    width: 80px;              /* ✅ 固定宽度，防止被字体撑开 */
+    height: 26px;
+    font-size: 13px;
+    padding: 0 10px;
+    border-radius: 16px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+  }
+
+
+
+
+
+    .mp-logo {
+    position: absolute;
+    left: 34%;
+    top: 14%;
+    transform: translate(-50%, -50%); /* ✅ 比 -52% 稍低，更对齐左右按钮 */
+    font-size: 2.2rem !important;
+    line-height: 1;
+    z-index: 2;
+  }
+
+    .mp-icon.large {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+  }
+
+    .mp-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+   .mp-right {
+    padding-right: 6px;
+    gap: 6px;
+  }
+
+   .mp-logout {
+    padding: 4px 8px;
+    font-size: 6px;
+    border-radius: 6px;
+  }
+
+  .mp-header {
+    height: 58px;
+    padding: 0 6px;
+  }
+
+
+
+  }
 
 
 @media (prefers-color-scheme: dark) {
@@ -331,7 +475,7 @@
   font-weight: 500;
   white-space: nowrap;
   cursor: pointer;}
-  
+
 .fab-item:hover { background: #f6f8fb; }
 
 
@@ -540,13 +684,9 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   border-radius: 18px;
   padding: 2rem 2rem 3rem;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-  width: 360px;
-  text-align: center;
+  width: 440px;
+  text-align: left;
   box-sizing: border-box;
-  padding: 2rem 6rem 6rem;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-  width: 360px;
-  text-align: center;
 }
 
 .uni-header {
@@ -560,12 +700,6 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
 
 .uni-header .logo {
   font-size: 1.8rem;
-  margin-bottom: 0.6rem;
-  transform: translateY(-8px); /* ✅ 整体上移一点 */
-}
-
-.uni-header .cl-brand,
-.uni-header .logo {
   font-size: rem;
   font-weight: 700;
   font-family: "Inter", sans-serif;
@@ -580,8 +714,6 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   position: absolute;
   right: 0.4rem;
   top: 0.4rem;
-  right: 0.1;
-  top: 0.-2rem;
 }
 
 
@@ -590,10 +722,9 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   font-size: 1.4rem;
   color: #1b1f24;
   margin-bottom: 1.4rem;
-  font-size: 1.5rem;
-  color: #1b1f24;
-  margin-bottom: 1.6rem;
   font-weight: 600;
+  text-align: center;   /* ✅ 居中标题 */
+  width: 100%;          /* ✅ 确保占满整行方便居中 */
 }
 
 .uni-search {
@@ -629,7 +760,7 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
 }
 
 .uni-btn {
-  width: 100%;
+  width: 95%;
   padding: 0.75rem;
   background: #57a9ff;
   color: white;
@@ -638,9 +769,10 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease;
-   margin-top: 2rem; /* ✅ 下移一点，与输入框拉开距离 */
-   margin-top: 5rem; /* ✅ 下移一点，与输入框拉开距离 */
+  margin: 2rem auto 0 auto;   /* ✅ 上下间距 + 居中 */
+  display: block;             /* ✅ 让 margin: auto 生效 */
 }
+
 .uni-btn:hover {
   background: #3497ff;
   transform: translateY(-1px);
@@ -650,72 +782,61 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   cursor: not-allowed;
 }
 
-/* ===== UniversitySelection Page Scoped Mobile Adaptation ===== */
-.screen-university {
-  min-height: 100svh;
-  display: flex;
-  align-items: center;
+/* === University dropdown (prettier version) === */
+.uni-select-box {
+  position: relative;
   justify-content: center;
-  padding: 16px env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  box-sizing: border-box;
-  background: transparent;
-}
-
-/* 仅影响此页的 card */
-.screen-university .card {
-  width: 360px;
-  max-width: 92vw;
-  padding: 1.6rem 1.2rem 2rem;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-  border: 1px solid #e5e8eb;
-  text-align: center;
-}
-
-.screen-university h1 {
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
-  color: #1b1f24;
-}
-
-/* 表单和按钮 */
-.screen-university select,
-.screen-university button {
   width: 100%;
-  min-height: 44px;
-  font-size: 1rem;
 }
 
-.screen-university button {
-  margin-top: 12px;
-  background: #57a9ff;
-  color: #fff;
-  border: none;
+.uni-dropdown {
+  width: 80%;
+  padding: 10px 14px;
+  font-size: 16px;
   border-radius: 10px;
+  border: 1.5px solid #57a9ff;
+  color: #213547;
+  background: #fff;
+  outline: none;
+  margin: 0 auto;          /* ✅ 居中 */
+  display: block;          /* ✅ 让 margin 生效 */
+}
+
+.uni-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);  /* ✅ 完全居中于输入框 */
+  width: 90%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(200, 220, 255, 0.4);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  z-index: 10;
+  transition: all 0.25s ease;
+}
+
+
+.uni-option {
+  padding: 12px 16px;
+  font-size: 15px;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease;
 }
-.screen-university button:hover {
-  background: #3497ff;
-  transform: translateY(-1px);
-}
-.screen-university button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+
+
+.uni-option:hover {
+  background: rgba(87, 169, 255, 0.1);  /* ✅ hover 高亮 */
 }
 
-/* 小屏优化 */
-@media (max-width: 480px) {
-  .screen-university .card {
-    padding: 1.2rem 1rem 1.6rem;
-    border-radius: 14px;
-  }
-  .screen-university h1 {
-    font-size: 1.25rem;
-    margin-bottom: 0.9rem;
-  }
+.uni-option.selected {
+  background: rgba(87, 169, 255, 0.2);
+  font-weight: 600;
 }
+
+
 
 /* 暗色模式 */
 @media (prefers-color-scheme: dark) {
@@ -811,3 +932,142 @@ select.cl-input {
 .modal-backdrop { z-index: 40; }
 /* Tabs 在底部，保持 1000 即可 */
 .mp-tabs { z-index: 1000; }
+
+/* ===== Password eye toggle (for RegisterPage & LoginPage) ===== */
+/* 修正：仅在 PasswordField 组件内部生效 */
+.form-group .eye-wrap {
+  position: relative;
+  flex: 2; /* 保持与其他 input 一样宽 */
+}
+
+.form-group .eye-wrap input.password-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 38px; /* 稍微减小，避免挤压 */
+}
+@media (prefers-color-scheme: dark) {
+  body, html, #root {
+    background-color: #121212 !important;
+    color: #e8e8e8 !important;
+  }
+
+  .register-container,
+  .uni-card,
+  .mp-root,
+  .cl-root,
+  .cg-root,
+  .modal,
+  .kebab-menu,
+  .mp-tabs {
+    background-color: #1e1e1e !important;
+    color: #e8e8e8 !important;
+    border-color: #333 !important;
+  }
+
+  input, textarea, select {
+    background-color: #2b2b2b !important;
+    color: #e8e8e8 !important;
+    border-color: #444 !important;
+  }
+
+  button {
+    background-color: #4a76d9 !important;
+    color: #fff !important;
+  }
+
+  .error-text {
+    background-color: rgba(211,47,47,0.15) !important;
+    border-color: rgba(211,47,47,0.3) !important;
+    color: #ff6b6b !important;
+  }
+
+  .mp-empty, .password-rules {
+    color: #aaa !important;
+  }
+}
+/* 🧿 禁止 Edge / Chrome / Safari 自动出现的小眼睛按钮 */
+input[type="password"]::-ms-reveal,   /* Edge / IE */
+input[type="password"]::-ms-clear,    /* Edge / IE 清除按钮 */
+input[type="password"]::-webkit-contacts-auto-fill-button,
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+}
+/* ===== University Selection — Dark mode visibility fix (append) ===== */
+
+/* 基础布局（保持你现有的白色主题不变） */
+.uni-page {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 1rem; box-sizing: border-box;
+  background: #ffffff;
+}
+.uni-card {
+  background: #ffffff; border: 1px solid #e5e8eb; border-radius: 18px;
+  padding: 2rem 2rem 2.5rem; box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+  width: 440px; text-align: left; box-sizing: border-box;
+}
+.uni-title { font-size: 1.5rem; font-weight: 700; margin: 0.5rem 0 0.25rem; }
+.uni-sub { margin: 0 0 1rem; color: #6b7280; }
+
+.uni-search { margin-bottom: 0.75rem; }
+.uni-input {
+  width: 100%; box-sizing: border-box; border-radius: 10px;
+  border: 1px solid #e5e7eb; padding: 10px 12px; font-size: 14px; outline: none;
+  background: #fff; color: #111827;
+}
+.uni-input:focus { border-color: #4a76d9; box-shadow: 0 0 0 3px rgba(74,118,217,.15); }
+
+.uni-list {
+  display: grid; grid-template-columns: 1fr; gap: 8px;
+  max-height: 280px; overflow: auto; padding-right: 2px; /* 防止遮挡滚动条 */
+}
+.uni-item {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; border-radius: 12px; border: 1px solid #e5e7eb;
+  background: #fafafa; color: #111827; padding: 12px 14px;
+  cursor: pointer; transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.uni-item:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.uni-item.is-active { border-color: #4a76d9; box-shadow: 0 0 0 3px rgba(74,118,217,.15); }
+.uni-item:focus { outline: none; box-shadow: 0 0 0 3px rgba(74,118,217,.15); }
+.uni-item-name { font-size: 14px; font-weight: 600; }
+.uni-dot { opacity: .35; }
+
+/* 底部按钮区 */
+.uni-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+.uni-btn { border-radius: 10px; padding: 10px 14px; border: 1px solid transparent; font-weight: 600; cursor: pointer; }
+.uni-btn.ghost { background: #eef2f7; color: #374151; border-color: #e5e7eb; }
+.uni-btn.ghost:hover { filter: brightness(.98); }
+.uni-btn.primary { background: #4a76d9; color: #fff; }
+.uni-btn.primary:disabled { opacity: .65; cursor: not-allowed; }
+
+/* ===== Dark mode: 保证文本/背景对比清晰，可见 ===== */
+@media (prefers-color-scheme: dark) {
+  .uni-page { background: #121212 !important; }
+  .uni-card { background: #1a1a1a !important; border-color: #2a2a2a !important; color: #e8e8e8 !important; }
+
+  .uni-title { color: #e8e8e8 !important; }
+  .uni-sub { color: #a3a3a3 !important; }
+
+  .uni-input {
+    background: #1f2937 !important; color: #e8e8e8 !important; border-color: #374151 !important;
+  }
+  .uni-input::placeholder { color: #8b8b8b !important; }
+
+  .uni-list { scrollbar-color: #374151 #1a1a1a; }
+
+  .uni-item {
+    background: #1f2937 !important; color: #e6e6e6 !important; border-color: #374151 !important;
+  }
+  .uni-item:hover { background: #233044 !important; border-color: #445067 !important; }
+  .uni-item.is-active {
+    border-color: #7aa2ff !important; box-shadow: 0 0 0 3px rgba(122,162,255,.22) !important;
+  }
+  .uni-item:focus { box-shadow: 0 0 0 3px rgba(122,162,255,.22) !important; }
+  .uni-dot { color: #9aa4b2 !important; opacity: .9; }
+
+  .uni-btn.ghost { background: #2a2a2a !important; color: #e8e8e8 !important; border-color: #3a3a3a !important; }
+  .uni-btn.primary { background: #3d6edc !important; color: #fff !important; }
+}
