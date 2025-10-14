@@ -81,112 +81,75 @@ export default function AppHeader({
         e.stopPropagation();
         safeNavigate(onHome);
     };
-return (
-    <header
-        className="mp-header mp-header--safe"
-        style={{
-            display: "grid",
-            gridTemplateColumns: "1fr auto 1fr", // 左中右三列
-            alignItems: "center",
-            height: "64px",
-            borderBottom: "1px solid #e5e7eb",
-            background: "#fff",
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 1000,
-            padding: "0 1rem",
-            boxSizing: "border-box",
-        }}
-    >
-        {/* === 左侧：返回 + 主页 + 用户 === */}
-        <div className="mp-left" style={{ display: "flex", alignItems: "center", gap: "0.8rem" }}>
-            {showBack && (
+
+    return (
+        <header className="mp-header mp-header--safe">
+            <div className="mp-left" data-zone="left">
+                {showBack && (
+                    <button
+                        type="button"
+                        className="mp-icon mp-round"
+                        onClick={handleBack}
+                        aria-label="Back"
+                        title="Back"
+                    >
+                        ←
+                    </button>
+                )}
+
                 <button
                     type="button"
                     className="mp-icon mp-round"
-                    onClick={handleBack}
-                    aria-label="Back"
-                    title="Back"
+                    aria-label="Home"
+                    onClick={handleHome}
+                    title="Home"
                 >
-                    ←
+                    🏠
                 </button>
-            )}
 
-            <button
-                type="button"
-                className="mp-icon mp-round"
-                aria-label="Home"
-                onClick={handleHome}
-                title="Home"
-            >
-                🏠
-            </button>
-
-            <div
-                className="mp-user"
-                role="button"
-                tabIndex={0}
-                onClick={handleGoProfile}
-                onKeyDown={(e) => e.key === "Enter" && handleGoProfile(e)}
-                title="Go to profile"
-            >
-                <div className="mp-avatar">🐧</div>
-                <span className="mp-username">{username}</span>
-            </div>
-        </div>
-
-        {/* === 中间：Logo 居中 === */}
-        <div
-            className="mp-center"
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gridColumn: "2", // ✅ 明确在中间那一列
-                pointerEvents: "none", // ✅ 避免拦截点击
-            }}
-        >
-            <Logo size={36} />
-        </div>
-
-        {/* === 右侧：Search + 菜单 + Logout === */}
-        <div
-            className="mp-right"
-            style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                gap: "0.6rem",
-            }}
-        >
-            {showSearch && (
-                <div className="mp-search-wrap spaced">
-                    <input
-                        className="mp-search"
-                        type="search"
-                        placeholder={searchPlaceholder}
-                        value={searchValue}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                    />
+                {/* ✅ 整块可点去 Profile（阻止冒泡） */}
+                <div
+                    className="mp-user"
+                    role="button"
+                    tabIndex={0}
+                    onClick={handleGoProfile}
+                    onKeyDown={(e) => e.key === "Enter" && handleGoProfile(e)}
+                    title="Go to profile"
+                >
+                    <div className="mp-avatar">🐧</div>
+                    <span className="mp-username">{username}</span>
                 </div>
-            )}
+            </div>
 
-            <KebabMenu onReport={onReport} />
+            <div className="mp-center">
+                <Logo size={36} />
+            </div>
 
-            <button
-                type="button"
-                className="mp-logout"
-                onClick={onLogout}
-                aria-label="Logout"
-                title="Logout"
-            >
-                Logout
-            </button>
-        </div>
-    </header>
-);
+            <div className="mp-right" data-zone="right">
+                {showSearch && (
+                    <div className="mp-search-wrap spaced">
+                        <input
+                            className="mp-search"
+                            type="search"
+                            placeholder={searchPlaceholder}
+                            value={searchValue}
+                            onChange={(e) => onSearchChange(e.target.value)}
+                        />
+                    </div>
+                )}
 
-   
+                <KebabMenu onReport={onReport} />
+
+                <button
+                    type="button"
+                    className="mp-logout"
+                    onClick={onLogout}
+                    aria-label="Logout"
+                    title="Logout"
+                >
+                    Logout
+                </button>
+            </div>
+        </header>
+    );
 }
