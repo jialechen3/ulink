@@ -28,11 +28,12 @@ export default function ListingPage({
                                         onLogout,
                                         onGoCreateListing,
                                         onGoCreateGroup,
-                                        onGoProfile,         // 👈 新增
-                                        onGoMessages,        // 👈 新增
-                                        onOpenPost,          // 👈 新增
-                                        reloadTick = 0,      // 👈 接收“刷新信号”
-                                        onRequestRefresh,    // 👈 本页 Home 调用以刷新
+                                        onGoProfile,        // ✅ 点击用户名跳转
+                                        onGoMessages,
+                                        onOpenPost,
+                                        reloadTick = 0,
+                                        onRequestRefresh,
+                                        username = "User name",   // ✅ 新增：从外部传入要显示的用户名
                                     }) {
     const [listings, setListings] = useState([]);
     const [q, setQ] = useState("");
@@ -71,48 +72,57 @@ export default function ListingPage({
         <div className="mp-root">
             {/* Header */}
             <header className="mp-header">
-                <div className="mp-left">
-                    <button className="mp-icon mp-round" onClick={() => history.back()} aria-label="Back">←</button>
+  <div className="mp-left">
+    <button className="mp-icon mp-round large" onClick={() => history.back()} aria-label="Back">←</button>
+    <button
+      className="mp-icon mp-round large"
+      aria-label="Home"
+      onClick={() => { onRequestRefresh && onRequestRefresh(); }}
+      title="Refresh"
+    >
+      🏠
+    </button>
 
-                    {/* ✅ 在 listing 页：Home = 刷新列表 */}
-                    <button
-                        className="mp-icon mp-round"
-                        aria-label="Home"
-                        onClick={() => { onRequestRefresh && onRequestRefresh(); }}
-                        title="Refresh"
-                    >
-                        🏠
-                    </button>
+    {/* ✅ 用户信息区：点击头像或名字进入 Profile */}
+    <div
+      className="mp-user"
+      onClick={onGoProfile}
+      style={{ cursor: "pointer" }}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && onGoProfile && onGoProfile()}
+      title="Go to profile"
+    >
+      <div className="mp-avatar">🐧</div>
+      <span className="mp-username">{username}</span>
+    </div>
+  </div>
 
-                    {/* ✅ 用户名区域可点击，去 Profile */}
-                    <div
-                        className="mp-user"
-                        onClick={onGoProfile}
-                        style={{ cursor: "pointer" }}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => e.key === "Enter" && onGoProfile && onGoProfile()}
-                        title="Go to profile"
-                    >
-                        <div className="mp-avatar">🐧</div>
-                        <span className="mp-username">User name</span>
-                    </div>
-                </div>
+  {/* ✅ 居中 Ulink Logo */}
+  <div className="mp-logo ulink-logo">
+    <span className="ulink-u">U</span>link
+  </div>
 
-                <div className="mp-search-wrap">
-                    <input
-                        value={q}
-                        onChange={(e) => setQ(e.target.value)}
-                        className="mp-search"
-                        placeholder="Search"
-                    />
-                </div>
+  {/* ✅ 搜索框右移 */}
+  <div className="mp-search-wrap spaced">
+    <input
+      value={q}
+      onChange={(e) => setQ(e.target.value)}
+      className="mp-search"
+      placeholder="Search"
+    />
+  </div>
 
-                <div className="mp-right">
-                    <KebabMenu onReport={() => setShowReport(true)} />
-                    <button className="mp-logout" onClick={onLogout} aria-label="Logout">Logout</button>
-                </div>
-            </header>
+  <div className="mp-right">
+    <KebabMenu onReport={() => setShowReport(true)} />
+    <button className="mp-logout" onClick={onLogout} aria-label="Logout">
+      Logout
+    </button>
+  </div>
+</header>
+
+            
+       
 
             {/* Feed / Groups */}
             <main className="mp-feed">
@@ -129,10 +139,10 @@ export default function ListingPage({
                                 title="Open post"
                             >
                                 <div className="mp-post-texts">
-  {item.title?.trim() && <div className="mp-post-title">{item.title}</div>}
-  {item.description?.trim() && <div className="mp-post-desc">{item.description}</div>}
-  {item.price !== undefined && <div className="mp-post-price">${item.price}</div>}
-</div>
+                                    {item.title?.trim() && <div className="mp-post-title">{item.title}</div>}
+                                    {item.description?.trim() && <div className="mp-post-desc">{item.description}</div>}
+                                    {item.price !== undefined && <div className="mp-post-price">${item.price}</div>}
+                                </div>
 
                                 <div className="mp-post-media">
                                     <div className="mp-imgbox">

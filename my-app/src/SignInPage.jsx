@@ -26,7 +26,6 @@ export default function SignInPage({ onSignIn, onBack }) {
             const data = await res.json();
 
             if (data.success) {
-                // ✅ 不再弹 "Successfully logged in!"
                 onSignIn && onSignIn(data.id);
             } else {
                 setError(data.message || "Login failed");
@@ -41,22 +40,33 @@ export default function SignInPage({ onSignIn, onBack }) {
 
     return (
         <div className="register-container">
-            {/* 顶部工具行（可保留你的 KebabMenu） */}
+            {/* 顶部工具栏 */}
             <div className="register-header header-without-search">
-                <button className="signup-btn" onClick={onBack} disabled={loading}>
+                {/* 用按钮 + 改 hash；并阻止默认与冒泡，避免被父级 <a href="/register/"> 抢走 */}
+                <button
+                    type="button"
+                    className="signup-btn"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // 只改哈希，保证得到 #/register/，不会被服务器路径重写
+                        window.location.hash = "/register/";
+                    }}
+                >
                     Sign Up
                 </button>
                 <div className="spacer" />
                 <KebabMenu onReport={() => setShowReport(true)} />
             </div>
 
-            {/* ✅ 居中的 ULink Logo（标题上方） */}
+            {/* LOGO 区域 */}
             <div className="auth-logo-spot">
                 <Logo size={36} />
             </div>
 
             <h1 className="register-title">Sign In</h1>
 
+            {/* 登录表单 */}
             <form onSubmit={handleSubmit} className="register-form">
                 <div className="form-group">
                     <label>Username:</label>
