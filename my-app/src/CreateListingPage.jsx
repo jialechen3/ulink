@@ -4,6 +4,8 @@ import { API_BASE } from "./config";
 import KebabMenu from "./KebabMenu";
 import BugReportModal from "./BugReportModal";
 import Logo from "./Logo"
+import AppHeader from "./AppHeader";
+
 
 export default function CreateListingPage({
                                             user,
@@ -26,6 +28,20 @@ export default function CreateListingPage({
   const [loading, setLoading] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const dropRef = useRef(null);
+
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+      document.documentElement.style.overflow = "auto";
+    };
+  }, []);
+
+
+
+
 
   /** 文件选择上传 */
   const onPick = (e) => {
@@ -133,34 +149,14 @@ export default function CreateListingPage({
   return (
       <div className="cl-root">
         {/* ✅ Header identical to ListingPage */}
-        <header className="mp-header">
-          <div className="mp-left">
-            <button className="mp-icon mp-round" onClick={onBack} aria-label="Back">←</button>
-            <button className="mp-icon mp-round" aria-label="Home" onClick={onHome} title="Home">🏠</button>
-            <div
-                className="mp-user"
-                onClick={onGoProfile}
-                style={{cursor: "pointer"}}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === "Enter" && onGoProfile && onGoProfile()}
-                title="Go to profile"
-            >
-              <div className="mp-avatar">🐧</div>
-              <span className="mp-username">{username}</span>
-            </div>
-          </div>
-
-          {/* ✅ 居中放 ULink Logo */}
-          <div className="mp-center">
-            <Logo size={36}/>
-          </div>
-
-          <div className="mp-right">
-            <KebabMenu onReport={() => setShowReport(true)}/>
-            <button className="mp-logout" onClick={onLogout} aria-label="Logout">Logout</button>
-          </div>
-        </header>
+      <AppHeader
+          username={username}
+          onBack={onBack}
+          onHome={onHome}
+          onGoProfile={onGoProfile}
+          onLogout={onLogout}
+          onReport={() => setShowReport(true)}
+        />
 
 
         {/* === Main Content === */}
