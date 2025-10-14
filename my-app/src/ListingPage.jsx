@@ -3,6 +3,7 @@ import { API_BASE } from "./config";
 import "./App.css";
 import KebabMenu from "./KebabMenu";
 import BugReportModal from "./BugReportModal";
+import AppHeader from "./AppHeader";
 
 function timeAgo(ts) {
     const d = new Date(ts);
@@ -71,58 +72,18 @@ export default function ListingPage({
     return (
         <div className="mp-root">
             {/* Header */}
-            <header className="mp-header">
-  <div className="mp-left">
-    <button className="mp-icon mp-round large" onClick={() => history.back()} aria-label="Back">←</button>
-    <button
-      className="mp-icon mp-round large"
-      aria-label="Home"
-      onClick={() => { onRequestRefresh && onRequestRefresh(); }}
-      title="Refresh"
-    >
-      🏠
-    </button>
-
-    {/* ✅ 用户信息区：点击头像或名字进入 Profile */}
-    <div
-      className="mp-user"
-      onClick={onGoProfile}
-      style={{ cursor: "pointer" }}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && onGoProfile && onGoProfile()}
-      title="Go to profile"
-    >
-      <div className="mp-avatar">🐧</div>
-      <span className="mp-username">{username}</span>
-    </div>
-  </div>
-
-  {/* ✅ 居中 Ulink Logo */}
-  <div className="mp-logo ulink-logo">
-    <span className="ulink-u">U</span>link
-  </div>
-
-  {/* ✅ 搜索框右移 */}
-  <div className="mp-search-wrap spaced">
-    <input
-      value={q}
-      onChange={(e) => setQ(e.target.value)}
-      className="mp-search"
-      placeholder="Search"
-    />
-  </div>
-
-  <div className="mp-right">
-    <KebabMenu onReport={() => setShowReport(true)} />
-    <button className="mp-logout" onClick={onLogout} aria-label="Logout">
-      Logout
-    </button>
-  </div>
-</header>
-
-            
-       
+            <AppHeader
+              username={username ||user?.name || user?.username}
+              showBack={false}                          // 首页不显示返回
+              showSearch={true}                         // 首页需要搜索框
+              searchPlaceholder="Search"
+              searchValue={q}                           // 绑定现有状态
+              onSearchChange={setQ}                    // 绑定 setter
+              onHome={() => onRequestRefresh?.()}      // “Home”=触发刷新
+              onGoProfile={onGoProfile}                // 点击头像/用户名
+              onReport={() => setShowReport(true)}     // 三点上报
+              onLogout={onLogout}                      // 退出
+            />
 
             {/* Feed / Groups */}
             <main className="mp-feed">
