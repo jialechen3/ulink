@@ -127,6 +127,7 @@
 
 /* =================== Marketplace / Listing (保留) =================== */
 .mp-root { display: grid; grid-template-rows: auto 1fr auto; height: 100vh; background: #fff; color: #111; }
+
 /* === Header Layout Override for Ulink Logo === */
 .mp-header {
   position: fixed;
@@ -142,18 +143,10 @@
   box-sizing: border-box;
 }
 
+/* 给主内容加顶部留白，避免被header遮住（mp-feed 保持 margin-top 方案） */
+.mp-feed { margin-top: 64px; overflow-y: auto; padding: 10px 0; }
 
-/* 给主内容加顶部留白，避免被header遮住 */
-.mp-feed {
-  margin-top: 64px;
-}
-
-/* 左边按钮区放大 */
-.mp-left {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
+.mp-left { display: flex; align-items: center; gap: 0.8rem; }
 
 .mp-icon.large {
   width: 42px;
@@ -191,35 +184,33 @@
 .mp-user {
   display: flex;
   align-items: center;
-  gap: 10px;      /* 原本是 6px，这样更自然 */
+  gap: 10px;
   margin-left: 6px;
 }
 
 .mp-avatar {
-  width: 45px;         /* ✅ 放大 */
+  width: 45px;
   height: 45px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #f3f4f6;
-  font-size: 18px;     /* ✅ 内部表情或首字母也更大 */
+  font-size: 18px;
 }
-
-
 .mp-avatar.sm { width: 24px; height: 24px; }
 
 .mp-username {
-  font-weight: 700;         /* ✅ 加粗一点 */
-  font-size: 22px;          /* ✅ 比原来大一些 */
-  color: #1b1f24;           /* ✅ 深一点的灰黑色 */
+  font-weight: 700;
+  font-size: 22px;
+  color: #1b1f24;
   letter-spacing: 0.3px;
   margin-left: 2px;
 }
 
 .mp-search-wrap.spaced {
   margin-left: auto;
-  margin-right: 3rem;   /* 搜索栏整体右移 */
+  margin-right: 3rem;
   flex-shrink: 0;
 }
 .mp-search {
@@ -231,19 +222,16 @@
   background: #f9fafb;
   transition: 0.2s;
 }
-
 .mp-search:focus {
   border-color: #57a9ff;
   background: #fff;
 }
 
-
-.mp-feed { overflow-y: auto; padding: 10px 0; }
 .mp-post { padding: 6px 14px 0 14px; }
 .mp-post-head { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
 .mp-post-texts { display: grid; gap: 2px; }
 .mp-post-title { font-weight: 700; font-size: 14px; }
-.mp-post-desc { font-size: 12px; color: #666; }
+.mp-post-desc { font-size: 12px; color: #666; white-space: pre-wrap; }
 
 .mp-post-media { padding-left: 38px; margin-top: 6px; }
 .mp-imgbox { width: 64px; height: 64px; background: #f3f4f6; border-radius: 8px; display:flex; align-items:center; justify-content:center; border: 1px solid #e5e7eb; overflow: hidden; }
@@ -269,108 +257,60 @@
   grid-template-columns: repeat(3, 1fr);
   z-index: 1000;
 }
-
-.mp-feed {
-  padding-bottom: 80px; /* ✅ 底部留白给 tabs */
-}
+.mp-feed { padding-bottom: 80px; } /* 底部留白给 tabs */
 
 .mp-tabs .tab { background: none; border: none; padding: 10px 0; cursor: pointer; color: #666; }
 .mp-tabs .tab.active { color: #6a5acd; font-weight: 700; }
 .mp-fab { position: absolute; right: 14px; top: -20px; width: 44px; height: 44px; border-radius: 999px; background: #57a9ff; color: #fff; border: none; font-size: 26px; line-height: 44px; text-align: center; cursor: pointer; box-shadow: 0 6px 14px rgba(0,0,0,.18); }
 
-
-
-/* 桌面版默认显示输入框 */
-.desktop-only {
-  display: block;
-}
-.mobile-only {
-  display: none;
-}
-
+/* 桌面/移动显示切换 */
+.desktop-only { display: block; }
+.mobile-only { display: none; }
 
 /* ✅ Mobile 优化：隐藏用户名文字，避免 Header 挤压 */
-  @media (max-width: 480px) {
+@media (max-width: 480px) {
+  .kebab-wrapper { position: relative; right: -20px; }
+  .mp-username { display: none; }
 
-    .kebab-wrapper {
-    position: relative;
-    right: -20px;     /* ✅ 向右移动 6px，可以按视觉微调成 -8px */
-  }
-  
-    .mp-username,.sr-only {
-    display: none !important;
-  }
-    
-     /* 左边按钮区域稍靠左 */
-    .mp-left {
-      gap: 6px;
-      margin-left: -4px;
-    }
-      
+  .mp-left { gap: 6px; margin-left: 1px; }
+  .mp-user { margin-left: 1px; }
 
-    /* 如果想稍微拉近头像和搜索框的距离，可以再加 */
-    .mp-user {
-      margin-left: 1px;
-    }
-
-     /* ✅ 搜索框微缩并右移 */
   .mp-search-wrap.spaced {
     display: flex !important;
     justify-content: flex-end;
     margin-left: auto;
-    margin-right: 60px;     /* ✅ 稍微右移，不遮 Logo */
-    flex: 0 0 20px;        /* ✅ 宽度自适应，不超出 */
+    margin-right: 60px;
+    flex: 0 0 20px;
   }
-
-
-    .mp-search {
+  .mp-search {
     position: absolute;
-    left: 60%;
+    left: 56%;
     top: 26%;
-    height: 30px;
-    width: 70px;              /* ✅ 固定宽度，防止被字体撑开 */
-    height: 30px; 
-    font-size: 10px;
-    padding: 0 px;
-    border-radius: 10px;
+    width: 80px;
+    height: 26px;
+    font-size: 13px;
+    padding: 0 10px;
+    border-radius: 16px;
     border: 1px solid #d1d5db;
     background: #f9fafb;
   }
-  
-    .mp-logo {
+  .mp-logo {
     position: absolute;
-    left: 50%;
+    left: 34%;
     top: 14%;
-    transform: translate(-50%, -40%); /* ✅ 比 -52% 稍低，更对齐左右按钮 */
-    font-size: 2.2rem !important;  
+    transform: translate(-50%, -50%);
+    font-size: 2.2rem !important;
     line-height: 1;
-    z-index: 2; 
+    z-index: 2;
   }
-    .mp-icon.large {
-    width: 32px;
-    height: 32px;
-    font-size: 15px;
-  }
-    .mp-avatar {
-    width: 32px;
-    height: 32px;
-  }
-   .mp-right {
-    padding-right: 6px;
-    gap: 6px;
-  }
-   .mp-logout {
-    padding: 4px 8px;
-    font-size: 4px;
-    border-radius: 6px;
-  }
-  .mp-header {
-    height: 58px;
-    padding: 0 6px;
-  }
-  }
+  .mp-icon.large { width: 32px; height: 32px; font-size: 15px; }
+  .mp-avatar { width: 32px; height: 32px; }
+  .mp-right { padding-right: 6px; gap: 6px; }
+  .mp-logout { padding: 4px 8px; font-size: 6px; border-radius: 6px; }
+  .mp-header { height: 58px; padding: 0 6px; }
+}
 
-
+/* Marketplace Dark */
 @media (prefers-color-scheme: dark) {
   .mp-root { background: #121212; color: #e8e8e8; }
   .mp-header, .mp-tabs { border-color: #2a2a2a; }
@@ -382,59 +322,40 @@
   .mp-tabs .tab { color:#aaa; }
 }
 
-/* FAB */
-
+/* ============== FAB ============== */
 :root {
   --fab-blue: #57a9ff;
   --fab-size: 64px;
 }
-
-
 .mp-fab-right {
   position: fixed;
   right: 40px;
   bottom: 80px;
-
   width: var(--fab-size);
   height: var(--fab-size);
   border-radius: 50%;
   box-sizing: border-box;
-
-  /* ✅ 蓝色描边圈 */
   border: 6px solid var(--fab-blue);
   background: #ffffff;
-
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;              /* ✅ 加号大小适中 */
-  color: var(--fab-blue);       /* ✅ 蓝色加号 */
-
+  font-size: 20px;
+  color: var(--fab-blue);
   cursor: pointer;
   box-shadow: 0 10px 22px rgba(87,169,255,.28);
   transition: all 0.25s ease;
   z-index: 100;
 }
-
-/* --- SVG 加号图标（取代文字 +，防偏移） --- */
-.mp-fab-right svg path {
-  stroke: var(--fab-blue);
-  transition: stroke 0.25s ease;
-}
-
-/* --- Hover 效果 --- */
+.mp-fab-right svg path { stroke: var(--fab-blue); transition: stroke 0.25s ease; }
 .mp-fab-right:hover {
-  background: var(--fab-blue);     /* 悬停变实心蓝 */
-  color: #fff;                     /* 加号变白色 */
+  background: var(--fab-blue);
+  color: #fff;
   transform: translateY(-3px);
   box-shadow: 0 12px 24px rgba(87,169,255,.4);
 }
-
-.mp-fab-right:hover svg path {
-  stroke: #ffffff;
-}
+.mp-fab-right:hover svg path { stroke: #ffffff; }
 .mp-fab-right:active { transform: scale(.97); }
-
 
 .fab-menu {
   position: fixed;
@@ -453,8 +374,6 @@
   animation: fadeInUp 0.25s ease-out;
   z-index: 49;
 }
-
-
 .fab-item {
   background: #fff;
   border: 1px solid #eef1f5;
@@ -462,47 +381,36 @@
   border-radius: 12px;
   font-weight: 500;
   white-space: nowrap;
-  cursor: pointer;}
-
+  cursor: pointer;
+}
 .fab-item:hover { background: #f6f8fb; }
 
-
-
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
 @media (prefers-color-scheme: dark) {
   .fab-menu { background:#1b1b1b; border-color:#2a2a2a; color:#eee; }
   .fab-item:hover { background:#2a2a2a; }
 }
 
 /* =================== Create Listing Page (修复遮挡) =================== */
-/* 用变量统一 Header 高度，主内容按此留白，避免被固定 Header 遮挡 */
 .cl-root {
-  --cl-header-h: 64px;          /* ← 统一高度 */
+  --cl-header-h: 64px;
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 100vh;
   background: #fff;
   color: #111;
 }
-
-/* 固定在顶部，但有明确高度；去掉 100vw 防止溢出导致横向滚动 */
 .cl-header {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;                     /* ← 替代 width:100vw，避免溢出 */
-  height: var(--cl-header-h);   /* ← 明确高度 */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  top: 0; left: 0; right: 0;
+  height: var(--cl-header-h);
+  display: flex; align-items: center; justify-content: space-between;
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
-  padding: 0 18px;              /* 垂直方向改为 0，依赖 height 居中 */
+  padding: 0 18px;
   box-sizing: border-box;
-  z-index: 1000;                /* 提升层级，确保在最上 */
+  z-index: 1000;
 }
-
 .cl-left { display: flex; align-items: center; gap: 10px; }
 .cl-right { display: flex; align-items: center; justify-content: flex-end; }
 
@@ -514,32 +422,19 @@
 }
 .cl-round:hover { background-color: #f1f1f1; }
 
-/* 如果 header 中放 Logo，这里禁止它拦截点击，并保证居中对齐 */
 .auth-logo-spot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;         /* ← 关键：不拦截点击 */
-  height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; height: 100%;
 }
 
-/* 主内容为 Title/Input 预留顶部空间：Header 高度 + 额外 16px 呼吸 */
 .cl-main {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: calc(var(--cl-header-h) + 16px) 24px 160px;  /* ← 修复遮挡的核心 */
-  background: #fff;
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  box-sizing: border-box;
+  display: flex; flex-direction: column; gap: 18px;
+  padding: calc(var(--cl-header-h) + 16px) 24px 160px;
+  background: #fff; width: 100%; max-width: 1100px;
+  margin: 0 auto; box-sizing: border-box;
 }
-
-@media (min-width: 1200px) {
-  .cl-main { max-width: 75vw; }
-}
+@media (min-width: 1200px) { .cl-main { max-width: 75vw; } }
 
 .cl-brand {
   flex: 1; text-align: center; font-family: 'Georgia', serif;
@@ -561,65 +456,29 @@
 .cl-select { appearance: none; -webkit-appearance: none; -moz-appearance: none; }
 .cl-textarea { resize: vertical; }
 
-/* 上传区：修正了 margin-top 的空格错误（10 px -> 10px） */
+/* 上传区 */
 .cl-upload {
   width: 100%;
   height: 220px;
-  background: none;
+  background: #e9e9e9;
   border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
+  display: flex; align-items: center; justify-content: space-evenly;
   position: relative;
-  margin-top: 10px;             /* ← 修正 */
+  margin-top: 10px;
 }
 .cl-upload-col { text-align: center; }
+.cl-upload-ic { font-size: 32px; cursor: pointer; opacity: 0.85; transition: opacity 0.2s ease; }
+.cl-upload-ic:hover { opacity: 1; }
+.cl-hint { font-size: 14px; color: #555; cursor: pointer; }
+.cl-file { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
-.cl-upload-ic {
-  font-size: 32px;
-  cursor: pointer;
-  opacity: 0.85;
-  transition: opacity 0.2s ease;
-}
+/* 预览区（新） */
+.cl-previews { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.cl-thumb { width: 86px; height: 86px; border-radius: 8px; overflow: hidden; background:#f3f4f6; border:1px solid #e5e7eb; }
+.cl-thumb img { width: 100%; height: 100%; object-fit: cover; }
+/* 兼容旧写法 */
+.cl-prev.cl-previews { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 
-.cl-upload-ic:hover {
-  opacity: 1;
-}
-
-
-.cl-hint {
-  font-size: 14px;
-  color: #555;
-  cursor: pointer;
-}
-
-.cl-file {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.cl-prev.cl-previews {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.cl-thumb {
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #f3f4f6;
-  border: 1px solid #ddd;
-}
-.cl-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-/* 底部操作栏固定不遮内容（主内容已预留 160px 下内边距） */
 .cl-actions {
   position: fixed;
   bottom: 0; left: 0; right: 0;
@@ -655,8 +514,6 @@
   .mp-logout { background: #dc2626; color: #fff; }
 }
 
-.mp-post-desc { white-space: pre-wrap; }
-
 /* 全局防横向滚动（保留） */
 html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-behavior-x: none; }
 #root { width: 100%; overflow-x: hidden; }
@@ -684,8 +541,6 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   0%, 100% { transform: scale(1); filter: brightness(1); }
   50%      { transform: scale(1.05); filter: brightness(1.15); }
 }
-
-/* 如果 Logo 也会单独用于认证页的顶部区域，可复用该容器 */
 .auth-logo-spot--standalone {
   display: flex; justify-content: center; align-items: center;
   margin: 10px 0;
@@ -697,12 +552,10 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: #ffffff; /* ✅ 纯白背景 */
-  padding: 1rem; /* ✅ 为小屏留边距 */
+  background: #ffffff;
+  padding: 1rem;
   box-sizing: border-box;
-
 }
-
 .uni-card {
   background: #ffffff;
   border: 1px solid #e5e8eb;
@@ -713,45 +566,32 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   text-align: left;
   box-sizing: border-box;
 }
-
 .uni-header {
   position: relative;
   display: flex;
-  justify-content: center;   /* ✅ 居中 Logo */
+  justify-content: center;
   align-items: center;
   margin-bottom: 0.8rem;
-  transform: translateY(-6px); /* ✅ 整体上移一点 */
+  transform: translateY(-6px);
 }
-
 .uni-header .logo {
   font-size: 1.8rem;
-  font-size: rem;
   font-weight: 700;
   font-family: "Inter", sans-serif;
   background: linear-gradient(90deg, #ffb347, #845ec2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
-
-/* ✅ 保持右上角菜单 */
-.uni-header .kebab-wrapper {
-  position: absolute;
-  right: 0.4rem;
-  top: 0.4rem;
-}
-
-
+.uni-header .kebab-wrapper { position: absolute; right: 0.4rem; top: 0.4rem; }
 
 .uni-title {
   font-size: 1.4rem;
   color: #1b1f24;
   margin-bottom: 1.4rem;
   font-weight: 600;
-  text-align: center;   /* ✅ 居中标题 */
-  width: 100%;          /* ✅ 确保占满整行方便居中 */
+  text-align: center;
+  width: 100%;
 }
-
 .uni-search {
   width: 100%;
   padding: 0.6rem 0.8rem;
@@ -761,14 +601,8 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   margin-bottom: 0.8rem;
   transition: border 0.2s ease;
   box-sizing: border-box;
-
 }
-
-.uni-search:focus {
-  border-color: #57a9ff;
-  outline: none;
-}
-
+.uni-search:focus { border-color: #57a9ff; outline: none; }
 .uni-select {
   width: 100%;
   padding: 0.7rem 0.8rem;
@@ -780,9 +614,7 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   cursor: pointer;
   transition: border 0.2s ease;
 }
-.uni-select:hover {
-  border-color: #57a9ff;
-}
+.uni-select:hover { border-color: #57a9ff; }
 
 .uni-btn {
   width: 95%;
@@ -794,26 +626,14 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease;
-  margin: 2rem auto 0 auto;   /* ✅ 上下间距 + 居中 */
-  display: block;             /* ✅ 让 margin: auto 生效 */
+  margin: 2rem auto 0 auto;
+  display: block;
 }
+.uni-btn:hover { background: #3497ff; transform: translateY(-1px); }
+.uni-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.uni-btn:hover {
-  background: #3497ff;
-  transform: translateY(-1px);
-}
-.uni-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* === University dropdown (prettier version) === */
-.uni-select-box {
-  position: relative;
-  justify-content: center;
-  width: 100%;
-}
-
+/* 下拉增强 */
+.uni-select-box { position: relative; justify-content: center; width: 100%; }
 .uni-dropdown {
   width: 80%;
   padding: 10px 14px;
@@ -823,15 +643,14 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   color: #213547;
   background: #fff;
   outline: none;
-  margin: 0 auto;          /* ✅ 居中 */
-  display: block;          /* ✅ 让 margin 生效 */
+  margin: 0 auto;
+  display: block;
 }
-
 .uni-dropdown-menu {
   position: absolute;
   top: calc(100% + 6px);
   left: 50%;
-  transform: translateX(-50%);  /* ✅ 完全居中于输入框 */
+  transform: translateX(-50%);
   width: 90%;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px) saturate(180%);
@@ -842,28 +661,46 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   z-index: 10;
   transition: all 0.25s ease;
 }
-
-
 .uni-option {
   padding: 12px 16px;
   font-size: 15px;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease;
 }
+.uni-option:hover { background: rgba(87, 169, 255, 0.1); }
+.uni-option.selected { background: rgba(87, 169, 255, 0.2); font-weight: 600; }
 
-
-.uni-option:hover {
-  background: rgba(87, 169, 255, 0.1);  /* ✅ hover 高亮 */
+/* University Selection — 列表样式（附带更细的控件状态） */
+.uni-sub { margin: 0 0 1rem; color: #6b7280; }
+.uni-input {
+  width: 100%; box-sizing: border-box; border-radius: 10px;
+  border: 1px solid #e5e7eb; padding: 10px 12px; font-size: 14px; outline: none;
+  background: #fff; color: #111827;
 }
-
-.uni-option.selected {
-  background: rgba(87, 169, 255, 0.2);
-  font-weight: 600;
+.uni-input:focus { border-color: #4a76d9; box-shadow: 0 0 0 3px rgba(74,118,217,.15); }
+.uni-list {
+  display: grid; grid-template-columns: 1fr; gap: 8px;
+  max-height: 280px; overflow: auto; padding-right: 2px;
 }
+.uni-item {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; border-radius: 12px; border: 1px solid #e5e7eb;
+  background: #fafafa; color: #111827; padding: 12px 14px;
+  cursor: pointer; transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.uni-item:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.uni-item.is-active { border-color: #4a76d9; box-shadow: 0 0 0 3px rgba(74,118,217,.15); }
+.uni-item:focus { outline: none; box-shadow: 0 0 0 3px rgba(74,118,217,.15); }
+.uni-item-name { font-size: 14px; font-weight: 600; }
+.uni-dot { opacity: .35; }
 
+/* 底部按钮区（另一版本兼容） */
+.uni-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+.uni-btn.ghost { background: #eef2f7; color: #374151; border: 1px solid #e5e7eb; }
+.uni-btn.ghost:hover { filter: brightness(.98); }
+.uni-btn.primary { background: #4a76d9; color: #fff; }
 
-
-/* 暗色模式 */
+/* University Selection 暗色模式（两套都覆盖） */
 @media (prefers-color-scheme: dark) {
   .screen-university .card {
     background: #1e1e1e;
@@ -876,106 +713,83 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
     border: 1px solid #3a3a3a;
     color: #e8e8e8;
   }
-  .screen-university button {
-    background: #4a90e2;
+  .screen-university button { background: #4a90e2; }
+
+  .uni-page { background: #121212 !important; }
+  .uni-card { background: #1a1a1a !important; border-color: #2a2a2a !important; color: #e8e8e8 !important; }
+  .uni-title { color: #e8e8e8 !important; }
+  .uni-sub { color: #a3a3a3 !important; }
+  .uni-input { background: #1f2937 !important; color: #e8e8e8 !important; border-color: #374151 !important; }
+  .uni-input::placeholder { color: #8b8b8b !important; }
+  .uni-list { scrollbar-color: #374151 #1a1a1a; }
+  .uni-item {
+    background: #1f2937 !important; color: #e6e6e6 !important; border-color: #374151 !important;
   }
+  .uni-item:hover { background: #233044 !important; border-color: #445067 !important; }
+  .uni-item.is-active { border-color: #7aa2ff !important; box-shadow: 0 0 0 3px rgba(122,162,255,.22) !important; }
+  .uni-item:focus { box-shadow: 0 0 0 3px rgba(122,162,255,.22) !important; }
+  .uni-dot { color: #9aa4b2 !important; opacity: .9; }
+  .uni-btn.ghost { background: #2a2a2a !important; color: #e8e8e8 !important; border-color: #3a3a3a !important; }
+  .uni-btn.primary { background: #3d6edc !important; color: #fff !important; }
 }
+
+/* Create Listing 输入字体（Risque） */
 .cl-input,
 .cl-textarea,
 .cl-select,
 select.cl-input {
   font-family: "Risque", cursive !important;
 }
-
-/* 占位符也使用 Risque，保持一致 */
 .cl-input::placeholder,
 .cl-textarea::placeholder {
   font-family: "Risque", cursive !important;
 }
 
-.mp-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-/* 居中 Logo 区不拦截点击，避免覆盖左侧用户名点击 */
-.mp-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none; /* 关键 */
-}
-
-/* 明确用户区可点（确保优先级） */
-.mp-user {
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
 /* ===== Header Clickability Fix Pack ===== */
-
-/* 让 Header 永远在最上且能接收点击 */
-.mp-header,
-.mp-header.mp-header--safe {
-  position: fixed;    /* 你的样式里本来就是 fixed，这里明确一下 */
-  top: 0; left: 0; right: 0;
-  z-index: 10000;     /* 提升到足够高，压过任何上传/蒙层等 */
-  pointer-events: auto;
+.mp-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* 居中 Logo 不拦截点击 */
 }
-
-/* 三个区域都明确可点击 */
+.mp-user,
 .mp-left,
 .mp-right,
-.mp-user,
 .mp-icon,
-.mp-logout {
+.mp-logout { pointer-events: auto; cursor: pointer; }
+
+.mp-header,
+.mp-header.mp-header--safe {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10000;
   pointer-events: auto;
 }
 
-/* 居中区不要盖住点击（有些容器可能撑满列导致遮挡） */
-.mp-search-wrap {
-  pointer-events: auto;   /* 搜索框需要正常交互 */
-}
-.mp-center {               /* 如果你在别处有中间 Logo 容器也套这个类 */
-  pointer-events: none;    /* 不要拦截左右侧的点击 */
-  flex: 0 0 auto;
-}
-
-/* 防止其他元素越界到 Header 顶部：常见是绝对定位的 file input */
+/* 防止其他元素越界到 Header 顶部 */
 .cl-upload { position: relative; z-index: 1; }
 .cl-upload .cl-file { z-index: 1; }
 
-/* 确保主内容不会覆盖 Header（Header 是 fixed） */
-.mp-feed, .cl-main, .cg-main {
-  padding-top: 64px;       /* 与 header 高度一致 */
-}
-
-/* 如果你有全屏蒙层类（例如 modal/backdrop），确保 z-index < 10000 */
-.modal-backdrop { z-index: 40; }
-/* Tabs 在底部，保持 1000 即可 */
-.mp-tabs { z-index: 1000; }
+/* 确保主内容不会覆盖 Header（mp-feed 已用 margin-top，其他页面用 padding-top） */
+.cl-main, .cg-main { padding-top: 64px; }
 
 /* ===== Password eye toggle (for RegisterPage & LoginPage) ===== */
-/* 修正：仅在 PasswordField 组件内部生效 */
 .form-group .eye-wrap {
   position: relative;
-  flex: 2; /* 保持与其他 input 一样宽 */
+  flex: 2;
 }
-
 .form-group .eye-wrap input.password-input {
   width: 100%;
   box-sizing: border-box;
-  padding-right: 38px; /* 稍微减小，避免挤压 */
+  padding-right: 38px;
 }
+
+/* 全局增强的暗色变量（重要控件） */
 @media (prefers-color-scheme: dark) {
   body, html, #root {
     background-color: #121212 !important;
     color: #e8e8e8 !important;
   }
-
   .register-container,
   .uni-card,
   .mp-root,
@@ -988,28 +802,23 @@ select.cl-input {
     color: #e8e8e8 !important;
     border-color: #333 !important;
   }
-
   input, textarea, select {
     background-color: #2b2b2b !important;
     color: #e8e8e8 !important;
     border-color: #444 !important;
   }
-
   button {
     background-color: #4a76d9 !important;
     color: #fff !important;
   }
-
   .error-text {
     background-color: rgba(211,47,47,0.15) !important;
     border-color: rgba(211,47,47,0.3) !important;
     color: #ff6b6b !important;
   }
-
-  .mp-empty, .password-rules {
-    color: #aaa !important;
-  }
+  .mp-empty, .password-rules { color: #aaa !important; }
 }
+
 /* 🧿 禁止 Edge / Chrome / Safari 自动出现的小眼睛按钮 */
 input[type="password"]::-ms-reveal,   /* Edge / IE */
 input[type="password"]::-ms-clear,    /* Edge / IE 清除按钮 */
@@ -1020,5 +829,3 @@ input[type="password"]::-webkit-textfield-decoration-container {
   appearance: none;
   -webkit-appearance: none;
 }
-
-
