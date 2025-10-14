@@ -1,4 +1,4 @@
-// src/App.jsx
+// src/App.jsx — Hash 路由版（#/path/，刷新不会 404）+ 已有大学后禁止访问选大学页
 import { useEffect, useState } from "react";
 import RegisterPage from "./RegisterPage";
 import UniversitySelection from "./UniversitySelection";
@@ -11,40 +11,10 @@ import MessagesPage from "./MessagesPage";
 import PostDetailPage from "./PostDetailPage";
 import { API_BASE } from "./config";
 
-/** ======== 基于 API_BASE 自动推导部署前缀（子目录） ======== */
-function getBaseFromAPI() {
-    try {
-        const u = new URL(API_BASE);
-        let p = u.pathname || "/";
-        if (!p.startsWith("/")) p = "/" + p;
-        if (!p.endsWith("/")) p = p + "/";
-        return p;
-    } catch {
-        const a = document.createElement("a");
-        a.href = API_BASE;
-        let p = a.pathname || "/";
-        if (!p.startsWith("/")) p = "/" + p;
-        if (!p.endsWith("/")) p = p + "/";
-        return p;
-    }
-}
-const BASE_PATH = getBaseFromAPI();
-
-/** 规范化到 /xxx/（不含 BASE_PATH） */
-function normPath(seg) {
-    let s = (seg || "").trim();
-    s = s.replace(/^\/+|\/+$/g, ""); // 去掉两端斜杠
-    if (!s) return "/";
-    return `/${s}/`;
-}
-
-/** 从实际 pathname 里剥掉 BASE_PATH，再解析出 step */
-function parseStepFromLocation(pathname) {
-    let p = pathname || "/";
-    if (!p.startsWith("/")) p = "/" + p;
-    if (p.startsWith(BASE_PATH)) p = p.slice(BASE_PATH.length - 1); // 保留前导 /
-    const seg = p.replace(/^\/+|\/+$/g, "");
-    if (!seg) return "signin";
+/** 解析当前 step（基于 location.hash） */
+function parseStepFromHash() {
+    const raw = window.location.hash || "#/signin/";
+    const seg = raw.replace(/^#\/?|\/+$/g, ""); // 去掉 #/ 和尾部 /
     const head = seg.split("/")[0].toLowerCase();
     const known = new Set([
         "signin", "register", "university", "listing",
@@ -54,89 +24,129 @@ function parseStepFromLocation(pathname) {
     return known.has(head) ? head : "signin";
 }
 
+/** 规范化成 "#/xxx/" */
+function toHash(seg) {
+    let s = (seg || "").trim().replace(/^\/+|\/+$/g, "");
+    if (!s) s = "signin";
+    return `#/${s}/`;
+}
+
 export default function App() {
-    const [step, setStep] = useState(() => parseStepFromLocation(window.location.pathname));
+    const [step, setStep] = useState(() => parseStepFromHash());
     const [user, setUser] = useState(null);
     const [university, setUniversity] = useState(null);
     const [username, setUsername] = useState("User name");
     const [listReloadTick, setListReloadTick] = useState(0);
     const [currentPost, setCurrentPost] = useState(null);
+    const [blockTipTick, setBlockTipTick] = useState(0); // 触发重新渲染提示的小计数
 
-    /** 统一导航（基于 BASE_PATH），强制 /xxx/ 形式 */
+    /** 是否“锁定选大学页”：已有 university 则锁定 */
+    const universityLocked = !!(university && university !== "null" && university !== "undefined");
+
+    /** Hash 导航（不会整页请求，刷新不 404） */
     const navigate = (seg) => {
-        const rel = normPath(seg); // 例如 "/profile/"
-        const href = BASE_PATH.replace(/\/+$/,"/") + rel.replace(/^\/+/,""); // BASE_PATH + 相对
-        if (window.location.pathname !== href) {
-            window.history.pushState({}, "", href);
-            // 让所有依赖 popstate 的组件同步
-            window.dispatchEvent(new PopStateEvent("popstate"));
+        const target = toHash(seg);
+
+        // ✅ 禁止导航到 /university/（已有大学时）
+        if (universityLocked && target === "#/university/") {
+            // 不跳转、不改变 hash，只刷新提示
+            setBlockTipTick((t) => t + 1);
+            return;
         }
-        setStep(parseStepFromLocation(href));
+
+        if (window.location.hash !== target) {
+            window.location.hash = target; // 触发 hashchange
+        } else {
+            // 触发一次 hashchange 以便同页刷新时也能重渲染
+            window.dispatchEvent(new HashChangeEvent("hashchange"));
+        }
     };
 
-    // 监听浏览器前进/后退
+    // 监听前进/后退（hashchange）
     useEffect(() => {
-        const onPop = () => setStep(parseStepFromLocation(window.location.pathname));
-        window.addEventListener("popstate", onPop);
-        return () => window.removeEventListener("popstate", onPop);
-    }, []);
+        const onHash = () => {
+            const next = parseStepFromHash();
+            // ✅ 用户手动在地址栏输入 #/university/：已有大学则不切换 step，仅刷新提示
+            if (universityLocked && next === "university") {
+                setBlockTipTick((t) => t + 1);
+                return; // 不更新 step，保持当前页面
+            }
+            setStep(next);
+        };
+        window.addEventListener("hashchange", onHash);
+        return () => window.removeEventListener("hashchange", onHash);
+    }, [universityLocked]);
 
-    // 启动：尝试恢复用户与大学，并决定落地页
+    // 启动时恢复用户与大学，并决定落地页（不做任何强制跳转到其他功能）
     useEffect(() => {
         const savedUser = localStorage.getItem("userId");
         const savedUniversity = localStorage.getItem("university");
         const savedName = localStorage.getItem("username");
         if (savedName) setUsername(savedName);
 
+        // 未登录：允许直接去 /register 和 /university，其余统一回 signin
         if (!savedUser) {
-            const s = parseStepFromLocation(window.location.pathname);
-            if (s !== "register" && s !== "university") navigate("/signin/");
+            const s = parseStepFromHash();
+            if (s !== "register" && s !== "university") {
+                navigate("/signin/");
+            }
             return;
         }
 
         setUser(savedUser);
+
         (async () => {
             try {
-                const res = await fetch(`${API_BASE}/db.php?user=${savedUser}`);
+                const res = await fetch(`${API_BASE}/db.php?user=${encodeURIComponent(savedUser)}`);
                 const data = await res.json();
                 const uni = data?.user?.university_id;
                 const name = data?.user?.username;
+
                 if (name) {
                     setUsername(name);
                     localStorage.setItem("username", name);
                 }
+
                 if (data?.success && uni != null) {
                     const uniStr = String(uni);
                     setUniversity(uniStr);
                     localStorage.setItem("university", uniStr);
-                    if (parseStepFromLocation(window.location.pathname) === "signin") {
+                    // 不强行改路由；仅当当前是 signin 时，给个默认入口到 listing
+                    if (parseStepFromHash() === "signin") {
                         navigate("/listing/");
                     } else {
-                        setStep(parseStepFromLocation(window.location.pathname));
+                        setStep(parseStepFromHash());
                     }
                 } else {
                     localStorage.removeItem("university");
-                    navigate("/university/");
+                    // 未设置大学时，若当前不是 register/university/signin，则引导去 university
+                    const cur = parseStepFromHash();
+                    if (cur !== "register" && cur !== "university" && cur !== "signin") {
+                        navigate("/university/");
+                    }
                 }
             } catch {
+                // API 不可用时：若本地有大学缓存保持现状；否则引导去 university
                 if (savedUniversity && savedUniversity !== "null" && savedUniversity !== "undefined") {
                     setUniversity(savedUniversity);
-                    if (parseStepFromLocation(window.location.pathname) === "signin") navigate("/listing/");
+                    if (parseStepFromHash() === "signin") setStep("listing");
                 } else {
                     localStorage.removeItem("university");
-                    navigate("/university/");
+                    const cur = parseStepFromHash();
+                    if (cur !== "register" && cur !== "university" && cur !== "signin") {
+                        navigate("/university/");
+                    }
                 }
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    /** 登录成功 */
     const handleSignIn = async (id) => {
         setUser(id);
         localStorage.setItem("userId", id);
         try {
-            const res = await fetch(`${API_BASE}/db.php?user=${id}`);
+            const res = await fetch(`${API_BASE}/db.php?user=${encodeURIComponent(id)}`);
             const data = await res.json();
             const uni = data?.user?.university_id;
             const name = data?.user?.username;
@@ -159,14 +169,12 @@ export default function App() {
         }
     };
 
-    /** 注册成功 */
     const handleRegister = (id) => {
         setUser(id);
         localStorage.setItem("userId", id);
         navigate("/university/");
     };
 
-    /** 选择大学确认 */
     const handleUniversityConfirm = (uni) => {
         const uniStr = String(uni);
         setUniversity(uniStr);
@@ -174,7 +182,6 @@ export default function App() {
         navigate("/listing/");
     };
 
-    /** 登出 */
     const handleLogout = () => {
         localStorage.removeItem("userId");
         localStorage.removeItem("university");
@@ -185,22 +192,39 @@ export default function App() {
         navigate("/signin/");
     };
 
-    /** 回首页并刷新列表一次 */
     const goHomeToListing = () => {
         navigate("/listing/");
         setListReloadTick((t) => t + 1);
     };
 
-    /** 统一“返回上一页”函数（供需要时传下去） */
     const goBackOne = () => window.history.back();
+
+    // ===== 403 提示（仅在当前 hash 是 #/university/ 且已锁定时显示，不做跳转） =====
+    const renderUniversityLocked = () => (
+        <div className="uni-locked" style={{ maxWidth: 520, margin: "80px auto", textAlign: "center" }}>
+            <h1 style={{ marginBottom: 12 }}>University selection is locked</h1>
+            <p style={{ opacity: 0.8, lineHeight: 1.6 }}>
+                Your account already has a university set. Returning to the university selection page is disabled.
+            </p>
+            {/* 不提供跳转按钮，保持“不要丢到别的功能”的要求 */}
+            {/* 你可以放一个关闭提示的按钮，仅刷新本页提示： */}
+            <button
+                type="button"
+                style={{ marginTop: 16, padding: "8px 14px", borderRadius: 8, border: "1px solid #ccc" }}
+                onClick={() => setBlockTipTick((t) => t + 1)}
+            >
+                OK
+            </button>
+        </div>
+    );
 
     return (
         <div className="app-container">
             {step === "signin" && (
                 <SignInPage
                     onSignIn={handleSignIn}
-                    // 返回上一页（比如从 register 来）
-                    onBack={goBackOne}
+                    // 你原来用 onBack 当成“去注册”的触发，这里保持兼容
+                    onBack={() => navigate("/register/")}
                 />
             )}
 
@@ -212,10 +236,14 @@ export default function App() {
             )}
 
             {step === "university" && (
-                <UniversitySelection
-                    userId={user}
-                    onConfirm={handleUniversityConfirm}
-                />
+                universityLocked
+                    ? renderUniversityLocked()
+                    : (
+                        <UniversitySelection
+                            userId={user}
+                            onConfirm={handleUniversityConfirm}
+                        />
+                    )
             )}
 
             {step === "listing" && (
@@ -231,7 +259,6 @@ export default function App() {
                     reloadTick={listReloadTick}
                     onRequestRefresh={() => setListReloadTick((t) => t + 1)}
                     username={username}
-                    // 顶层一般不需要返回，不传 onBack 让 Header 隐藏或使用默认
                 />
             )}
 
@@ -239,7 +266,6 @@ export default function App() {
                 <CreateListingPage
                     user={user}
                     university={university}
-                    // ✅ 真实上一页返回（从这里去 profile，再点返回会回到 createlisting）
                     onBack={goBackOne}
                     onCreated={() => navigate("/listing/")}
                     onHome={goHomeToListing}
@@ -261,7 +287,6 @@ export default function App() {
 
             {step === "profile" && (
                 <ProfilePage
-                    // ✅ 从任意页进入 profile，返回均回到“进入前那一页”
                     onBack={goBackOne}
                     onHome={goHomeToListing}
                     onLogout={handleLogout}

@@ -7,24 +7,40 @@ import Logo from "./Logo";
 
 export default function UniversitySelection({ userId, onConfirm }) {
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [universities, setUniversities] = useState([]);
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState("");
+  const [error, setError] = useState("");
 
-  // 拉取大学列表
+  const DB_URL = `${API_BASE}/db.php`;
+  const UNI_URL = `${API_BASE}/universities.php`;
+
+  // 拉取大学列表（支持搜索）
   useEffect(() => {
     let abort = false;
     const fetchUnis = async () => {
       setLoading(true);
+      setError("");
       try {
-        const url = `${API_BASE}/universities.php${q ? `?q=${encodeURIComponent(q)}` : ""}`;
+        const url = `${UNI_URL}${q ? `?q=${encodeURIComponent(q)}` : ""}`;
         const res = await fetch(url);
         const data = await res.json();
-        if (!abort && Array.isArray(data?.items)) {
-          setUniversities(data.items);
+        if (!abort) {
+          if (Array.isArray(data?.items)) {
+            setUniversities(data.items);
+          } else if (Array.isArray(data)) {
+            // 兼容直接返回数组的旧 universities.php
+            setUniversities(data);
+          } else {
+            setUniversities([]);
+          }
         }
-      } catch (_) {
-        if (!abort) setUniversities([]);
+      } catch (e) {
+        if (!abort) {
+          setUniversities([]);
+          setError("Failed to load universities.");
+        }
       } finally {
         if (!abort) setLoading(false);
       }
@@ -33,12 +49,42 @@ export default function UniversitySelection({ userId, onConfirm }) {
     return () => { abort = true; };
   }, [q]);
 
-  const canConfirm = useMemo(() => !!selected, [selected]);
+  const canConfirm = useMemo(() => !!selected && !!userId && !saving, [selected, userId, saving]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!canConfirm) return;
-    // 回调给上层
-    onConfirm?.(selected);
+    setSaving(true);
+    setError("");
+
+    try {
+      // 将所选大学保存到后端（PATCH 到 db.php）
+      const res = await fetch(DB_URL, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: Number(userId),
+          university_id: Number(selected),
+        }),
+      });
+
+      // 后端约定：成功时通常返回 { success: true, ... }，
+      // 但也可能返回 { success: false, message: ... }
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && (data.success === undefined || data.success === true)) {
+        // 通知上层完成 & 传回已选的 university_id
+        onConfirm?.(String(selected));
+      } else {
+        const msg =
+            data?.message ||
+            `Failed to save university (HTTP ${res.status}).`;
+        setError(msg);
+      }
+    } catch (e) {
+      setError("Network error while saving university.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -67,7 +113,10 @@ export default function UniversitySelection({ userId, onConfirm }) {
             />
           </div>
 
-          {/* 选项列表（自定义列表，避免 <select> 在暗色下样式受限） */}
+          {/* 状态/错误 */}
+          {error && <div className="uni-error" role="alert">{error}</div>}
+
+          {/* 选项列表（用按钮保证暗色可控样式） */}
           <div className="uni-list" role="listbox" aria-label="Universities">
             {loading && <div className="uni-empty">Loading…</div>}
 
@@ -99,6 +148,7 @@ export default function UniversitySelection({ userId, onConfirm }) {
                 type="button"
                 className="uni-btn ghost"
                 onClick={() => window.history.back()}
+                disabled={saving}
             >
               Back
             </button>
@@ -108,7 +158,7 @@ export default function UniversitySelection({ userId, onConfirm }) {
                 disabled={!canConfirm}
                 onClick={handleConfirm}
             >
-              Continue
+              {saving ? "Saving…" : "Continue"}
             </button>
           </div>
         </div>
