@@ -299,14 +299,14 @@
     .mp-username {
       display: none; /* 隐藏 “User name” */
     }
-    
-    
+
+
      /* 左边按钮区域稍靠左 */
     .mp-left {
       gap: 6px;
       margin-left: 1px;
     }
-      
+
 
     /* 如果想稍微拉近头像和搜索框的距离，可以再加 */
     .mp-user {
@@ -329,26 +329,26 @@
     top: 26%;
     height: 30px;
     width: 80px;              /* ✅ 固定宽度，防止被字体撑开 */
-    height: 26px; 
+    height: 26px;
     font-size: 13px;
     padding: 0 10px;
     border-radius: 16px;
     border: 1px solid #d1d5db;
     background: #f9fafb;
   }
-  
-  
 
-    
+
+
+
 
     .mp-logo {
     position: absolute;
     left: 34%;
     top: 14%;
     transform: translate(-50%, -50%); /* ✅ 比 -52% 稍低，更对齐左右按钮 */
-    font-size: 2.2rem !important;  
+    font-size: 2.2rem !important;
     line-height: 1;
-    z-index: 2; 
+    z-index: 2;
   }
 
     .mp-icon.large {
@@ -475,7 +475,7 @@
   font-weight: 500;
   white-space: nowrap;
   cursor: pointer;}
-  
+
 .fab-item:hover { background: #f6f8fb; }
 
 
@@ -785,7 +785,7 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
 /* === University dropdown (prettier version) === */
 .uni-select-box {
   position: relative;
-  justify-content: center; 
+  justify-content: center;
   width: 100%;
 }
 
@@ -945,7 +945,46 @@ select.cl-input {
   box-sizing: border-box;
   padding-right: 38px; /* 稍微减小，避免挤压 */
 }
+@media (prefers-color-scheme: dark) {
+  body, html, #root {
+    background-color: #121212 !important;
+    color: #e8e8e8 !important;
+  }
 
+  .register-container,
+  .uni-card,
+  .mp-root,
+  .cl-root,
+  .cg-root,
+  .modal,
+  .kebab-menu,
+  .mp-tabs {
+    background-color: #1e1e1e !important;
+    color: #e8e8e8 !important;
+    border-color: #333 !important;
+  }
+
+  input, textarea, select {
+    background-color: #2b2b2b !important;
+    color: #e8e8e8 !important;
+    border-color: #444 !important;
+  }
+
+  button {
+    background-color: #4a76d9 !important;
+    color: #fff !important;
+  }
+
+  .error-text {
+    background-color: rgba(211,47,47,0.15) !important;
+    border-color: rgba(211,47,47,0.3) !important;
+    color: #ff6b6b !important;
+  }
+
+  .mp-empty, .password-rules {
+    color: #aaa !important;
+  }
+}
 /* 🧿 禁止 Edge / Chrome / Safari 自动出现的小眼睛按钮 */
 input[type="password"]::-ms-reveal,   /* Edge / IE */
 input[type="password"]::-ms-clear,    /* Edge / IE 清除按钮 */
@@ -955,4 +994,80 @@ input[type="password"]::-webkit-textfield-decoration-container {
   display: none !important;
   appearance: none;
   -webkit-appearance: none;
+}
+/* ===== University Selection — Dark mode visibility fix (append) ===== */
+
+/* 基础布局（保持你现有的白色主题不变） */
+.uni-page {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 1rem; box-sizing: border-box;
+  background: #ffffff;
+}
+.uni-card {
+  background: #ffffff; border: 1px solid #e5e8eb; border-radius: 18px;
+  padding: 2rem 2rem 2.5rem; box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+  width: 440px; text-align: left; box-sizing: border-box;
+}
+.uni-title { font-size: 1.5rem; font-weight: 700; margin: 0.5rem 0 0.25rem; }
+.uni-sub { margin: 0 0 1rem; color: #6b7280; }
+
+.uni-search { margin-bottom: 0.75rem; }
+.uni-input {
+  width: 100%; box-sizing: border-box; border-radius: 10px;
+  border: 1px solid #e5e7eb; padding: 10px 12px; font-size: 14px; outline: none;
+  background: #fff; color: #111827;
+}
+.uni-input:focus { border-color: #4a76d9; box-shadow: 0 0 0 3px rgba(74,118,217,.15); }
+
+.uni-list {
+  display: grid; grid-template-columns: 1fr; gap: 8px;
+  max-height: 280px; overflow: auto; padding-right: 2px; /* 防止遮挡滚动条 */
+}
+.uni-item {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; border-radius: 12px; border: 1px solid #e5e7eb;
+  background: #fafafa; color: #111827; padding: 12px 14px;
+  cursor: pointer; transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.uni-item:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.uni-item.is-active { border-color: #4a76d9; box-shadow: 0 0 0 3px rgba(74,118,217,.15); }
+.uni-item:focus { outline: none; box-shadow: 0 0 0 3px rgba(74,118,217,.15); }
+.uni-item-name { font-size: 14px; font-weight: 600; }
+.uni-dot { opacity: .35; }
+
+/* 底部按钮区 */
+.uni-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+.uni-btn { border-radius: 10px; padding: 10px 14px; border: 1px solid transparent; font-weight: 600; cursor: pointer; }
+.uni-btn.ghost { background: #eef2f7; color: #374151; border-color: #e5e7eb; }
+.uni-btn.ghost:hover { filter: brightness(.98); }
+.uni-btn.primary { background: #4a76d9; color: #fff; }
+.uni-btn.primary:disabled { opacity: .65; cursor: not-allowed; }
+
+/* ===== Dark mode: 保证文本/背景对比清晰，可见 ===== */
+@media (prefers-color-scheme: dark) {
+  .uni-page { background: #121212 !important; }
+  .uni-card { background: #1a1a1a !important; border-color: #2a2a2a !important; color: #e8e8e8 !important; }
+
+  .uni-title { color: #e8e8e8 !important; }
+  .uni-sub { color: #a3a3a3 !important; }
+
+  .uni-input {
+    background: #1f2937 !important; color: #e8e8e8 !important; border-color: #374151 !important;
+  }
+  .uni-input::placeholder { color: #8b8b8b !important; }
+
+  .uni-list { scrollbar-color: #374151 #1a1a1a; }
+
+  .uni-item {
+    background: #1f2937 !important; color: #e6e6e6 !important; border-color: #374151 !important;
+  }
+  .uni-item:hover { background: #233044 !important; border-color: #445067 !important; }
+  .uni-item.is-active {
+    border-color: #7aa2ff !important; box-shadow: 0 0 0 3px rgba(122,162,255,.22) !important;
+  }
+  .uni-item:focus { box-shadow: 0 0 0 3px rgba(122,162,255,.22) !important; }
+  .uni-dot { color: #9aa4b2 !important; opacity: .9; }
+
+  .uni-btn.ghost { background: #2a2a2a !important; color: #e8e8e8 !important; border-color: #3a3a3a !important; }
+  .uni-btn.primary { background: #3d6edc !important; color: #fff !important; }
 }
