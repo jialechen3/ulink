@@ -268,32 +268,43 @@
 .mobile-only { display: none; }
 
 /* ✅ Mobile 优化：隐藏用户名文字，避免 Header 挤压 */
-@media (max-width: 480px) {
+@media (max-width: 900px) {
   .kebab-wrapper { position: relative; right: -20px; }
   .mp-username { display: none; }
 
+  .mp-center {
+    display: none !important;
+  }
+  
   .mp-left { gap: 6px; margin-left: 1px; }
   .mp-user { margin-left: 1px; }
 
+  /* 1) 让搜索容器在 header 内绝对几何居中 */
   .mp-search-wrap.spaced {
-    display: flex !important;
-    justify-content: flex-end;
-    margin-left: auto;
-    margin-right: 60px;
-    flex: 0 0 20px;
+    position: absolute !important;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0 !important;
+    display: block !important;
+    flex: none !important;
+    width: 40vw;            /* 可调：搜索框整体宽度 */
+    max-width: 260px;       /* 可调：上限 */
+    z-index: 3;             /* 保证不被左右按钮覆盖 */
   }
+
+  /* 2) 搜索输入自身回到普通流式（别再绝对定位） */
   .mp-search {
-    position: absolute;
-    left: 56%;
-    top: 26%;
-    width: 80px;
-    height: 26px;
+    position: static !important;
+    width: 100% !important;
+    height: 28px;
     font-size: 13px;
     padding: 0 10px;
     border-radius: 16px;
     border: 1px solid #d1d5db;
     background: #f9fafb;
   }
+  
   .mp-logo {
     position: absolute;
     left: 34%;
@@ -746,11 +757,18 @@ select.cl-input {
 }
 
 /* ===== Header Clickability Fix Pack ===== */
+/* 居中 Logo 容器：绝对几何居中，且不拦截点击 */
 .mp-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none; /* 居中 Logo 不拦截点击 */
+  pointer-events: none; /* 不拦截左右区域点击 */
+  z-index: 2;
 }
 .mp-user,
 .mp-left,
