@@ -1,125 +1,117 @@
-import { useState, useEffect, useRef } from "react";
+// src/UniversitySelection.jsx
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import { API_BASE } from "./config";
 import KebabMenu from "./KebabMenu";
-import BugReportModal from "./BugReportModal";
 import Logo from "./Logo";
 
 export default function UniversitySelection({ userId, onConfirm }) {
-  const [universities, setUniversities] = useState([]);
-  const [filter, setFilter] = useState("");
-  const [university, setUniversity] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showReport, setShowReport] = useState(false);
-  const [open, setOpen] = useState(false);
-  const boxRef = useRef(null);
+  const [universities, setUniversities] = useState([]);
+  const [q, setQ] = useState("");
+  const [selected, setSelected] = useState("");
 
+  // 拉取大学列表
   useEffect(() => {
-    const fetchUniversities = async () => {
+    let abort = false;
+    const fetchUnis = async () => {
+      setLoading(true);
       try {
-        const res = await fetch(`${API_BASE}/universities.php`);
+        const url = `${API_BASE}/universities.php${q ? `?q=${encodeURIComponent(q)}` : ""}`;
+        const res = await fetch(url);
         const data = await res.json();
-        if (data.items) setUniversities(data.items);
-      } catch (err) {
-        console.error("Failed to load universities:", err);
+        if (!abort && Array.isArray(data?.items)) {
+          setUniversities(data.items);
+        }
+      } catch (_) {
+        if (!abort) setUniversities([]);
+      } finally {
+        if (!abort) setLoading(false);
       }
     };
-    fetchUniversities();
-  }, []);
+    fetchUnis();
+    return () => { abort = true; };
+  }, [q]);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (boxRef.current && !boxRef.current.contains(e.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const canConfirm = useMemo(() => !!selected, [selected]);
 
-  const filtered = universities.filter((u) =>
-    u.name.toLowerCase().includes(filter.toLowerCase())
-  );
-
-  const handleConfirm = async () => {
-    if (!university) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/db.php`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: userId, university_id: university }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert("University saved!");
-        onConfirm && onConfirm(university);
-      } else {
-        alert(data.message || "Failed to save.");
-      }
-    } catch {
-      alert("Network error.");
-    } finally {
-      setLoading(false);
-    }
+  const handleConfirm = () => {
+    if (!canConfirm) return;
+    // 回调给上层
+    onConfirm?.(selected);
   };
 
   return (
-    <div className="uni-page">
-      <div className="uni-card">
-        <div className="uni-header">
-          <Logo />
-          <KebabMenu onReport={() => setShowReport(true)} />
-        </div>
-
-        <h2 className="uni-title">Choose Your University</h2>
-
-        {/* ✅ 自定义可控 Select */}
-        <div className="uni-select-box" ref={boxRef}>
-          <input
-            type="text"
-            className="uni-dropdown"
-            placeholder="Search or select university"
-            value={filter}
-            onFocus={() => setOpen(true)}
-            onChange={(e) => {
-              const val = e.target.value;
-              setFilter(val);
-              const match = universities.find(
-                (u) => u.name.toLowerCase() === val.toLowerCase()
-              );
-              setUniversity(match ? match.id : "");
-            }}
-          />
-          {open && filtered.length > 0 && (
-            <div className="uni-dropdown-menu">
-              {filtered.map((u) => (
-                <div
-                  key={u.id}
-                  className={`uni-option ${
-                    university === u.id ? "selected" : ""
-                  }`}
-                  onClick={() => {
-                    setUniversity(u.id);
-                    setFilter(u.name);
-                    setOpen(false);
-                  }}
-                >
-                  {u.name}
-                </div>
-              ))}
+      <div className="uni-page">
+        <div className="uni-card">
+          {/* 顶部 Logo + 菜单 */}
+          <div className="uni-header">
+            <div className="logo"><Logo size={30} /></div>
+            <div className="kebab-wrapper">
+              <KebabMenu onReport={() => { /* 可接 BugReportModal */ }} />
             </div>
-          )}
+          </div>
+
+          <h1 className="uni-title">Select your university</h1>
+          <p className="uni-sub">We’ll personalize your feed based on your campus.</p>
+
+          {/* 搜索框 */}
+          <div className="uni-search">
+            <input
+                className="uni-input"
+                type="search"
+                placeholder="Search university…"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                aria-label="Search university"
+            />
+          </div>
+
+          {/* 选项列表（自定义列表，避免 <select> 在暗色下样式受限） */}
+          <div className="uni-list" role="listbox" aria-label="Universities">
+            {loading && <div className="uni-empty">Loading…</div>}
+
+            {!loading && universities.length === 0 && (
+                <div className="uni-empty">No results</div>
+            )}
+
+            {!loading && universities.map((u) => {
+              const active = String(selected) === String(u.id);
+              return (
+                  <button
+                      key={u.id}
+                      type="button"
+                      role="option"
+                      aria-selected={active}
+                      className={`uni-item${active ? " is-active" : ""}`}
+                      onClick={() => setSelected(String(u.id))}
+                  >
+                    <span className="uni-item-name">{u.name}</span>
+                    <span className="uni-dot" aria-hidden>●</span>
+                  </button>
+              );
+            })}
+          </div>
+
+          {/* 操作按钮 */}
+          <div className="uni-actions">
+            <button
+                type="button"
+                className="uni-btn ghost"
+                onClick={() => window.history.back()}
+            >
+              Back
+            </button>
+            <button
+                type="button"
+                className="uni-btn primary"
+                disabled={!canConfirm}
+                onClick={handleConfirm}
+            >
+              Continue
+            </button>
+          </div>
         </div>
-
-        <button
-          className="uni-btn"
-          onClick={handleConfirm}
-          disabled={!university || loading}
-        >
-          {loading ? "Saving..." : "Confirm"}
-        </button>
       </div>
-
-      <BugReportModal isOpen={showReport} onClose={() => setShowReport(false)} />
-    </div>
   );
 }

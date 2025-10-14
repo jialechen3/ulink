@@ -43,11 +43,17 @@ export default function SignInPage({ onSignIn, onBack }) {
         <div className="register-container">
             {/* 顶部工具行（可保留你的 KebabMenu） */}
             <div className="register-header header-without-search">
-                <button className="signup-btn" onClick={onBack} disabled={loading}>
+                <button
+                    className="signup-btn"
+                    onClick={() => {
+                        window.location.href = "/register/";
+                        //window.location.href = "/CSE442/2025-Fall/cse-442z/register/";
+                    }}
+                >
                     Sign Up
                 </button>
-                <div className="spacer" />
-                <KebabMenu onReport={() => setShowReport(true)} />
+                <div className="spacer"/>
+                <KebabMenu onReport={() => setShowReport(true)}/>
             </div>
 
             {/* ✅ 居中的 ULink Logo（标题上方） */}
