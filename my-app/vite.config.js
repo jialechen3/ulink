@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
 
-  //base: '/CSE442/2025-Fall/cse-442z',
+  base: '/CSE442/2025-Fall/cse-442z',
 })
