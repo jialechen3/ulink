@@ -194,3 +194,19 @@
     align-self: flex-end;
   }
 }
+
+/* 💲 Price section */
+.pd-price {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2e7d32; /* dark green for clarity */
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 480px) {
+  .pd-price {
+    font-size: 16px;
+    margin-top: 6px;
+  }
+}

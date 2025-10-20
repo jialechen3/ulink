@@ -119,7 +119,12 @@ export default function PostDetailPage({
 
         {/* Post Description */}
         {post.description && <p className="pd-desc">{post.description}</p>}
-
+        {/* Post Price (if available) */}
+        {post.price !== undefined && post.price !== null && post.price !== 0 && (
+          <div className="pd-price">
+            💲{parseFloat(post.price).toFixed(2)}
+          </div>
+        )}
         {/* Post Stats */}
         <div className="pd-stats">
           <span className="pd-eye">👁 {post.views ?? 0}</span>
