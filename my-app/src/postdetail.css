@@ -149,3 +149,48 @@
     font-size: 13px;
   }
 }
+
+/* 💬 Comment input section */
+.pd-comment-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+}
+
+.pd-comment-input textarea {
+  flex: 1;
+  resize: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.pd-comment-input button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.pd-comment-input button:hover {
+  background-color: #0056b3;
+}
+
+/* 📱 Mobile tweak */
+@media (max-width: 480px) {
+  .pd-comment-input {
+    flex-direction: column;
+  }
+
+  .pd-comment-input button {
+    align-self: flex-end;
+  }
+}
