@@ -101,9 +101,9 @@ export default function PostDetailPage({
               </div>
             </div>
           </div>
-
+          
           <div className="pd-menu">
-            <KebabMenu onReport={() => setShowReport(true)} />
+            {/*<KebabMenu onReport={() => setShowReport(true)} >*/}
           </div>
         </div>
 
@@ -166,5 +166,6 @@ export default function PostDetailPage({
         onClose={() => setShowReport(false)}
       />
     </div>
+    
   );
 }
