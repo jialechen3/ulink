@@ -210,3 +210,22 @@
     margin-top: 6px;
   }
 }
+
+/* === Offset main content so header doesn't cover it === */
+.post-detail {
+  padding-top: 70px; /* adjust based on your AppHeader height */
+}
+
+/* Optional: consistent side padding for nice layout */
+.post-detail {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* On smaller screens, give slightly more breathing room */
+@media (max-width: 480px) {
+  .post-detail {
+    padding-top: 80px;
+  }
+}
+
