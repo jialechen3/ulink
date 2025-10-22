@@ -1054,3 +1054,12 @@ body { margin: 0; }
   z-index: 90;
   background: #fff;
 }
+
+.gp-badge{ align-self:start; margin-left:8px; padding:2px 8px; font-size:12px; line-height:1.2;
+  background:#fff; color:#213547; border:1px solid #e5e7eb; border-radius:999px; white-space:nowrap; }
+.gp-avatars{ display:flex; align-items:center; gap:6px; padding-top:8px; }
+.gp-avatar{ width:28px; height:28px; border-radius:50%; border:1px solid #e5e7eb;
+  background:#f8fafc; display:grid; place-items:center; font-size:16px; overflow:hidden; }
+.gp-overflow{ font-size:12px; padding:2px 6px; border:1px solid #e5e7eb; border-radius:999px; background:#fff; }
+.gp-cap{ margin-left:auto; font-weight:600; }
+
