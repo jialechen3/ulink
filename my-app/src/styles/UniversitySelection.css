@@ -1,0 +1,290 @@
+/* UniversitySelection.css */
+
+/* ===== University Selection Page ===== */
+.uni-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #ffffff;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.uni-card {
+  background: #ffffff;
+  border: 1px solid #e5e8eb;
+  border-radius: 18px;
+  padding: 2rem 2rem 3rem;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  width: 440px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.uni-header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.8rem;
+  transform: translateY(-6px);
+}
+
+.uni-header .logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(90deg, #ffb347, #845ec2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.uni-header .kebab-wrapper { 
+  position: absolute; 
+  right: 0.4rem; 
+  top: 0.4rem; 
+}
+
+.uni-title {
+  font-size: 1.4rem;
+  color: #1b1f24;
+  margin-bottom: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+}
+
+.uni-search {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #cfd3d7;
+  border-radius: 10px;
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+  transition: border 0.2s ease;
+  box-sizing: border-box;
+}
+
+.uni-search:focus { 
+  border-color: #57a9ff; 
+  outline: none; 
+}
+
+.uni-select {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #cfd3d7;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 1rem;
+  margin-bottom: 1.4rem;
+  cursor: pointer;
+  transition: border 0.2s ease;
+}
+
+.uni-select:hover { 
+  border-color: #57a9ff; 
+}
+
+.uni-btn {
+  width: 95%;
+  padding: 0.75rem;
+  background: #57a9ff;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+  margin: 2rem auto 0 auto;
+  display: block;
+}
+
+.uni-btn:hover { 
+  background: #3497ff; 
+  transform: translateY(-1px); 
+}
+
+.uni-btn:disabled { 
+  opacity: 0.5; 
+  cursor: not-allowed; 
+}
+
+/* ===== Dropdown Components ===== */
+.uni-select-box { 
+  position: relative; 
+  justify-content: center; 
+  width: 100%; 
+}
+
+.uni-dropdown {
+  width: 80%;
+  padding: 10px 14px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1.5px solid #57a9ff;
+  color: #213547;
+  background: #fff;
+  outline: none;
+  margin: 0 auto;
+  display: block;
+}
+
+.uni-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(200, 220, 255, 0.4);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  z-index: 10;
+  transition: all 0.25s ease;
+}
+
+.uni-option {
+  padding: 12px 16px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.uni-option:hover { 
+  background: rgba(87, 169, 255, 0.1); 
+}
+
+.uni-option.selected { 
+  background: rgba(87, 169, 255, 0.2); 
+  font-weight: 600; 
+}
+
+/* ===== University List Styles ===== */
+.uni-sub { 
+  margin: 0 0 1rem; 
+  color: #6b7280; 
+}
+
+.uni-input {
+  width: 100%; 
+  box-sizing: border-box; 
+  border-radius: 10px;
+  border: 1px solid #e5e7eb; 
+  padding: 10px 12px; 
+  font-size: 14px; 
+  outline: none;
+  background: #fff; 
+  color: #111827;
+}
+
+.uni-input:focus { 
+  border-color: #4a76d9; 
+  box-shadow: 0 0 0 3px rgba(74,118,217,.15); 
+}
+
+.uni-list {
+  display: grid; 
+  grid-template-columns: 1fr; 
+  gap: 8px;
+  max-height: 280px; 
+  overflow: auto; 
+  padding-right: 2px;
+}
+
+.uni-item {
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between;
+  width: 100%; 
+  border-radius: 12px; 
+  border: 1px solid #e5e7eb;
+  background: #fafafa; 
+  color: #111827; 
+  padding: 12px 14px;
+  cursor: pointer; 
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.uni-item:hover { 
+  background: #f1f5f9; 
+  border-color: #cbd5e1; 
+}
+
+.uni-item.is-active { 
+  border-color: #4a76d9; 
+  box-shadow: 0 0 0 3px rgba(74,118,217,.15); 
+}
+
+.uni-item:focus { 
+  outline: none; 
+  box-shadow: 0 0 0 3px rgba(74,118,217,.15); 
+}
+
+.uni-item-name { 
+  font-size: 14px; 
+  font-weight: 600; 
+}
+
+.uni-dot { 
+  opacity: .35; 
+}
+
+/* ===== Button Variations ===== */
+.uni-actions { 
+  display: flex; 
+  gap: 10px; 
+  justify-content: flex-end; 
+  margin-top: 14px; 
+}
+
+.uni-btn.ghost { 
+  background: #eef2f7; 
+  color: #374151; 
+  border: 1px solid #e5e7eb; 
+}
+
+.uni-btn.ghost:hover { 
+  filter: brightness(.98); 
+}
+
+.uni-btn.primary { 
+  background: #4a76d9; 
+  color: #fff; 
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 480px) {
+  .uni-card {
+    width: 90%;
+    padding: 1.5rem 1.5rem 2.5rem;
+    margin: 0 auto;
+  }
+  
+  .uni-title {
+    font-size: 1.2rem;
+  }
+  
+  .uni-search,
+  .uni-select {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.7rem;
+  }
+  
+  .uni-btn {
+    width: 100%;
+    padding: 0.7rem;
+  }
+  
+  .uni-dropdown {
+    width: 90%;
+  }
+  
+  .uni-dropdown-menu {
+    width: 95%;
+  }
+}
+

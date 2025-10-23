@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import "./App.css";
-import { API_BASE } from "./config";
-import KebabMenu from "./KebabMenu";
-import BugReportModal from "./BugReportModal";
-import Logo from "./Logo"
-import AppHeader from "./AppHeader";
+import "../App.css";
+import { API_BASE } from "../config";
+import KebabMenu from "../components/KebabMenu";
+import BugReportModal from "../components/BugReportModal";
+import Logo from "../components/Logo"
+import AppHeader from "../components/AppHeader";
 
 
 export default function CreateListingPage({

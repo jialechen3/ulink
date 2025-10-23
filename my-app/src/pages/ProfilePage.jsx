@@ -1,8 +1,8 @@
 // src/ProfilePage.jsx
-import "./App.css";
+import "../styles/ProfilePage.css";
 import { useEffect, useMemo, useState } from "react";
-import AppHeader from "./AppHeader.jsx";
-import { API_BASE } from "./config";
+import AppHeader from "../components/AppHeader.jsx";
+import { API_BASE } from "../config.js";
 
 export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
   // ===== State =====
@@ -25,9 +25,7 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
 
   // 选中的 listing（用于 Edit / Delete）
   const [selectedId, setSelectedId] = useState(null);
-
-  
-  
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   // ===== Identity & Route =====
   const myId = useMemo(() => localStorage.getItem("userId"), []);
@@ -134,9 +132,11 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
     if (diff < 86400) return `${Math.floor(diff/3600)} Hours ago`;
     return `${Math.floor(diff/86400)} days ago`;
   }
+  
   function isUrlLike(s) {
     return /^(https?:)?\/\//.test(s || "");
   }
+  
   async function fileToDataURL(file) {
     if (!file || !file.type.startsWith("image/")) throw new Error("请选择图片文件");
     const raw = await new Promise((resolve, reject) => {
@@ -164,11 +164,18 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
     });
     return dataUrl;
   }
+  
   const AvatarPreview = ({ value, size = 72 }) => {
     const styleBox = {
-      width: size, height: size, borderRadius: "50%",
-      border: "1px solid #e5e8eb", background: "#f8fafc",
-      display: "grid", placeItems: "center", fontSize: size * 0.5, overflow: "hidden"
+      width: size, 
+      height: size, 
+      borderRadius: "50%",
+      border: "1px solid #e5e8eb", 
+      background: "#f8fafc",
+      display: "grid", 
+      placeItems: "center", 
+      fontSize: size * 0.5, 
+      overflow: "hidden"
     };
     const showImg = isUrlLike(value) || (value || "").startsWith("data:");
     return (
@@ -203,48 +210,42 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
   };
 
   // ===== Listing operations =====
-const editListing = (id) => {
-  const base = `${location.origin}${location.pathname}`.replace(/\/$/, "");
-  window.location.href = `${base}#/createlisting/?edit=${encodeURIComponent(id)}`;
-};
+  const editListing = (id) => {
+    const base = `${location.origin}${location.pathname}`.replace(/\/$/, "");
+    window.location.href = `${base}#/createlisting/?edit=${encodeURIComponent(id)}`;
+  };
 
-async function deleteListing(id) {
-  if (!confirm("Delete this listing?")) return;
-  try {
+  async function deleteListing(id) {
+    if (!confirm("Delete this listing?")) return;
+    try {
+      const fd = new FormData();
+      fd.append("action", "delete_listing");
+      fd.append("id", id);
+      await fetch(`${API_BASE}/db.php`, { method: "POST", body: fd }).catch(() => {});
+    } finally {
+      setListings((prev) => prev.filter((x) => String(x.id) !== String(id)));
+      if (String(selectedId) === String(id)) setSelectedId(null);
+    }
+  }
+
+  async function uploadAvatar(file) {
+    if (!file || !file.type.startsWith("image/")) throw new Error("请选择图片文件");
+    if (file.size > 5 * 1024 * 1024) throw new Error("图片过大（≤5MB）");
+
     const fd = new FormData();
-    fd.append("action", "delete_listing");
-    fd.append("id", id);
-    await fetch(`${API_BASE}/db.php`, { method: "POST", body: fd }).catch(() => {});
-  } finally {
-    setListings((prev) => prev.filter((x) => String(x.id) !== String(id)));
-    if (String(selectedId) === String(id)) setSelectedId(null);
+    fd.append("file", file);
+
+    setUploadingAvatar(true);
+    try {
+      const res = await fetch(`${API_BASE}/upload.php`, { method: "POST", body: fd });
+      const data = await res.json().catch(() => ({}));
+      const url = Array.isArray(data?.urls) ? data.urls[0] : null;
+      if (!url) throw new Error(data?.message || "上传失败");
+      return url;
+    } finally {
+      setUploadingAvatar(false);
+    }
   }
-}
-
-
-const [uploadingAvatar, setUploadingAvatar] = useState(false);
-
-async function uploadAvatar(file) {
-  if (!file || !file.type.startsWith("image/")) throw new Error("请选择图片文件");
-  // 可按需限制体积；你后端现在是 100MB（见 MAX_BYTES=100*1024*1024）
-  if (file.size > 5 * 1024 * 1024) throw new Error("图片过大（≤5MB）");
-
-  const fd = new FormData();
-  fd.append("file", file); // 后端支持 'file'
-
-  setUploadingAvatar(true);
-  try {
-    const res = await fetch(`${API_BASE}/upload.php`, { method: "POST", body: fd });
-    const data = await res.json().catch(() => ({}));
-    const url = Array.isArray(data?.urls) ? data.urls[0] : null;
-    if (!url) throw new Error(data?.message || "上传失败");
-    return url; // 绝对 URL
-  } finally {
-    setUploadingAvatar(false);
-  }
-}
-
-
 
   // ===== Render =====
   return (
@@ -294,19 +295,18 @@ async function uploadAvatar(file) {
                   <input
                     className="pf-input"
                     value={form.avatar}
-                   onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        try {
-                            const url = await uploadAvatar(file);     // ⇦ 调用后端
-                            setForm((s) => ({ ...s, avatar: url }));  // 用服务器返回的绝对 URL
-                        } catch (err) {
-                            alert(err.message || "上传失败");
-                        } finally {
-                            e.target.value = ""; // 重置
-                        }
-                            }}
-
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      try {
+                        const url = await uploadAvatar(file);
+                        setForm((s) => ({ ...s, avatar: url }));
+                      } catch (err) {
+                        alert(err.message || "上传失败");
+                      } finally {
+                        e.target.value = "";
+                      }
+                    }}
                   />
                   <label className="pf-btn" style={{ cursor:"pointer" }}>
                     <input
@@ -317,7 +317,7 @@ async function uploadAvatar(file) {
                         const file = e.target.files?.[0];
                         if (!file) return;
                         try {
-                          const dataUrl = await fileToDataURL(file); // ⇦ 纯前端 DataURL
+                          const dataUrl = await fileToDataURL(file);
                           setForm(s => ({ ...s, avatar: dataUrl }));
                         } catch (err) {
                           alert(err.message || "上传失败");
@@ -328,10 +328,7 @@ async function uploadAvatar(file) {
                     />
                     Upload
                   </label>
-                  <div className="pf-avatar-preview" title="Preview" style={{
-                    width:40,height:40,borderRadius:"50%",border:"1px solid #e5e8eb",
-                    background:"#f8fafc",display:"grid",placeItems:"center",overflow:"hidden",fontSize:20
-                  }}>
+                  <div className="pf-avatar-preview" title="Preview">
                     {(isUrlLike(form.avatar) || (form.avatar || "").startsWith("data:"))
                       ? <img src={form.avatar} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                       : (form.avatar || "🙂")}
@@ -394,19 +391,10 @@ async function uploadAvatar(file) {
         {/* 列表区 */}
         <section className="pf-list">
           {/* 标题 + 操作按钮（仅自己可见） */}
-                <div
-                style={{
-                    margin: "0 0 8px 0",
-                    padding: "0 4px",
-                    fontWeight: 700,
-                }}
-                >
-                {isSelf ? "My Listings" : "Listings"}
-                {listings.length ? ` · ${listings.length}` : ""}
-                </div>
-
-        
-
+          <div className="pf-list-header">
+            {isSelf ? "My Listings" : "Listings"}
+            {listings.length ? ` · ${listings.length}` : ""}
+          </div>
 
           {loading ? (
             <div className="pf-empty">Loading…</div>
@@ -431,13 +419,8 @@ async function uploadAvatar(file) {
               return (
                 <article
                   key={it.id}
-                  className="pf-post"
+                  className={`pf-post ${String(selectedId) === String(it.id) ? 'pf-post-selected' : ''}`}
                   onClick={() => setSelectedId(it.id)}
-                  style={{
-                    cursor:"pointer",
-                    outline: String(selectedId) === String(it.id) ? "2px solid #7c3aed" : "none",
-                    outlineOffset: 2,
-                  }}
                 >
                   <header className="pf-post-head">
                     <div className="pf-post-left">
@@ -446,17 +429,16 @@ async function uploadAvatar(file) {
                       </span>
                       <div className="pf-post-titlewrap">
                         <div className="pf-post-title">{it.title || "Title"}</div>
-                        <div className="pf-post-sub">I’m selling… {it?.description?.slice?.(0, 24) || "..."}</div>
+                        <div className="pf-post-sub">I'm selling… {it?.description?.slice?.(0, 24) || "..."}</div>
                       </div>
                     </div>
 
-                {isSelf && (
-                <div className="pf-post-tools" onClick={(e)=>e.stopPropagation()}>
-                    <button className="pf-iconbtn" title="Edit this" onClick={() => editListing(it.id)}>✏️</button>
-                    <button className="pf-iconbtn" title="Delete this" onClick={() => deleteListing(it.id)}>🗑️</button>
-                </div>
-                )}
-
+                    {isSelf && (
+                      <div className="pf-post-tools" onClick={(e)=>e.stopPropagation()}>
+                        <button className="pf-iconbtn" title="Edit this" onClick={() => editListing(it.id)}>✏️</button>
+                        <button className="pf-iconbtn" title="Delete this" onClick={() => deleteListing(it.id)}>🗑️</button>
+                      </div>
+                    )}
                   </header>
 
                   <div className="pf-post-images">
@@ -473,16 +455,15 @@ async function uploadAvatar(file) {
                   <footer className="pf-post-foot">
                     <span className="pf-time">{timeAgo(it.created_at)}</span>
                     {(() => {
-                    const safeViews =
+                      const safeViews =
                         Number.isFinite(+it.views) ? +it.views :
                         Number.isFinite(+it.view_count) ? +it.view_count : 0;
-                    return (
+                      return (
                         <span className="pf-views" title={`${safeViews} views`}>
-                        👁️ {formatViews(safeViews)}
+                          👁️ {formatViews(safeViews)}
                         </span>
-                    );
+                      );
                     })()}
-
                     <span className="pf-comment" aria-label="comment">💬</span>
                   </footer>
                 </article>

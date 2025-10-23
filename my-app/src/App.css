@@ -6,7 +6,7 @@
   
   html, body, #root, .app-container,
   .mp-root, .cl-root, .cg-root, .register-container,
-  .uni-page, .uni-card, .pf-scope, .post-detail,
+  .uni-page, .uni-card, .post-detail,
   .modal, .kebab-menu, .mp-header, .mp-tabs {
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -18,7 +18,6 @@
     border-color: #ccc !important;
   }
   
-  
   /* Only style specific buttons */
   .signup-btn,
   .uni-btn:not(.ghost),
@@ -28,9 +27,7 @@
   }
 }
 
-
-
-/* =================== Global / Vite defaults (保留) =================== */
+/* =================== Global / Vite defaults =================== */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -58,7 +55,7 @@
 .card { padding: 2em; }
 .read-the-docs { color: #888; }
 
-/* =================== Register Page (保留) =================== */
+/* =================== Register Page =================== */
 .register-container {
   background: white;
   padding: 40px;
@@ -93,9 +90,7 @@
 
 .error-text { color: #d32f2f; background-color: #ffebee; border: 1px solid #ffcdd2; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 14px; }
 
-
-
-/* =================== Kebab & Bug Modal (保留) =================== */
+/* =================== Kebab & Bug Modal =================== */
 .kebab-wrapper { position: relative; }
 .kebab-menu {
   position: absolute;
@@ -138,271 +133,7 @@
   .modal { width: 94vw; }
 }
 
-/* =================== Marketplace / Listing (保留) =================== */
-.mp-root { display: grid; grid-template-rows: auto 1fr auto; height: 100vh; background: #fff; color: #111; }
-
-/* === Header Layout Override for Ulink Logo === */
-.mp-header {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 64px;
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1rem;
-  box-sizing: border-box;
-}
-
-/* 给主内容加顶部留白，避免被header遮住（mp-feed 保持 margin-top 方案） */
-.mp-feed { margin-top: 64px; overflow-y: auto; padding: 10px 0; }
-
-.mp-left { display: flex; align-items: center; gap: 0.8rem; }
-
-.mp-icon.large {
-  width: 42px;
-  height: 42px;
-  font-size: 1.3rem;
-}
-
-.mp-logo {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.mp-right { display: flex; justify-content: flex-end; padding-right: 6px; }
-
-.mp-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  height: 34px;
-  width: 34px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-.mp-icon:hover { background-color: #f0f0f0; }
-
-.mp-round { border-radius: 999px; }
-
-.mp-user {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-left: 6px;
-}
-
-.mp-avatar {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f3f4f6;
-  font-size: 18px;
-}
-.mp-avatar.sm { width: 24px; height: 24px; }
-
-.mp-username {
-  font-weight: 700;
-  font-size: 22px;
-  color: #1b1f24;
-  letter-spacing: 0.3px;
-  margin-left: 2px;
-}
-
-.mp-search-wrap.spaced {
-  margin-left: auto;
-  margin-right: 3rem;
-  flex-shrink: 0;
-}
-.mp-search {
-  max-width: 280px;
-  padding: 0.4rem 0.8rem;
-  border-radius: 18px;
-  border: 1px solid #ddd;
-  font-size: 1rem;
-  background: #f9fafb;
-  transition: 0.2s;
-}
-.mp-search:focus {
-  border-color: #57a9ff;
-  background: #fff;
-}
-
-.mp-post { padding: 6px 14px 0 14px; }
-.mp-post-head { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
-.mp-post-texts { display: grid; gap: 2px; }
-.mp-post-title { font-weight: 700; font-size: 14px; }
-.mp-post-desc { font-size: 12px; color: #666; white-space: pre-wrap; }
-
-.mp-post-media { padding-left: 38px; margin-top: 6px; }
-.mp-imgbox { width: 64px; height: 64px; background: #f3f4f6; border-radius: 8px; display:flex; align-items:center; justify-content:center; border: 1px solid #e5e7eb; overflow: hidden; }
-.mp-img-ic { font-size: 18px; opacity: .6; }
-
-.mp-post-meta { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #444; padding-left: 38px; margin: 8px 0; }
-.mp-dot { width: 3px; height: 3px; background:#999; border-radius:999px; display:inline-block; }
-.mp-eye { line-height: 1; }
-.mp-cmt { margin-left: auto; background: none; border: none; cursor: pointer; font-size: 14px; }
-
-.mp-divider { height: 1px; background: #e5e7eb; margin-left: 14px; }
-.mp-empty { padding: 24px; text-align: center; color: #666; }
-
-/* --- Fix footer tabs to always stay visible --- */
-.mp-tabs {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #fff;
-  border-top: 1px solid #e5e7eb;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  z-index: 1000;
-}
-.mp-feed { padding-bottom: 80px; } /* 底部留白给 tabs */
-
-.mp-tabs .tab { background: none; border: none; padding: 10px 0; cursor: pointer; color: #666; }
-.mp-tabs .tab.active { color: #6a5acd; font-weight: 700; }
-.mp-fab { position: absolute; right: 14px; top: -20px; width: 44px; height: 44px; border-radius: 999px; background: #57a9ff; color: #fff; border: none; font-size: 26px; line-height: 44px; text-align: center; cursor: pointer; box-shadow: 0 6px 14px rgba(0,0,0,.18); }
-
-/* 桌面/移动显示切换 */
-.desktop-only { display: block; }
-.mobile-only { display: none; }
-
-/* ✅ Mobile 优化：隐藏用户名文字，避免 Header 挤压 */
-@media (max-width: 900px) {
-  .kebab-wrapper { position: relative; right: -20px; }
-  .mp-username { display: none; }
-
-  .mp-center {
-    display: none !important;
-  }
-  
-  .mp-left { gap: 6px; margin-left: 1px; }
-  .mp-user { margin-left: 1px; }
-
-  /* 1) 让搜索容器在 header 内绝对几何居中 */
-  .mp-search-wrap.spaced {
-    position: absolute !important;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    margin: 0 !important;
-    display: block !important;
-    flex: none !important;
-    width: 40vw;            /* 可调：搜索框整体宽度 */
-    max-width: 260px;       /* 可调：上限 */
-    z-index: 3;             /* 保证不被左右按钮覆盖 */
-  }
-
-  /* 2) 搜索输入自身回到普通流式（别再绝对定位） */
-  .mp-search {
-    position: static !important;
-    width: 100% !important;
-    height: 28px;
-    font-size: 13px;
-    padding: 0 10px;
-    border-radius: 16px;
-    border: 1px solid #d1d5db;
-    background: #f9fafb;
-  }
-  
-  .mp-logo {
-    position: absolute;
-    left: 34%;
-    top: 14%;
-    transform: translate(-50%, -50%);
-    font-size: 2.2rem !important;
-    line-height: 1;
-    z-index: 2;
-  }
-  .mp-icon.large { width: 32px; height: 32px; font-size: 15px; }
-  .mp-avatar { width: 32px; height: 32px; }
-  .mp-right { padding-right: 6px; gap: 6px; }
-  .mp-logout { padding: 4px 8px; font-size: 6px; border-radius: 6px; }
-  .mp-header { height: 58px; padding: 0 6px; }
-}
-
-
-
-/* ============== FAB ============== */
-:root {
-  --fab-blue: #57a9ff;
-  --fab-size: 64px;
-}
-.mp-fab-right {
-  position: fixed;
-  right: 40px;
-  bottom: 80px;
-  width: var(--fab-size);
-  height: var(--fab-size);
-  border-radius: 50%;
-  box-sizing: border-box;
-  border: 6px solid var(--fab-blue);
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  color: var(--fab-blue);
-  cursor: pointer;
-  box-shadow: 0 10px 22px rgba(87,169,255,.28);
-  transition: all 0.25s ease;
-  z-index: 100;
-}
-.mp-fab-right svg path { stroke: var(--fab-blue); transition: stroke 0.25s ease; }
-.mp-fab-right:hover {
-  background: var(--fab-blue);
-  color: #fff;
-  transform: translateY(-3px);
-  box-shadow: 0 12px 24px rgba(87,169,255,.4);
-}
-.mp-fab-right:hover svg path { stroke: #ffffff; }
-.mp-fab-right:active { transform: scale(.97); }
-
-.fab-menu {
-  position: fixed;
-  right: 40px;
-  bottom: 146px;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  animation: fadeInUp 0.25s ease-out;
-  z-index: 49;
-}
-.fab-item {
-  background: #fff;
-  border: 1px solid #eef1f5;
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.fab-item:hover { background: #f6f8fb; }
-
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-
-/* =================== Create Listing Page (修复遮挡) =================== */
+/* =================== Create Listing Page =================== */
 .cl-root {
   --cl-header-h: 64px;
   display: grid;
@@ -483,11 +214,10 @@
 .cl-hint { font-size: 14px; color: #555; cursor: pointer; }
 .cl-file { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
-/* 预览区（新） */
+/* 预览区 */
 .cl-previews { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .cl-thumb { width: 86px; height: 86px; border-radius: 8px; overflow: hidden; background:#f3f4f6; border:1px solid #e5e7eb; }
 .cl-thumb img { width: 100%; height: 100%; object-fit: cover; }
-/* 兼容旧写法 */
 .cl-prev.cl-previews { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 
 .cl-actions {
@@ -501,26 +231,11 @@
 .cl-btn.primary { background: #4a90e2; color: #fff; }
 .cl-btn.ghost { background: #e5e7eb; color: #333; }
 
-
-
-/* =================== Create Group Placeholder (保留) =================== */
+/* =================== Create Group Placeholder =================== */
 .cg-root { display:grid; grid-template-rows:auto 1fr; height:100vh; }
 .cg-main { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; }
 
-/* Logout */
-.mp-logout {
-  margin-left: 8px;
-  background: #ef4444; color: #fff; border: none; border-radius: 8px;
-  padding: 6px 10px; font-size: 12px; cursor: pointer;
-}
-.mp-logout:hover { opacity: .9; }
-
-
-/* 全局防横向滚动（保留） */
-html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-behavior-x: none; }
-#root { width: 100%; overflow-x: hidden; }
-
-/* =================== ULink Logo 风格（保留） =================== */
+/* =================== ULink Logo =================== */
 .ulink-logo {
   display: inline-block;
   font-family: 'Risque', cursive;
@@ -548,163 +263,7 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
   margin: 10px 0;
 }
 
-/* ===== University Selection (White clean UI) ===== */
-.uni-page {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: #ffffff;
-  padding: 1rem;
-  box-sizing: border-box;
-}
-.uni-card {
-  background: #ffffff;
-  border: 1px solid #e5e8eb;
-  border-radius: 18px;
-  padding: 2rem 2rem 3rem;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-  width: 440px;
-  text-align: left;
-  box-sizing: border-box;
-}
-.uni-header {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 0.8rem;
-  transform: translateY(-6px);
-}
-.uni-header .logo {
-  font-size: 1.8rem;
-  font-weight: 700;
-  font-family: "Inter", sans-serif;
-  background: linear-gradient(90deg, #ffb347, #845ec2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.uni-header .kebab-wrapper { position: absolute; right: 0.4rem; top: 0.4rem; }
-
-.uni-title {
-  font-size: 1.4rem;
-  color: #1b1f24;
-  margin-bottom: 1.4rem;
-  font-weight: 600;
-  text-align: center;
-  width: 100%;
-}
-.uni-search {
-  width: 100%;
-  padding: 0.6rem 0.8rem;
-  border: 1px solid #cfd3d7;
-  border-radius: 10px;
-  font-size: 1rem;
-  margin-bottom: 0.8rem;
-  transition: border 0.2s ease;
-  box-sizing: border-box;
-}
-.uni-search:focus { border-color: #57a9ff; outline: none; }
-.uni-select {
-  width: 100%;
-  padding: 0.7rem 0.8rem;
-  border: 1px solid #cfd3d7;
-  border-radius: 10px;
-  background: #fff;
-  font-size: 1rem;
-  margin-bottom: 1.4rem;
-  cursor: pointer;
-  transition: border 0.2s ease;
-}
-.uni-select:hover { border-color: #57a9ff; }
-
-.uni-btn {
-  width: 95%;
-  padding: 0.75rem;
-  background: #57a9ff;
-  color: white;
-  font-weight: 600;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
-  margin: 2rem auto 0 auto;
-  display: block;
-}
-.uni-btn:hover { background: #3497ff; transform: translateY(-1px); }
-.uni-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-/* 下拉增强 */
-.uni-select-box { position: relative; justify-content: center; width: 100%; }
-.uni-dropdown {
-  width: 80%;
-  padding: 10px 14px;
-  font-size: 16px;
-  border-radius: 10px;
-  border: 1.5px solid #57a9ff;
-  color: #213547;
-  background: #fff;
-  outline: none;
-  margin: 0 auto;
-  display: block;
-}
-.uni-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(200, 220, 255, 0.4);
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  overflow: hidden;
-  z-index: 10;
-  transition: all 0.25s ease;
-}
-.uni-option {
-  padding: 12px 16px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
-}
-.uni-option:hover { background: rgba(87, 169, 255, 0.1); }
-.uni-option.selected { background: rgba(87, 169, 255, 0.2); font-weight: 600; }
-
-/* University Selection — 列表样式（附带更细的控件状态） */
-.uni-sub { margin: 0 0 1rem; color: #6b7280; }
-.uni-input {
-  width: 100%; box-sizing: border-box; border-radius: 10px;
-  border: 1px solid #e5e7eb; padding: 10px 12px; font-size: 14px; outline: none;
-  background: #fff; color: #111827;
-}
-.uni-input:focus { border-color: #4a76d9; box-shadow: 0 0 0 3px rgba(74,118,217,.15); }
-.uni-list {
-  display: grid; grid-template-columns: 1fr; gap: 8px;
-  max-height: 280px; overflow: auto; padding-right: 2px;
-}
-.uni-item {
-  display: flex; align-items: center; justify-content: space-between;
-  width: 100%; border-radius: 12px; border: 1px solid #e5e7eb;
-  background: #fafafa; color: #111827; padding: 12px 14px;
-  cursor: pointer; transition: background .15s ease, border-color .15s ease, color .15s ease;
-}
-.uni-item:hover { background: #f1f5f9; border-color: #cbd5e1; }
-.uni-item.is-active { border-color: #4a76d9; box-shadow: 0 0 0 3px rgba(74,118,217,.15); }
-.uni-item:focus { outline: none; box-shadow: 0 0 0 3px rgba(74,118,217,.15); }
-.uni-item-name { font-size: 14px; font-weight: 600; }
-.uni-dot { opacity: .35; }
-
-/* 底部按钮区（另一版本兼容） */
-.uni-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
-.uni-btn.ghost { background: #eef2f7; color: #374151; border: 1px solid #e5e7eb; }
-.uni-btn.ghost:hover { filter: brightness(.98); }
-.uni-btn.primary { background: #4a76d9; color: #fff; }
-
-
-
-/* Create Listing 输入字体（Risque） */
+/* Create Listing font */
 .cl-input,
 .cl-textarea,
 .cl-select,
@@ -716,42 +275,8 @@ select.cl-input {
   font-family: "Risque", cursive !important;
 }
 
-/* ===== Header Clickability Fix Pack ===== */
-/* 居中 Logo 容器：绝对几何居中，且不拦截点击 */
-.mp-center {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none; /* 不拦截左右区域点击 */
-  z-index: 2;
-}
-.mp-user,
-.mp-left,
-.mp-right,
-.mp-icon,
-.mp-logout { pointer-events: auto; cursor: pointer; }
-
-.mp-header,
-.mp-header.mp-header--safe {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 10000;
-  pointer-events: auto;
-}
-
-/* 防止其他元素越界到 Header 顶部 */
-.cl-upload { position: relative; z-index: 1; }
-.cl-upload .cl-file { z-index: 1; }
-
-/* 确保主内容不会覆盖 Header（mp-feed 已用 margin-top，其他页面用 padding-top） */
-.cl-main, .cg-main { padding-top: 64px; }
-
-/* ===== Password eye toggle (for RegisterPage & LoginPage) ===== */
+/* =================== Global Utilities =================== */
+/* Password eye toggle */
 .form-group .eye-wrap {
   position: relative;
   flex: 2;
@@ -762,11 +287,9 @@ select.cl-input {
   padding-right: 38px;
 }
 
-
-
-/* 🧿 禁止 Edge / Chrome / Safari 自动出现的小眼睛按钮 */
-input[type="password"]::-ms-reveal,   /* Edge / IE */
-input[type="password"]::-ms-clear,    /* Edge / IE 清除按钮 */
+/* Disable browser password icons */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
 input[type="password"]::-webkit-contacts-auto-fill-button,
 input[type="password"]::-webkit-credentials-auto-fill-button,
 input[type="password"]::-webkit-textfield-decoration-container {
@@ -775,219 +298,28 @@ input[type="password"]::-webkit-textfield-decoration-container {
   -webkit-appearance: none;
 }
 
-
-/****** Ulink Profile — Figma 精准校准（仅样式覆盖） ******/
-
-/* 整页与内容区 */
-.pf-scope{background:#f3f3f3!important;min-height:100vh;}
-.pf-container{max-width:760px;margin:84px auto 48px;padding:0 32px;}
-
-/* 顶部卡片：左头像 + 右三条胶囊 */
-.pf-topcard{
-  display:grid;grid-template-columns:120px 1fr;gap:20px;
-  align-items:center;background:#fff;border-radius:18px;
-  padding:18px 20px;box-shadow:0 8px 24px rgba(0,0,0,.08);
-}
-.pf-avatar{
-  position:relative;width:96px;height:96px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;font-size:48px;
-  background:#fff;border:2px solid #E0E0E0;
-}
-.pf-avatar::after{ /* 外灰环，贴近 Figma */
-  content:"";position:absolute;inset:-10px;border-radius:999px;
-  background: #f0f0f0;z-index:-1;
-}
-.pf-pill{
-  background:#dedede;border-radius:20px;padding:10px 16px;margin:8px 0;
-  font-weight:700;letter-spacing:.2px;color:#111;max-width:460px;
-}
-
-/* 行为条：左侧泡泡 + 右侧大胶囊按钮 */
-.pf-actionbar{
-  display:grid;grid-template-columns:56px 1fr;gap:12px;
-  align-items:center;max-width:760px;margin:14px 0 4px;
-}
-.pf-bubble{
-  width:44px;height:44px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  background:#fff;border:2px solid #C8C8C8;box-shadow:0 2px 6px rgba(0,0,0,.08);
-}
-.pf-cta{
-  height:44px;border:none;border-radius:24px;background:#d8d8d8;
-  font-weight:700;letter-spacing:.2px;box-shadow:inset 0 1px 0 rgba(255,255,255,.6);
-}
-
-/* 分割线（与 Figma 一致的细线） */
-.pf-divider{
-  height:1px;border:none;background:#D4D4D4;max-width:760px;margin:8px 0 6px;
-}
-
-/* 列表容器 */
-.pf-list{max-width:760px;display:flex;flex-direction:column;gap:0;margin-top:6px;}
-.pf-empty{color:#6a6a6a;padding:8px 0 14px;}
-
-/* 单条发布行：只有底部分割线 */
-.pf-post{padding:10px 0 14px;border-bottom:1px solid #D4D4D4;background:transparent;}
-
-/* 头部：头像 + 标题 + 右上编辑/删除 */
-.pf-post-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
-.pf-post-left{display:flex;gap:8px;align-items:flex-start;}
-.pf-mini-avatar{font-size:20px;margin-top:2px;line-height:1;}
-.pf-post-titlewrap{line-height:1.2;}
-.pf-post-title{font-weight:700;}
-.pf-post-sub{font-size:12px;color:#6b6b6b;margin-top:2px;}
-.pf-post-tools{display:flex;gap:10px;}
-.pf-iconbtn{background:none;border:none;font-size:20px;cursor:pointer;}
-
-/* 图片区：尺寸、圆角、边框和占位图标 */
-.pf-post-images{display:flex;gap:16px;margin-top:12px;}
-.pf-imgbox{
-  width:200px;height:200px;border-radius:12px;background:#EFEFEF;
-  border:1px solid #DADADA;display:flex;align-items:center;justify-content:center;overflow:hidden;
-}
-.pf-imgbox img{width:100%;height:100%;object-fit:cover;}
-.pf-imgph{font-size:26px;color:#9a9a9a;}
-
-/* 底部三段：左时间 | 中浏览 | 右评论图标 */
-.pf-post-foot{display:grid;grid-template-columns:1fr auto auto;align-items:center;
-  column-gap:16px;margin-top:10px;color:#555;font-size:13px;}
-.pf-time{justify-self:start;}
-.pf-views{justify-self:start;}
-.pf-comment{justify-self:end;}
-
-/* 本人主页：隐藏左侧圆泡，按钮占满一行 */
-.pf-actionbar.self { grid-template-columns: 1fr; }
-.pf-actionbar.self .pf-bubble { display: none; }
-.pf-actionbar.self .pf-cta { width: 100%; }
-
-
-/* 手机端折行细化 */
-@media (max-width:520px){
-  .pf-container{padding:0 14px;}
-  .pf-topcard{grid-template-columns:88px 1fr;padding:14px 16px;border-radius:16px;}
-  .pf-avatar{width:72px;height:72px;font-size:36px;}
-  .pf-pill{padding:8px 12px;margin:6px 0;max-width:100%;}
-  .pf-actionbar{grid-template-columns:48px 1fr;}
-  .pf-imgbox{width:44vw;height:44vw;max-width:208px;}
-}
-
-/* ===== Profile Edit Form ===== */
-.pf-editcard{
-  background:#fff;
-  border:1px solid #e5e8eb;
-  border-radius:16px;
-  padding:16px 18px 14px;
-  max-width:760px;
-  margin:12px auto 0;
-  box-shadow:0 6px 18px rgba(0,0,0,.06);
-}
-.pf-edit-title{
-  margin:2px 0 10px;
-  font-weight:800;
-  font-size:18px;
-  text-align:center;
-  color:#0f172a;
-}
-.pf-edit-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-.pf-field{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-.pf-field-label{
-  font-size:12px;
-  font-weight:600;
-  color:#667085;
-  letter-spacing:.2px;
-}
-.pf-input,
-.pf-textarea{
-  border:1px solid #d0d5dd;
-  border-radius:10px;
-  padding:10px 12px;
-  font-size:14px;
-  outline:none;
-  transition:border-color .15s ease, box-shadow .15s ease;
-  background:#fff;
-}
-.pf-input::placeholder,
-.pf-textarea::placeholder{ color:#9aa3b2; }
-.pf-input:focus,
-.pf-textarea:focus{
-  border-color:#155eef;
-  box-shadow:0 0 0 3px rgba(21,94,239,.15);
-}
-.pf-textarea{ resize:vertical; min-height:92px; }
-
-/* 跨两列：Bio */
-.pf-field-col2{ grid-column:1 / -1; }
-
-/* 预览头像（可放 emoji 或图片） */
-.pf-avatar-preview{
-  width:40px; height:40px; border-radius:50%;
-  border:1px solid #e5e8eb; background:#f8fafc;
-  display:grid; place-items:center; font-size:20px; overflow:hidden;
-}
-.pf-avatar-preview img{ width:100%; height:100%; object-fit:cover; }
-
-/* 按钮区 */
-.pf-edit-actions{
-  display:flex; justify-content:flex-end; gap:8px; margin-top:10px;
-}
-.pf-btn{
-  border:1px solid #d0d5dd;
-  background:#fff;
-  padding:8px 12px;
-  border-radius:10px;
-  cursor:pointer;
-  font-size:14px;
-}
-.pf-btn-primary{
-  background:#155eef; border-color:#155eef; color:#fff;
-}
-.pf-btn:disabled{ opacity:.6; cursor:default; }
-@media (max-width:640px){
-  .pf-edit-grid{ grid-template-columns:1fr; }
-  .pf-field-col2{ grid-column:auto; }
-}
-
-/* 1) 去掉浏览器默认的顶部留白 */
+/* Global layout */
 html, body, #root { height: 99%; }
 body { margin: 0; }
 
-/* 2) 让 AppHeader 吸顶 */
+html, body { 
+  margin: 0; 
+  padding: 0; 
+  width: 100%; 
+  overflow-x: hidden; 
+  overscroll-behavior-x: none; 
+}
+#root { 
+  width: 100%; 
+  overflow-x: hidden; 
+}
+
+/* App header global */
 .app-header {
-  position: sticky;     /* 或 fixed；sticky 更简单不需要计算高度 */
+  position: sticky;
   top: 0;
   z-index: 100;
   background: #fff;
   backdrop-filter: saturate(150%) blur(8px);
   border-bottom: 1px solid #eee;
 }
-
-/* 3) 让正文别紧贴着 header（给一点顶部内边距） */
-.pf-container {
-  padding-top: 12px;    /* 如果 header 用 fixed 而不是 sticky，这里改成 header 的高度 */
-}
-
-/* （可选）让“我的 Listings · N”那行也吸顶 */
-.pf-list > .pf-sticky-bar {
-  position: sticky;
-  top: 56px;            /* 等于 header 的高度；按你的 header 实际高度微调 */
-  z-index: 90;
-  background: #fff;
-}
-
-.gp-badge{ align-self:start; margin-left:8px; padding:2px 8px; font-size:12px; line-height:1.2;
-  background:#fff; color:#213547; border:1px solid #e5e7eb; border-radius:999px; white-space:nowrap; }
-.gp-avatars{ display:flex; align-items:center; gap:6px; padding-top:8px; }
-.gp-avatar{ width:28px; height:28px; border-radius:50%; border:1px solid #e5e7eb;
-  background:#f8fafc; display:grid; place-items:center; font-size:16px; overflow:hidden; }
-.gp-overflow{ font-size:12px; padding:2px 6px; border:1px solid #e5e7eb; border-radius:999px; background:#fff; }
-.gp-cap{ margin-left:auto; font-weight:600; }
-
-
