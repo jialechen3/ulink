@@ -229,7 +229,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['user'])) {
         fail(500, "Fetch user failed", ["error"=>$e->getMessage()]);
     }
 }
-
+/* 3) 按用户读取 listing（获取用户发布的所有商品） */
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['listings_by_user'])) {
+    try {
+        $user_id = intval($_GET['listings_by_user']);
+        $stmt = $conn->prepare("
+            SELECT 
+                l.id, l.user_id, l.university_id, l.title, l.description,
+                l.pictures, l.comments,
+                l.price, l.category, l.location, l.contact,
+                l.views, l.created_at,
+                u.username
+            FROM listings l
+            LEFT JOIN users u ON u.id = l.user_id
+            WHERE l.user_id = ?
+            ORDER BY l.created_at DESC
+            LIMIT 100
+        ");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $items = [];
+        while ($row = $res->fetch_assoc()) {
+            $row['pictures'] = $row['pictures'] ? json_decode($row['pictures'], true) : [];
+            $row['comments'] = $row['comments'] ? json_decode($row['comments'], true) : [];
+            $items[] = $row;
+        }
+        ok(["success"=>true, "items"=>$items]);
+    } catch (Throwable $e) {
+        fail(500, "Fetch user listings failed", ["error"=>$e->getMessage()]);
+    }
+}
 /* ===================== POST ===================== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $body['action'] ?? '';

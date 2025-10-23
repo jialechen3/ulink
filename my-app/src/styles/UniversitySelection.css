@@ -71,6 +71,10 @@
   outline: none; 
 }
 
+.uni-search:hover {
+  border-color: #93c5fd;
+}
+
 .uni-select {
   width: 100%;
   padding: 0.7rem 0.8rem;
@@ -84,7 +88,7 @@
 }
 
 .uni-select:hover { 
-  border-color: #57a9ff; 
+  border-color: #93c5fd; 
 }
 
 .uni-btn {
@@ -96,19 +100,18 @@
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
+  transition: background 0.2s ease;
   margin: 2rem auto 0 auto;
   display: block;
 }
 
 .uni-btn:hover { 
   background: #3497ff; 
-  transform: translateY(-1px); 
 }
 
 .uni-btn:disabled { 
   opacity: 0.5; 
-  cursor: not-allowed; 
+  cursor: not-allowed;
 }
 
 /* ===== Dropdown Components ===== */
@@ -137,30 +140,33 @@
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(200, 220, 255, 0.4);
-  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   z-index: 10;
-  transition: all 0.25s ease;
 }
 
 .uni-option {
   padding: 12px 16px;
   font-size: 15px;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
+  transition: background 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.uni-option:last-child {
+  border-bottom: none;
 }
 
 .uni-option:hover { 
-  background: rgba(87, 169, 255, 0.1); 
+  background: #f0f9ff;
 }
 
 .uni-option.selected { 
-  background: rgba(87, 169, 255, 0.2); 
-  font-weight: 600; 
+  background: #dbeafe; 
+  font-weight: 600;
 }
 
 /* ===== University List Styles ===== */
@@ -183,7 +189,10 @@
 
 .uni-input:focus { 
   border-color: #4a76d9; 
-  box-shadow: 0 0 0 3px rgba(74,118,217,.15); 
+}
+
+.uni-input:hover {
+  border-color: #93c5fd;
 }
 
 .uni-list {
@@ -200,28 +209,29 @@
   align-items: center; 
   justify-content: space-between;
   width: 100%; 
-  border-radius: 12px; 
+  border-radius: 10px; 
   border: 1px solid #e5e7eb;
   background: #fafafa; 
   color: #111827; 
   padding: 12px 14px;
   cursor: pointer; 
-  transition: background .15s ease, border-color .15s ease, color .15s ease;
+  transition: all 0.2s ease;
 }
 
 .uni-item:hover { 
-  background: #f1f5f9; 
-  border-color: #cbd5e1; 
+  background: #f0f9ff;
+  border-color: #93c5fd;
 }
 
 .uni-item.is-active { 
+  background: #dbeafe;
   border-color: #4a76d9; 
-  box-shadow: 0 0 0 3px rgba(74,118,217,.15); 
+  border-width: 2px;
 }
 
 .uni-item:focus { 
   outline: none; 
-  box-shadow: 0 0 0 3px rgba(74,118,217,.15); 
+  border-color: #4a76d9;
 }
 
 .uni-item-name { 
@@ -248,12 +258,16 @@
 }
 
 .uni-btn.ghost:hover { 
-  filter: brightness(.98); 
+  background: #e5e7eb;
 }
 
 .uni-btn.primary { 
   background: #4a76d9; 
   color: #fff; 
+}
+
+.uni-btn.primary:hover {
+  background: #3b63b3;
 }
 
 /* ===== Responsive Design ===== */
@@ -288,3 +302,150 @@
   }
 }
 
+/* Add to ProfilePage.css */
+
+/* Inline Editing Styles */
+.pf-pill-editable {
+  position: relative;
+  margin: 8px 0;
+}
+
+.pf-pill.pf-editable {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.pf-pill.pf-editable:hover {
+  background: #e5e7eb;
+}
+
+.pf-edit-hint {
+  margin-left: 8px;
+  opacity: 0.6;
+  font-size: 12px;
+}
+
+.pf-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 10px 16px;
+}
+
+.pf-edit-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: inherit;
+  font-weight: 700;
+}
+
+.pf-edit-select {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pf-save-btn, .pf-cancel-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.pf-save-btn:hover {
+  background: #10b981;
+  color: white;
+}
+
+.pf-cancel-btn:hover {
+  background: #ef4444;
+  color: white;
+}
+
+/* Delete Modal Styles */
+.pf-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pf-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.pf-modal h3 {
+  margin: 0 0 12px 0;
+  color: #1f2937;
+}
+
+.pf-modal p {
+  margin: 0 0 20px 0;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.pf-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.pf-btn-ghost {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.pf-btn-danger {
+  background: #ef4444;
+  color: white;
+}
+
+.pf-btn-danger:hover {
+  background: #dc2626;
+}
+
+/* Mobile Responsive Improvements */
+@media (max-width: 480px) {
+  .pf-edit-row {
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 12px;
+  }
+  
+  .pf-edit-input, .pf-edit-select {
+    width: 100%;
+  }
+  
+  .pf-modal {
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+  
+  .pf-modal-actions {
+    flex-direction: column;
+  }
+}

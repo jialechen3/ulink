@@ -10,21 +10,21 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
   const [uniName, setUniName] = useState("");
   const [universities, setUniversities] = useState([]);
   const [selectedUniId, setSelectedUniId] = useState(null);
-
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState(null);
 
-  // 编辑态（四项：avatar, display_name, location, university）
-  const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({
-    avatar: "🐧",
+  // Inline editing state
+  const [editingField, setEditingField] = useState(null);
+  const [tempValues, setTempValues] = useState({
     display_name: "",
     location: "",
+    university_id: null
   });
-  const [saving, setSaving] = useState(false);
 
-  // 选中的 listing（用于 Edit / Delete）
-  const [selectedId, setSelectedId] = useState(null);
+  // Delete confirmation modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [listingToDelete, setListingToDelete] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   // ===== Identity & Route =====
@@ -32,6 +32,14 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
   const params = new URLSearchParams(window.location.search);
   const viewedId = params.get("id") || myId;
   const isSelf = String(viewedId || "") === String(myId || "");
+
+  console.log("🚀 ProfilePage Debug:", { 
+    myId, 
+    viewedId, 
+    isSelf, 
+    userId: localStorage.getItem("userId"),
+    API_BASE 
+  });
 
   // ===== Local overrides (frontend-only) =====
   const loadOverrides = (uid) => {
@@ -51,76 +59,184 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
     (async () => {
       try {
         setLoading(true);
+        console.log("📥 Starting to load profile data...");
 
         // 1) 用户
+        console.log("👤 Fetching user data from:", `${API_BASE}/db.php?user=${encodeURIComponent(viewedId)}`);
         const r1 = await fetch(`${API_BASE}/db.php?user=${encodeURIComponent(viewedId)}`);
-        const d1 = await r1.json().catch(() => ({}));
+        console.log("📊 User response status:", r1.status);
+        const responseText = await r1.text();
+        console.log("📄 Raw user response:", responseText);
+        
+        let d1;
+        try {
+          d1 = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error("❌ JSON parse error:", parseError);
+          d1 = {};
+        }
+        
+        console.log("👤 User data parsed:", d1);
         if (abort) return;
 
         if (d1?.user) {
+          console.log("✅ Found user data:", d1.user);
           const overrides = loadOverrides(viewedId);
+          console.log("📋 Overrides:", overrides);
           const merged = { ...d1.user, ...overrides };
           setUser(merged);
-
-          // 初始化编辑表单
-          setForm({
-            avatar: merged.avatar || "🐧",
-            display_name: merged.display_name || merged.username || "",
-            location: merged.location || "",
-          });
+        } else {
+          console.log("❌ No user data found in API response");
+          const defaultUser = {
+            id: viewedId,
+            username: "User" + viewedId,
+            display_name: "User Name",
+            location: "Location",
+            university_id: null
+          };
+          setUser(defaultUser);
         }
 
         // 2) 学校列表 + 当前学校
+        console.log("🎓 Fetching universities from:", `${API_BASE}/universities.php`);
         const r2 = await fetch(`${API_BASE}/universities.php`);
-        const d2 = await r2.json().catch(() => ({}));
+        console.log("📊 Universities response status:", r2.status);
+        const uniResponseText = await r2.text();
+        console.log("📄 Raw universities response:", uniResponseText);
+        
+        let d2;
+        try {
+          d2 = JSON.parse(uniResponseText);
+        } catch (parseError) {
+          console.error("❌ Universities JSON parse error:", parseError);
+          d2 = {};
+        }
+        
+        console.log("🎓 Universities data parsed:", d2);
         if (!abort) {
           const arr = Array.isArray(d2?.items) ? d2.items : Array.isArray(d2) ? d2 : [];
+          console.log("🏫 Universities array:", arr);
           setUniversities(arr);
 
-          const initUniId =
-            d1?.user?.university_id ??
-            loadOverrides(viewedId)?.university_id ??
-            localStorage.getItem("university");
+          const initUniId = d1?.user?.university_id ?? loadOverrides(viewedId)?.university_id ?? localStorage.getItem("university");
+          console.log("🎯 Initial university ID:", initUniId);
           setSelectedUniId(initUniId ?? (arr[0]?.id ?? null));
 
           const hit = arr.find((x) => String(x.id) === String(initUniId));
-          if (hit?.name) setUniName(hit.name);
+          if (hit?.name) {
+            setUniName(hit.name);
+            console.log("🏷️ University name set to:", hit.name);
+          }
         }
 
-        // 3) 该用户的发布 —— 先按用户拉，失败再回退按学校拉后过滤
+        // 3) 该用户的发布
+        console.log("📝 Fetching listings...");
         let list = [];
         try {
           const r3 = await fetch(`${API_BASE}/db.php?listings_by_user=${encodeURIComponent(viewedId)}`);
           const d3 = await r3.json().catch(() => ({}));
           list = Array.isArray(d3?.listings) ? d3.listings : Array.isArray(d3?.items) ? d3.items : [];
+          console.log("📦 Listings from user endpoint:", list);
         } catch (e) {
-          // ignore
+          console.log("❌ User listings endpoint failed:", e);
         }
+        
         if (!list.length) {
-          // 回退方案：按学校获取再过滤 user_id
+          console.log("🔍 No listings from user endpoint, trying university endpoint...");
           const uniIdForList = d1?.user?.university_id ?? localStorage.getItem("university");
           if (uniIdForList) {
             const r4 = await fetch(`${API_BASE}/db.php?listings_by_university=${encodeURIComponent(uniIdForList)}`);
             const d4 = await r4.json().catch(() => ({}));
             const all = Array.isArray(d4?.items) ? d4.items : [];
             list = all.filter(x => String(x.user_id) === String(viewedId));
+            console.log("📦 Listings from university endpoint:", list);
           }
         }
-        // 按时间倒序
+        
         list.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
         if (!abort) setListings(list);
+        console.log("✅ Final listings:", list);
+      } catch (error) {
+        console.error("💥 Error loading profile:", error);
       } finally {
-        if (!abort) setLoading(false);
+        if (!abort) {
+          setLoading(false);
+          console.log("🏁 Loading complete");
+        }
       }
     })();
     return () => { abort = true; };
   }, [viewedId]);
+
+  // ===== TEMPORARY FALLBACK - If APIs fail =====
+  useEffect(() => {
+    if (!user && !loading) {
+      console.log("🆘 No user data after loading, creating fallback...");
+      setUser({
+        id: viewedId,
+        username: "demo_user",
+        display_name: "Demo User", 
+        location: "Buffalo, NY",
+        university_id: 1
+      });
+      setUniName("University at Buffalo");
+      setListings([]);
+    }
+  }, [user, loading, viewedId]);
 
   // ===== Derived display =====
   const displayName = user?.display_name || user?.username || "User Name";
   const displayLoc  = user?.location || "Location";
   const displayUni  = uniName || "University";
   const avatarValue = user?.avatar || "🐧";
+
+  console.log("🎨 Derived display values:", { displayName, displayLoc, displayUni, avatarValue });
+
+  // ===== Show loading state =====
+  if (loading) {
+    return (
+      <div className="pf-scope">
+        <AppHeader
+          username="Loading..."
+          onBack={onBack}
+          onHome={onHome}
+          onGoProfile={onGoProfile}
+          onLogout={onLogout}
+        />
+        <main className="pf-container">
+          <div className="pf-empty">Loading profile...</div>
+        </main>
+      </div>
+    );
+  }
+
+  // ===== Show fallback if no data =====
+  if (!user) {
+    return (
+      <div className="pf-scope">
+        <AppHeader
+          username="User"
+          onBack={onBack}
+          onHome={onHome}
+          onGoProfile={onGoProfile}
+          onLogout={onLogout}
+        />
+        <main className="pf-container">
+          <section className="pf-topcard">
+            <div className="pf-top-left">
+              <div className="pf-avatar" aria-hidden>🙂</div>
+            </div>
+            <div className="pf-top-right">
+              <div className="pf-pill">User Name</div>
+              <div className="pf-pill">📍 Location</div>
+              <div className="pf-pill">University</div>
+            </div>
+          </section>
+          <div className="pf-empty">No profile data available</div>
+        </main>
+      </div>
+    );
+  }
 
   // ===== Helpers =====
   function timeAgo(isoLike) {
@@ -136,101 +252,51 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
   function isUrlLike(s) {
     return /^(https?:)?\/\//.test(s || "");
   }
-  
-  async function fileToDataURL(file) {
-    if (!file || !file.type.startsWith("image/")) throw new Error("请选择图片文件");
-    const raw = await new Promise((resolve, reject) => {
-      const r = new FileReader();
-      r.onload = () => resolve(r.result);
-      r.onerror = () => reject(new Error("读取文件失败"));
-      r.readAsDataURL(file);
+
+  // ===== Inline Editing Functions =====
+  const startEditing = (field, currentValue) => {
+    setEditingField(field);
+    setTempValues(prev => ({
+      ...prev,
+      [field]: currentValue
+    }));
+  };
+
+  const cancelEditing = () => {
+    setEditingField(null);
+    setTempValues({
+      display_name: "",
+      location: "",
+      university_id: null
     });
-    // 压缩至最长边 256，减小体积
-    const img = new Image();
-    const dataUrl = await new Promise((resolve) => {
-      img.onload = () => {
-        const max = 256;
-        const scale = Math.min(max / img.width, max / img.height, 1);
-        const w = Math.round(img.width * scale);
-        const h = Math.round(img.height * scale);
-        const cvs = document.createElement("canvas");
-        cvs.width = w; cvs.height = h;
-        const ctx = cvs.getContext("2d");
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(cvs.toDataURL("image/png"));
-      };
-      img.onerror = () => resolve(raw); // 兜底：用原始
-      img.src = raw;
-    });
-    return dataUrl;
-  }
-  
-  const AvatarPreview = ({ value, size = 72 }) => {
-    const styleBox = {
-      width: size, 
-      height: size, 
-      borderRadius: "50%",
-      border: "1px solid #e5e8eb", 
-      background: "#f8fafc",
-      display: "grid", 
-      placeItems: "center", 
-      fontSize: size * 0.5, 
-      overflow: "hidden"
+  };
+
+  const saveField = async (field) => {
+    const uniHit = universities.find((u) => String(u.id) === String(tempValues.university_id || selectedUniId));
+    const overrides = {
+      ...loadOverrides(viewedId),
+      [field]: tempValues[field],
+      university_id: tempValues.university_id || selectedUniId,
+      university_name: uniHit?.name || uniName,
     };
-    const showImg = isUrlLike(value) || (value || "").startsWith("data:");
-    return (
-      <div style={styleBox} title="Avatar">
-        {showImg ? <img src={value} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/> : (value || "🙂")}
-      </div>
-    );
-  };
-
-  // ===== Save (frontend-only) =====
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      const uniHit = universities.find((u) => String(u.id) === String(selectedUniId));
-      const overrides = {
-        avatar: (form.avatar || "🐧").trim(),
-        display_name: (form.display_name || "").trim() || user?.username || "",
-        location: (form.location || "").trim(),
-        university_id: selectedUniId,
-        university_name: uniHit?.name || uniName,
-        // 其余字段保持（不编辑）
-        bio: user?.bio,
-        contact: user?.contact,
-      };
-      saveOverrides(viewedId, overrides);
-      setUser((u) => ({ ...u, ...overrides }));
-      setUniName(overrides.university_name);
-      setEditing(false);
-    } finally {
-      setSaving(false);
+    
+    saveOverrides(viewedId, overrides);
+    setUser((u) => ({ ...u, ...overrides }));
+    if (field === 'university_id' && uniHit?.name) {
+      setUniName(uniHit.name);
     }
+    setEditingField(null);
+    setTempValues({
+      display_name: "",
+      location: "",
+      university_id: null
+    });
   };
 
-  // ===== Listing operations =====
-  const editListing = (id) => {
-    const base = `${location.origin}${location.pathname}`.replace(/\/$/, "");
-    window.location.href = `${base}#/createlisting/?edit=${encodeURIComponent(id)}`;
-  };
-
-  async function deleteListing(id) {
-    if (!confirm("Delete this listing?")) return;
-    try {
-      const fd = new FormData();
-      fd.append("action", "delete_listing");
-      fd.append("id", id);
-      await fetch(`${API_BASE}/db.php`, { method: "POST", body: fd }).catch(() => {});
-    } finally {
-      setListings((prev) => prev.filter((x) => String(x.id) !== String(id)));
-      if (String(selectedId) === String(id)) setSelectedId(null);
-    }
-  }
-
+  // ===== Avatar Upload =====
   async function uploadAvatar(file) {
-    if (!file || !file.type.startsWith("image/")) throw new Error("请选择图片文件");
-    if (file.size > 5 * 1024 * 1024) throw new Error("图片过大（≤5MB）");
+    if (!file || !file.type.startsWith("image/")) throw new Error("Please select an image file");
+    if (file.size > 5 * 1024 * 1024) throw new Error("Image too large (≤5MB)");
 
     const fd = new FormData();
     fd.append("file", file);
@@ -240,12 +306,137 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
       const res = await fetch(`${API_BASE}/upload.php`, { method: "POST", body: fd });
       const data = await res.json().catch(() => ({}));
       const url = Array.isArray(data?.urls) ? data.urls[0] : null;
-      if (!url) throw new Error(data?.message || "上传失败");
+      if (!url) throw new Error(data?.message || "Upload failed");
+      
+      // Save the avatar URL
+      const overrides = {
+        ...loadOverrides(viewedId),
+        avatar: url
+      };
+      saveOverrides(viewedId, overrides);
+      setUser((u) => ({ ...u, avatar: url }));
       return url;
     } finally {
       setUploadingAvatar(false);
     }
   }
+
+const AvatarPreview = ({ value, size = 88 }) => {
+  const [isHovering, setIsHovering] = useState(false);
+  
+  const styleBox = {
+    width: size, 
+    height: size, 
+    borderRadius: "50%",
+    border: "1px solid #e5e8eb", 
+    background: "#f8fafc",
+    display: "grid", 
+    placeItems: "center", 
+    fontSize: size * 0.5, 
+    overflow: "hidden",
+    cursor: isSelf ? "pointer" : "default",
+    position: 'relative'
+  };
+  
+  const showImg = isUrlLike(value) || (value || "").startsWith("data:");
+  
+  const handleAvatarClick = () => {
+    if (isSelf) {
+      document.getElementById('avatar-upload-input')?.click();
+    }
+  };
+
+  const handleMouseEnter = () => {
+    if (isSelf) {
+      setIsHovering(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+  };
+
+  return (
+    <>
+      <div 
+        style={styleBox} 
+        title={isSelf ? "Click to change avatar" : "Avatar"} 
+        onClick={handleAvatarClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {showImg ? (
+          <img src={value} alt="Profile avatar" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+        ) : (
+          value || "🙂"
+        )}
+        
+        {isSelf && isHovering && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.7)',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: Math.max(12, size * 0.15),
+            fontWeight: '500',
+            borderRadius: '50%'
+          }}>
+            Edit
+          </div>
+        )}
+      </div>
+      <input
+        id="avatar-upload-input"
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          try {
+            await uploadAvatar(file);
+          } catch (err) {
+            alert(err.message || "Upload failed");
+          } finally {
+            e.target.value = "";
+          }
+        }}
+      />
+    </>
+  );
+};
+
+  // ===== Listing operations =====
+  const editListing = (id) => {
+    const base = `${location.origin}${location.pathname}`.replace(/\/$/, "");
+    window.location.href = `${base}#/createlisting/?edit=${encodeURIComponent(id)}`;
+  };
+
+  const confirmDelete = (id) => {
+    setListingToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const executeDelete = async () => {
+    if (!listingToDelete) return;
+    
+    try {
+      const fd = new FormData();
+      fd.append("action", "delete_listing");
+      fd.append("id", listingToDelete);
+      await fetch(`${API_BASE}/db.php`, { method: "POST", body: fd }).catch(() => {});
+    } finally {
+      setListings((prev) => prev.filter((x) => String(x.id) !== String(listingToDelete)));
+      setShowDeleteModal(false);
+      setListingToDelete(null);
+    }
+  };
 
   // ===== Render =====
   return (
@@ -259,138 +450,174 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
       />
 
       <main className="pf-container">
-        {/* 顶部卡片 */}
+        {/* Enhanced Top Card */}
         <section className="pf-topcard">
           <div className="pf-top-left">
             <div className="pf-avatar" aria-hidden>
-              <AvatarPreview value={avatarValue} size={72} />
+              <AvatarPreview value={avatarValue} size={88} />
+          
             </div>
           </div>
           <div className="pf-top-right">
-            <div className="pf-pill">{displayName}</div>
-            <div className="pf-pill">📍 {displayLoc}</div>
-            <div className="pf-pill">{displayUni}</div>
+            <div className="pf-user-info">
+              {/* Display Name */}
+              {/* Display Name - Inline Editable */}
+<div className="pf-pill-editable">
+  {editingField === 'display_name' ? (
+    <div className="pf-edit-row">
+      <input
+        className="pf-edit-input"
+        value={tempValues.display_name}
+        onChange={(e) => setTempValues(prev => ({...prev, display_name: e.target.value}))}
+        placeholder="Enter your display name"
+        autoFocus
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') saveField('display_name');
+          if (e.key === 'Escape') cancelEditing();
+        }}
+      />
+      <button 
+        type="button"
+        className="pf-save-btn" 
+        onClick={(e) => {
+          e.stopPropagation();
+          saveField('display_name');
+        }}
+        title="Save"
+      >
+        ✓
+      </button>
+      <button 
+        type="button"
+        className="pf-cancel-btn" 
+        onClick={(e) => {
+          e.stopPropagation();
+          cancelEditing();
+        }}
+        title="Cancel"
+      >
+        ✕
+      </button>
+    </div>
+  ) : (
+    <div 
+      className="pf-pill pf-editable"
+      onClick={() => isSelf && startEditing('display_name', displayName)}
+      title={isSelf ? "Click to edit" : ""}
+    >
+      👤 {displayName}
+      {isSelf && <span className="pf-edit-hint">Edit</span>}
+    </div>
+  )}
+</div>
+
+{/* Location - Inline Editable */}
+<div className="pf-pill-editable">
+  {editingField === 'location' ? (
+    <div className="pf-edit-row">
+      <input
+        className="pf-edit-input"
+        value={tempValues.location}
+        onChange={(e) => setTempValues(prev => ({...prev, location: e.target.value}))}
+        placeholder="Enter your location"
+        autoFocus
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') saveField('location');
+          if (e.key === 'Escape') cancelEditing();
+        }}
+      />
+      <button 
+        type="button"
+        className="pf-save-btn" 
+        onClick={(e) => {
+          e.stopPropagation();
+          saveField('location');
+        }}
+      >
+        ✓
+      </button>
+      <button 
+        type="button"
+        className="pf-cancel-btn" 
+        onClick={(e) => {
+          e.stopPropagation();
+          cancelEditing();
+        }}
+      >
+        ✕
+      </button>
+    </div>
+  ) : (
+    <div 
+      className="pf-pill pf-editable"
+      onClick={() => isSelf && startEditing('location', displayLoc === "Location" ? "" : displayLoc)}
+      title={isSelf ? "Click to edit" : ""}
+    >
+      📍 {displayLoc}
+      {isSelf && <span className="pf-edit-hint">Edit</span>}
+    </div>
+  )}
+</div>
+
+{/* University - Inline Editable */}
+<div className="pf-pill-editable">
+  {editingField === 'university_id' ? (
+    <div className="pf-edit-row">
+      <select
+        className="pf-edit-select"
+        value={tempValues.university_id || selectedUniId}
+        onChange={(e) => setTempValues(prev => ({...prev, university_id: e.target.value}))}
+        autoFocus
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') saveField('university_id');
+          if (e.key === 'Escape') cancelEditing();
+        }}
+      >
+        <option value="">Select University</option>
+        {universities.map(u => (
+          <option key={u.id} value={u.id}>{u.name}</option>
+        ))}
+      </select>
+      <button 
+        type="button"
+        className="pf-save-btn" 
+        onClick={(e) => {
+          e.stopPropagation();
+          saveField('university_id');
+        }}
+      >
+        ✓
+      </button>
+      <button 
+        type="button"
+        className="pf-cancel-btn" 
+        onClick={(e) => {
+          e.stopPropagation();
+          cancelEditing();
+        }}
+      >
+        ✕
+      </button>
+    </div>
+  ) : (
+    <div 
+      className="pf-pill pf-editable"
+      onClick={() => isSelf && startEditing('university_id', selectedUniId)}
+      title={isSelf ? "Click to edit" : ""}
+    >
+      🎓 {displayUni}
+      {isSelf && <span className="pf-edit-hint">Edit</span>}
+    </div>
+  )}
+</div>
+            </div>
           </div>
         </section>
 
-        {/* 行为条：自己=Edit；他人=DM */}
-        <section className={`pf-actionbar ${isSelf ? "self" : ""}`}>
-          {!isSelf && <div className="pf-bubble" aria-hidden>💬</div>}
-          {isSelf ? (
-            <button className="pf-cta" onClick={() => setEditing(true)}>✏️ Edit Information</button>
-          ) : (
-            <button className="pf-cta">DM</button>
-          )}
-        </section>
-
-        {/* 编辑表单（仅自己 & 编辑态） */}
-        {isSelf && editing && (
-          <section className="pf-editcard">
-            <h3 className="pf-edit-title">Edit Profile</h3>
-            <div className="pf-edit-grid">
-              {/* Avatar：文本/URL/emoji + 纯前端上传 */}
-              <label className="pf-field">
-                <span className="pf-field-label">Avatar</span>
-                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                  <input
-                    className="pf-input"
-                    value={form.avatar}
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      try {
-                        const url = await uploadAvatar(file);
-                        setForm((s) => ({ ...s, avatar: url }));
-                      } catch (err) {
-                        alert(err.message || "上传失败");
-                      } finally {
-                        e.target.value = "";
-                      }
-                    }}
-                  />
-                  <label className="pf-btn" style={{ cursor:"pointer" }}>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      style={{ display:"none" }}
-                      onChange={async (e)=>{
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        try {
-                          const dataUrl = await fileToDataURL(file);
-                          setForm(s => ({ ...s, avatar: dataUrl }));
-                        } catch (err) {
-                          alert(err.message || "上传失败");
-                        } finally {
-                          e.target.value = "";
-                        }
-                      }}
-                    />
-                    Upload
-                  </label>
-                  <div className="pf-avatar-preview" title="Preview">
-                    {(isUrlLike(form.avatar) || (form.avatar || "").startsWith("data:"))
-                      ? <img src={form.avatar} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                      : (form.avatar || "🙂")}
-                  </div>
-                </div>
-              </label>
-
-              <LabeledInput
-                label="Display Name"
-                value={form.display_name}
-                onChange={(v)=>setForm(s=>({...s, display_name:v}))}
-                placeholder="Your name"
-              />
-
-              <LabeledInput
-                label="Location"
-                value={form.location}
-                onChange={(v)=>setForm(s=>({...s, location:v}))}
-                placeholder="Buffalo, NY"
-              />
-
-              <label className="pf-field">
-                <span className="pf-field-label">University</span>
-                <select
-                  className="pf-input"
-                  value={selectedUniId ?? ""}
-                  onChange={(e)=>setSelectedUniId(e.target.value)}
-                >
-                  {universities.map(u => (
-                    <option key={u.id} value={u.id}>{u.name}</option>
-                  ))}
-                </select>
-              </label>
-            </div>
-
-            <div className="pf-edit-actions">
-              <button className="pf-btn pf-btn-primary" onClick={handleSave} disabled={saving}>
-                {saving ? "Saving..." : "Save"}
-              </button>
-              <button
-                className="pf-btn"
-                onClick={()=>{
-                  setForm({
-                    avatar: avatarValue,
-                    display_name: displayName,
-                    location: displayLoc === "Location" ? "" : displayLoc,
-                  });
-                  setSelectedUniId(user?.university_id ?? selectedUniId);
-                  setEditing(false);
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          </section>
-        )}
-
         <hr className="pf-divider" />
 
-        {/* 列表区 */}
+        {/* Listings Section */}
         <section className="pf-list">
-          {/* 标题 + 操作按钮（仅自己可见） */}
           <div className="pf-list-header">
             {isSelf ? "My Listings" : "Listings"}
             {listings.length ? ` · ${listings.length}` : ""}
@@ -402,7 +629,6 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
             <div className="pf-empty">No listings yet.</div>
           ) : (
             listings.map((it) => {
-              // 解析图片
               let pics = [];
               try {
                 if (typeof it.pictures === "string") {
@@ -436,7 +662,7 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
                     {isSelf && (
                       <div className="pf-post-tools" onClick={(e)=>e.stopPropagation()}>
                         <button className="pf-iconbtn" title="Edit this" onClick={() => editListing(it.id)}>✏️</button>
-                        <button className="pf-iconbtn" title="Delete this" onClick={() => deleteListing(it.id)}>🗑️</button>
+                        <button className="pf-iconbtn" title="Delete this" onClick={() => confirmDelete(it.id)}>🗑️</button>
                       </div>
                     )}
                   </header>
@@ -474,22 +700,25 @@ export default function ProfilePage({ onBack, onHome, onGoProfile, onLogout }) {
 
         <hr className="pf-divider tail"/>
       </main>
-    </div>
-  );
-}
 
-/* —— 小组件 —— */
-function LabeledInput({ label, value, onChange, placeholder }) {
-  return (
-    <label className="pf-field">
-      <span className="pf-field-label">{label}</span>
-      <input
-        className="pf-input"
-        value={value}
-        onChange={(e)=>onChange(e.target.value)}
-        placeholder={placeholder}
-      />
-    </label>
+      {/* Enhanced Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="pf-modal-backdrop">
+          <div className="pf-modal">
+            <h3>Delete Listing</h3>
+            <p>Are you sure you want to delete this listing? This action cannot be undone.</p>
+            <div className="pf-modal-actions">
+              <button className="pf-btn pf-btn-ghost" onClick={() => setShowDeleteModal(false)}>
+                Cancel
+              </button>
+              <button className="pf-btn pf-btn-danger" onClick={executeDelete}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
