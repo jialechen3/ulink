@@ -11,16 +11,20 @@ import MessagesPage from "./MessagesPage";
 import PostDetailPage from "./PostDetailPage";
 import { API_BASE } from "./config";
 
+import EditListingPage from "./EditListingPage.jsx"; // ✅ 你刚创建的页面
+
+
 /** 解析当前 step（基于 location.hash） */
 function parseStepFromHash() {
     const raw = window.location.hash || "#/signin/";
     const seg = raw.replace(/^#\/?|\/+$/g, ""); // 去掉 #/ 和尾部 /
     const head = seg.split("/")[0].toLowerCase();
     const known = new Set([
-        "signin", "register", "university", "listing",
-        "createlisting", "creategroup", "profile",
-        "messages", "postdetail"
-    ]);
+    "signin", "register", "university", "listing",
+    "createlisting", "creategroup", "profile",
+    "messages", "postdetail", "editlisting" // ✅ 新增
+]);
+
     return known.has(head) ? head : "signin";
 }
 
@@ -39,6 +43,7 @@ export default function App() {
     const [listReloadTick, setListReloadTick] = useState(0);
     const [currentPost, setCurrentPost] = useState(null);
     const [blockTipTick, setBlockTipTick] = useState(0); // 触发重新渲染提示的小计数
+    
 
     /** 是否“锁定选大学页”：已有 university 则锁定 */
     const universityLocked = !!(university && university !== "null" && university !== "undefined");
@@ -334,6 +339,17 @@ export default function App() {
                     username={username}
                 />
             )}
+
+            {step === "editlisting" && (
+                <EditListingPage
+                    onBack={goBackOne}
+                    onHome={goHomeToListing}
+                    onGoProfile={() => navigate("/profile/")}
+                    onLogout={handleLogout}
+                    username={username}
+                />
+            )}
+
         </div>
     );
 }
