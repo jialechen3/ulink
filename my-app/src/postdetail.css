@@ -1,10 +1,14 @@
 
+
 .post-detail {
-  max-width: 600px;
+  width: 100%;
+  max-width: 1200px;         /* expand wide on desktop */
   margin: 0 auto;
-  padding: 16px;
+  padding: 80px 24px 40px;   /* top offset for header + side padding */
+  box-sizing: border-box;
   line-height: 1.6;
 }
+
 
 .pd-head {
   display: flex;
@@ -101,11 +105,79 @@
   margin-top: 4px;
 }
 
+/* === Make comment section scale to full width of parent === */
+.pd-comments {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 32px;
+  border-top: 1px solid #ddd;
+  padding-top: 20px;
+  box-sizing: border-box;
+}
+
+/* === Make each comment line up nicely and stretch === */
+.pd-comment {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.pd-comment-body {
+  flex: 1;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 15px;
+}
+
+/* === Make comment input bar expand fully too === */
+.pd-comment-input {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  border-top: 1px solid #ddd;
+  padding-top: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pd-comment-input textarea {
+  flex: 1;
+  width: 100%;
+  min-height: 60px;
+}
+
+/* === Responsive tweaks === */
+@media (min-width: 1024px) {
+  .pd-comments {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pd-comments {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .pd-comment-input {
+    flex-direction: column;
+  }
+
+  .pd-comment-input button {
+    align-self: flex-end;
+  }
+}
+
+
 /* 🌐 Large screens (desktop 1024px–1440px) */
 @media (min-width: 1024px) {
   .post-detail {
-    max-width: 800px;
-    padding: 32px;
+    max-width: 1400px;       /* use more horizontal space */
+    padding-left: 60px;
+    padding-right: 60px;
   }
 
   .pd-title {
@@ -120,7 +192,7 @@
 /* 📱 Small screens (mobile ≤ 480px) */
 @media (max-width: 480px) {
   .post-detail {
-    padding: 12px;
+    padding: 90px 16px 32px;
   }
 
   .pd-head {
