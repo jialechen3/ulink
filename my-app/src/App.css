@@ -1,3 +1,35 @@
+/* Force light colors */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: light !important;
+  }
+  
+  html, body, #root, .app-container,
+  .mp-root, .cl-root, .cg-root, .register-container,
+  .uni-page, .uni-card, .pf-scope, .post-detail,
+  .modal, .kebab-menu, .mp-header, .mp-tabs {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  input, textarea, select {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ccc !important;
+  }
+  
+  
+  /* Only style specific buttons */
+  .signup-btn,
+  .uni-btn:not(.ghost),
+  .cl-btn.primary {
+    background-color: #4a76d9 !important;
+    color: #ffffff !important;
+  }
+}
+
+
+
 /* =================== Global / Vite defaults (保留) =================== */
 #root {
   max-width: 1280px;
@@ -61,26 +93,7 @@
 
 .error-text { color: #d32f2f; background-color: #ffebee; border: 1px solid #ffcdd2; padding: 10px; border-radius: 4px; margin: 10px 0; font-size: 14px; }
 
-/* Dark mode for register */
-@media (prefers-color-scheme: dark) {
-  .register-container { background: #1e1e1e; color: #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
-  .register-title { color: #ffffff; }
-  .form-group label { color: #e0e0e0; }
-  .form-group input { background: #2d2d2d; border: 1px solid #444; color: #ffffff; }
-  .form-group input:focus { border-color: #4a76d9; }
-  .form-group input:disabled { background-color: #3a3a3a; color: #888; }
-  .icon-btn { color: #ffffff; }
-  .icon-btn:hover:not(:disabled) { background-color: #333; }
-  .icon-btn:disabled { color: #666; }
-  .password-rules { color: #ccc; }
-  .error-text { color: #ff6b6b; background-color: rgba(211, 47, 47, 0.1); border: 1px solid rgba(211, 47, 47, 0.3); }
-}
 
-/* Base dark mode background */
-@media (prefers-color-scheme: dark) {
-  body { background-color: #121212; color: #ffffff; }
-  #root { background-color: #121212; }
-}
 
 /* =================== Kebab & Bug Modal (保留) =================== */
 .kebab-wrapper { position: relative; }
@@ -321,17 +334,7 @@
   .mp-header { height: 58px; padding: 0 6px; }
 }
 
-/* Marketplace Dark */
-@media (prefers-color-scheme: dark) {
-  .mp-root { background: #121212; color: #e8e8e8; }
-  .mp-header, .mp-tabs { border-color: #2a2a2a; }
-  .mp-icon { border-color: #2a2a2a; color: #eee; }
-  .mp-search { background:#1b1b1b; border-color:#2a2a2a; color:#eee; }
-  .mp-avatar { background:#1f1f1f; }
-  .mp-imgbox { background:#1b1b1b; border-color:#2a2a2a; }
-  .mp-divider { background:#2a2a2a; }
-  .mp-tabs .tab { color:#aaa; }
-}
+
 
 /* ============== FAB ============== */
 :root {
@@ -397,10 +400,7 @@
 .fab-item:hover { background: #f6f8fb; }
 
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@media (prefers-color-scheme: dark) {
-  .fab-menu { background:#1b1b1b; border-color:#2a2a2a; color:#eee; }
-  .fab-item:hover { background:#2a2a2a; }
-}
+
 
 /* =================== Create Listing Page (修复遮挡) =================== */
 .cl-root {
@@ -501,14 +501,7 @@
 .cl-btn.primary { background: #4a90e2; color: #fff; }
 .cl-btn.ghost { background: #e5e7eb; color: #333; }
 
-@media (prefers-color-scheme: dark) {
-  .cl-root { background:#121212; color:#e8e8e8; }
-  .cl-header, .cl-actions { border-color:#2a2a2a; }
-  .cl-round { border-color:#2a2a2a; color:#eee; }
-  .cl-input, .cl-textarea, .cl-upload { background:#1b1b1b; color:#eee; }
-  .cl-thumb { background:#1b1b1b; border-color:#2a2a2a; }
-  .cl-btn.ghost { background:#2a2a2a; color:#eee; }
-}
+
 
 /* =================== Create Group Placeholder (保留) =================== */
 .cg-root { display:grid; grid-template-rows:auto 1fr; height:100vh; }
@@ -521,9 +514,7 @@
   padding: 6px 10px; font-size: 12px; cursor: pointer;
 }
 .mp-logout:hover { opacity: .9; }
-@media (prefers-color-scheme: dark) {
-  .mp-logout { background: #dc2626; color: #fff; }
-}
+
 
 /* 全局防横向滚动（保留） */
 html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-behavior-x: none; }
@@ -711,38 +702,7 @@ html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; overscroll-
 .uni-btn.ghost:hover { filter: brightness(.98); }
 .uni-btn.primary { background: #4a76d9; color: #fff; }
 
-/* University Selection 暗色模式（两套都覆盖） */
-@media (prefers-color-scheme: dark) {
-  .screen-university .card {
-    background: #1e1e1e;
-    color: #e8e8e8;
-    border-color: #2a2a2a;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.35);
-  }
-  .screen-university select {
-    background: #2a2a2a;
-    border: 1px solid #3a3a3a;
-    color: #e8e8e8;
-  }
-  .screen-university button { background: #4a90e2; }
 
-  .uni-page { background: #121212 !important; }
-  .uni-card { background: #1a1a1a !important; border-color: #2a2a2a !important; color: #e8e8e8 !important; }
-  .uni-title { color: #e8e8e8 !important; }
-  .uni-sub { color: #a3a3a3 !important; }
-  .uni-input { background: #1f2937 !important; color: #e8e8e8 !important; border-color: #374151 !important; }
-  .uni-input::placeholder { color: #8b8b8b !important; }
-  .uni-list { scrollbar-color: #374151 #1a1a1a; }
-  .uni-item {
-    background: #1f2937 !important; color: #e6e6e6 !important; border-color: #374151 !important;
-  }
-  .uni-item:hover { background: #233044 !important; border-color: #445067 !important; }
-  .uni-item.is-active { border-color: #7aa2ff !important; box-shadow: 0 0 0 3px rgba(122,162,255,.22) !important; }
-  .uni-item:focus { box-shadow: 0 0 0 3px rgba(122,162,255,.22) !important; }
-  .uni-dot { color: #9aa4b2 !important; opacity: .9; }
-  .uni-btn.ghost { background: #2a2a2a !important; color: #e8e8e8 !important; border-color: #3a3a3a !important; }
-  .uni-btn.primary { background: #3d6edc !important; color: #fff !important; }
-}
 
 /* Create Listing 输入字体（Risque） */
 .cl-input,
@@ -802,40 +762,7 @@ select.cl-input {
   padding-right: 38px;
 }
 
-/* 全局增强的暗色变量（重要控件） */
-@media (prefers-color-scheme: dark) {
-  body, html, #root {
-    background-color: #121212 !important;
-    color: #e8e8e8 !important;
-  }
-  .register-container,
-  .uni-card,
-  .mp-root,
-  .cl-root,
-  .cg-root,
-  .modal,
-  .kebab-menu,
-  .mp-tabs {
-    background-color: #1e1e1e !important;
-    color: #e8e8e8 !important;
-    border-color: #333 !important;
-  }
-  input, textarea, select {
-    background-color: #2b2b2b !important;
-    color: #e8e8e8 !important;
-    border-color: #444 !important;
-  }
-  button {
-    background-color: #4a76d9 !important;
-    color: #fff !important;
-  }
-  .error-text {
-    background-color: rgba(211,47,47,0.15) !important;
-    border-color: rgba(211,47,47,0.3) !important;
-    color: #ff6b6b !important;
-  }
-  .mp-empty, .password-rules { color: #aaa !important; }
-}
+
 
 /* 🧿 禁止 Edge / Chrome / Safari 自动出现的小眼睛按钮 */
 input[type="password"]::-ms-reveal,   /* Edge / IE */
@@ -1054,3 +981,13 @@ body { margin: 0; }
   z-index: 90;
   background: #fff;
 }
+
+.gp-badge{ align-self:start; margin-left:8px; padding:2px 8px; font-size:12px; line-height:1.2;
+  background:#fff; color:#213547; border:1px solid #e5e7eb; border-radius:999px; white-space:nowrap; }
+.gp-avatars{ display:flex; align-items:center; gap:6px; padding-top:8px; }
+.gp-avatar{ width:28px; height:28px; border-radius:50%; border:1px solid #e5e7eb;
+  background:#f8fafc; display:grid; place-items:center; font-size:16px; overflow:hidden; }
+.gp-overflow{ font-size:12px; padding:2px 6px; border:1px solid #e5e7eb; border-radius:999px; background:#fff; }
+.gp-cap{ margin-left:auto; font-weight:600; }
+
+

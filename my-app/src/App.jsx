@@ -198,6 +198,7 @@ export default function App() {
     };
 
     const goHomeToListing = () => {
+        localStorage.removeItem("currentPost"); 
         navigate("/listing/");
         setListReloadTick((t) => t + 1);
     };
@@ -222,6 +223,18 @@ export default function App() {
             </button>
         </div>
     );
+    useEffect(() => {
+  if (!currentPost) {
+    const savedPost = localStorage.getItem("currentPost");
+    if (savedPost) {
+      try {
+        setCurrentPost(JSON.parse(savedPost));
+      } catch {
+        console.warn("Invalid saved post data");
+      }
+    }
+  }
+}, []);
 
     return (
         <div className="app-container">
@@ -260,8 +273,11 @@ export default function App() {
                     onGoCreateGroup={() => navigate("/creategroup/")}
                     onGoProfile={() => navigate("/profile/")}
                     onGoMessages={() => navigate("/messages/")}
-                    onOpenPost={(post) => { setCurrentPost(post); navigate("/postdetail/"); }}
-                    reloadTick={listReloadTick}
+                    onOpenPost={(post) => {
+                    setCurrentPost(post);
+                    localStorage.setItem("currentPost", JSON.stringify(post));
+                    navigate("/postdetail/");
+                    }}                    reloadTick={listReloadTick}
                     onRequestRefresh={() => setListReloadTick((t) => t + 1)}
                     username={username}
                 />
@@ -309,8 +325,11 @@ export default function App() {
                     username={username}
                 />
             )}
-
-            {step === "postdetail" && (
+            
+            {
+            
+            step === "postdetail" && (
+                
                 <PostDetailPage
                     post={currentPost}
                     onBack={goBackOne}

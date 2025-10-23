@@ -13,6 +13,25 @@ function timeAgo(ts) {
     const days = Math.floor(h / 24);
     return `${days}d ago`;
 }
+function parsePics(pictures) {
+  try {
+    if (Array.isArray(pictures)) return pictures;
+    if (typeof pictures === "string") {
+      if (pictures.trim().startsWith("[")) return JSON.parse(pictures);
+      return pictures.split(",").map(s => s.trim()).filter(Boolean);
+    }
+  } catch {}
+  return [];
+}
+const EMOJI_POOL = ["🐧","🦊","🐼","🐯","🦉","🐨","🐸","🐵","🦁","🐮","🐱","🐶","🐻","🦄"];
+function makeEmojiMembers(n) {
+  const arr = [];
+  const lim = Math.max(0, Math.min(n, 5)); // show up to 5
+  for (let i = 0; i < lim; i++) {
+    arr.push(EMOJI_POOL[(Math.floor(Math.random()*EMOJI_POOL.length))]);
+  }
+  return arr;
+}
 
 // 简单的 Groups 视图（占位，可改成真实 DB）
 function GroupsView() {
@@ -41,6 +60,9 @@ export default function ListingPage({
     const [showReport, setShowReport] = useState(false);
     const [openFab, setOpenFab] = useState(false);
     const [activeTab, setActiveTab] = useState("listings"); // "listings" | "groups"
+    const [groups, setGroups] = useState([]);
+    const [groupsLoading, setGroupsLoading] = useState(false);
+
 
     const fetchListings = async () => {
         if (!university) return;
@@ -53,11 +75,68 @@ export default function ListingPage({
         }
     };
 
+    async function fetchGroupsMock() {
+        setGroupsLoading(true);
+        try {
+            // Simulated network delay
+            await new Promise(r => setTimeout(r, 300));
+
+            // Build 5 demo groups. Feel free to tweak copy/pics.
+            const now = new Date().toISOString();
+            const demo = [
+                {
+                    id: 9001, title: "CSE 331 — Algorithm Grind",
+                    description: "Weekly DP/Greedy review",
+                    pictures: [], category: "study",
+                    capacity: 3, member_count: 2, views: 42, created_at: now
+                },
+                {
+                    id: 9002, title: "CSE 474 — ML Review",
+                    description: "Paper reading + LeetML",
+                    pictures: [], category: "study",
+                    capacity: 2, member_count: 2, views: 81, created_at: now
+                },
+                {
+                    id: 9003, title: "CSE 250 — DS Q&A",
+                    description: "Sunday office hours (Zoom)",
+                    pictures: [], category: "qa",
+                    capacity: null, member_count: 1, views: 12, created_at: now
+                },
+                {
+                    id: 9004, title: "CSE 442 — Project Sync",
+                    description: "Standup + code review",
+                    pictures: [], category: "project",
+                    capacity: 6, member_count: 4, views: 5, created_at: now
+                },
+                {
+                    id: 9005, title: "Exam Prep — Algorithms",
+                    description: "Past papers & tricks",
+                    pictures: [], category: "exam",
+                    capacity: 5, member_count: 3, views: 19, created_at: now
+                },
+        ];
+
+    // OPTIONAL: if you have listing photos, copy first image into groups for nicer cards
+    // e.g., if (listings?.[0]?.pictures) demo[0].pictures = [listings[0].pictures[0]];
+    setGroups(demo);
+  } finally {
+    setGroupsLoading(false);
+  }
+}
+
     // 首次 & 大学变化 & 外部刷新信号 时拉取
     useEffect(() => {
         fetchListings();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [university, reloadTick]);
+
+    // NEW: only fetch groups when the Groups tab is active
+    useEffect(() => {
+        if (activeTab !== "groups") return;   // guard
+        fetchGroupsMock();                    // or fetchGroups()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [activeTab, university, reloadTick]);
+    
 
     const filtered = useMemo(() => {
         const k = q.trim().toLowerCase();
@@ -141,10 +220,58 @@ export default function ListingPage({
                     ) : (
                         <div className="mp-empty">No listings found for this university.</div>
                     )
-                ) : (
-                    <GroupsView />
-                )}
-            </main>
+                ) : activeTab === "groups" ? (
+                        groupsLoading ? (
+                        <div className="mp-empty" style={{ paddingTop: 24 }}>Loading groups…</div>
+                        ) : groups.length === 0 ? (
+                        <div className="mp-empty" style={{ paddingTop: 24 }}>No groups yet.</div>
+                        ) : (
+                        groups.map((g) => {
+                            const pics = parsePics(g.pictures);
+                            const capText = g.capacity == null ? `${g.member_count || 0}/∞` : `${g.member_count || 0}/${g.capacity}`;
+                            const previews = makeEmojiMembers(g.member_count || 0);
+                            const overflow = Math.max(0, (g.member_count || 0) - previews.length);
+                            return (
+                            <article key={g.id} className="mp-post" title="Open group">
+                                <div className="mp-post-head" style={{ gridTemplateColumns: "1fr auto" }}>
+                                <div className="mp-post-texts">
+                                    {g.title?.trim() && <div className="mp-post-title">{g.title}</div>}
+                                    {g.description?.trim() && <div className="mp-post-desc">{g.description}</div>}
+                                </div>
+                                <div className="gp-badge" title="Category">{g.category?.trim() || "Group"}</div>
+                                </div>
+
+                                <div className="mp-post-media" style={{ paddingLeft: 0, marginTop: 8 }}>
+                                <div className="mp-imgbox">
+                                    {pics[0] ? (
+                                    <img src={pics[0]} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", borderRadius:8 }} loading="lazy" />
+                                    ) : <span className="mp-img-ic">🖼️</span>}
+                                </div>
+                                </div>
+
+                                <div className="gp-avatars">
+                                {previews.map((emj, i) => <div className="gp-avatar" key={i} aria-hidden>{emj}</div>)}
+                                {overflow > 0 && <div className="gp-overflow">+{overflow}</div>}
+                                </div>
+
+                                <div className="mp-post-meta" style={{ paddingLeft: 0 }}>
+                                <span>{timeAgo(g.created_at)}</span>
+                                <span className="mp-dot" />
+                                <span className="mp-eye" aria-label="views">👁</span>
+                                <span>{Number.isFinite(+g.views) ? +g.views : 0}</span>
+                                <span className="gp-cap" title="Members / Capacity">👥 {capText}</span>
+                                </div>
+
+                                <div className="mp-divider" />
+                            </article>
+                            );
+                        })
+                        )
+                    ) : (
+                        /* Messages (or placeholder) */
+                        <div className="mp-empty" style={{ paddingTop: 24 }}>Messages coming soon…</div>
+                    )}
+                    </main>
 
             {/* Tabs + 右下角 FAB */}
             <footer className="mp-tabs">
