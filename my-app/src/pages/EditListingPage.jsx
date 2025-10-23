@@ -1,8 +1,8 @@
 // src/EditListingPage.jsx
 import React, { useEffect, useState } from "react";
-import AppHeader from "./AppHeader.jsx";
-import BugReportModal from "./BugReportModal.jsx";
-import "./App.css";
+import AppHeader from "../components/AppHeader.jsx";
+import BugReportModal from "../components/BugReportModal.jsx";
+import "../App.css";
 
 export default function EditListingPage({ onBack, onHome, onGoProfile, onLogout }) {
   const [listingId, setListingId] = useState(null);

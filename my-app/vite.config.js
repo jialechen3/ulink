@@ -5,4 +5,5 @@ export default defineConfig({
   plugins: [react()],
 
   //base: '/CSE442/2025-Fall/cse-442z',
+ 
 })

@@ -1,0 +1,275 @@
+/* Header.css */
+
+/* ===== Header Layout ===== */
+.mp-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+.mp-header.mp-header--safe {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  pointer-events: auto;
+}
+
+/* ===== Header Sections ===== */
+.mp-left {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.mp-right {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 6px;
+  gap: 6px;
+}
+
+.mp-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ===== Header Components ===== */
+.mp-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  height: 34px;
+  width: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  pointer-events: auto;
+}
+
+.mp-icon:hover {
+  background-color: #f0f0f0;
+}
+
+.mp-icon.large {
+  width: 42px;
+  height: 42px;
+  font-size: 1.3rem;
+}
+
+.mp-round {
+  border-radius: 999px;
+}
+
+/* ===== User Section ===== */
+.mp-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 6px;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.mp-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  font-size: 18px;
+}
+
+.mp-avatar.sm {
+  width: 24px;
+  height: 24px;
+}
+
+.mp-username {
+  font-weight: 700;
+  font-size: 22px;
+  color: #1b1f24;
+  letter-spacing: 0.3px;
+  margin-left: 2px;
+}
+
+/* ===== Search ===== */
+.mp-search-wrap.spaced {
+  margin-left: auto;
+  margin-right: 3rem;
+  flex-shrink: 0;
+}
+
+.mp-search {
+  max-width: 280px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 18px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  background: #f9fafb;
+  transition: 0.2s;
+}
+
+.mp-search:focus {
+  border-color: #57a9ff;
+  background: #fff;
+}
+
+/* ===== Logo ===== */
+.mp-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* ===== Logout Button ===== */
+.mp-logout {
+  margin-left: 8px;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.mp-logout:hover {
+  opacity: .9;
+}
+
+/* ===== Header Variations ===== */
+.header-without-search {
+  position: relative;
+}
+
+.header-with-search {
+  position: relative;
+  padding-bottom: 36px;
+}
+
+.header-with-search .kebab-wrapper {
+  position: absolute;
+  right: 12px;
+  bottom: 6px;
+}
+
+/* ===== Mobile Responsive ===== */
+@media (max-width: 900px) {
+  .mp-username {
+    display: none;
+  }
+
+  .mp-center {
+    display: none !important;
+  }
+
+  .mp-left {
+    gap: 6px;
+    margin-left: 1px;
+  }
+
+  .mp-user {
+    margin-left: 1px;
+  }
+
+  /* Search container positioning on mobile */
+  .mp-search-wrap.spaced {
+    position: absolute !important;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0 !important;
+    display: block !important;
+    flex: none !important;
+    width: 40vw;
+    max-width: 260px;
+    z-index: 3;
+  }
+
+  /* Search input on mobile */
+  .mp-search {
+    position: static !important;
+    width: 100% !important;
+    height: 28px;
+    font-size: 13px;
+    padding: 0 10px;
+    border-radius: 16px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+  }
+
+  .mp-logo {
+    position: absolute;
+    left: 34%;
+    top: 14%;
+    transform: translate(-50%, -50%);
+    font-size: 2.2rem !important;
+    line-height: 1;
+    z-index: 2;
+  }
+
+  .mp-icon.large {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+  }
+
+  .mp-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .mp-right {
+    padding-right: 6px;
+    gap: 6px;
+  }
+
+  .mp-logout {
+    padding: 4px 8px;
+    font-size: 6px;
+    border-radius: 6px;
+  }
+
+  .mp-header {
+    height: 58px;
+    padding: 0 6px;
+  }
+}
+
+/* ===== App Header Global ===== */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  backdrop-filter: saturate(150%) blur(8px);
+  border-bottom: 1px solid #eee;
+}

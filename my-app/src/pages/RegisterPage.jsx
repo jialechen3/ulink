@@ -1,9 +1,9 @@
 import { useState } from "react";
-import "./App.css";
-import { API_BASE } from "./config";
-import KebabMenu from "./KebabMenu";
-import BugReportModal from "./BugReportModal";
-import Logo from "./Logo";
+import "../App.css";
+import { API_BASE } from "../config";
+import KebabMenu from "../components/KebabMenu";
+import BugReportModal from "../components/BugReportModal";
+import Logo from "../components/Logo";
 
 
 /** ✅ 统一的本地校验规则（与后端保持一致） */

@@ -1,9 +1,9 @@
-import "./App.css";
-import "./postdetail.css";
-import KebabMenu from "./KebabMenu";
-import BugReportModal from "./BugReportModal";
+import "../App.css";
+import "../styles/postdetail.css";
+import KebabMenu from "../components/KebabMenu.jsx";
+import BugReportModal from "../components/BugReportModal.jsx";
 import { useState } from "react";
-import AppHeader from "./AppHeader.jsx";
+import AppHeader from "../components/AppHeader.jsx";
 
 function escapeHTML(str) {
   return str

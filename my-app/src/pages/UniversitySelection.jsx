@@ -1,9 +1,10 @@
 // src/UniversitySelection.jsx
 import { useEffect, useMemo, useState } from "react";
-import "./App.css";
-import { API_BASE } from "./config";
-import KebabMenu from "./KebabMenu";
-import Logo from "./Logo";
+import "../styles/UniversitySelection.css";
+import "../App.css";
+import { API_BASE } from "../config";
+import KebabMenu from "../components/KebabMenu";
+import Logo from "../components/Logo";
 
 export default function UniversitySelection({ userId, onConfirm }) {
   const [loading, setLoading] = useState(false);

@@ -1,8 +1,8 @@
-import "./App.css";
-import KebabMenu from "./KebabMenu.jsx";
-import BugReportModal from "./BugReportModal.jsx";
+import "../App.css";
+import KebabMenu from "../components/KebabMenu.jsx";
+import BugReportModal from "../components/BugReportModal.jsx";
 import { useState } from "react";
-import AppHeader from "./AppHeader";
+import AppHeader from "../components/AppHeader.jsx";
 
 export default function MessagesPage({ username,
                                          onBack,

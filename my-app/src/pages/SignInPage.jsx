@@ -1,9 +1,9 @@
 import { useState } from "react";
-import "./App.css";
-import { API_BASE } from "./config";
-import KebabMenu from "./KebabMenu";
-import BugReportModal from "./BugReportModal";
-import Logo from "./Logo";
+import "../App.css";
+import { API_BASE } from "../config";
+import KebabMenu from "../components/KebabMenu";
+import BugReportModal from "../components/BugReportModal";
+import Logo from "../components/Logo";
 
 export default function SignInPage({ onSignIn, onBack }) {
     const [username, setUsername] = useState("");

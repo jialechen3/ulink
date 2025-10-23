@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { API_BASE } from "./config";
-import "./App.css";
-import KebabMenu from "./KebabMenu";
-import BugReportModal from "./BugReportModal";
-import AppHeader from "./AppHeader";
+import { API_BASE } from "../config";
+import "../App.css";
+import "../styles/ListingPage.css";
+import "../styles/Header.css";
+
+import KebabMenu from "../components/KebabMenu";
+import BugReportModal from "../components/BugReportModal";
+import AppHeader from "../components/AppHeader";
 
 function timeAgo(ts) {
     const d = new Date(ts);

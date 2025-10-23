@@ -1,0 +1,741 @@
+/* ProfilePage.css */
+
+/* ===== Profile Page Container ===== */
+.pf-scope {
+  background: #f3f3f3 !important;
+  min-height: 100vh;
+}
+
+.pf-container {
+  max-width: 760px;
+  margin: 84px auto 48px;
+  padding: 0 32px;
+}
+
+/* ===== Top Card ===== */
+.pf-topcard {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 20px;
+  align-items: center;
+  background: #fff;
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+}
+
+.pf-avatar {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  background: #fff;
+  border: 2px solid #E0E0E0;
+}
+
+.pf-avatar::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 999px;
+  background: #f0f0f0;
+  z-index: -1;
+}
+
+.pf-pill {
+  background: #dedede;
+  border-radius: 20px;
+  padding: 10px 16px;
+  margin: 8px 0;
+  font-weight: 700;
+  letter-spacing: .2px;
+  color: #111;
+  max-width: 460px;
+}
+
+/* ===== Action Bar ===== */
+.pf-actionbar {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 12px;
+  align-items: center;
+  max-width: 760px;
+  margin: 14px 0 4px;
+}
+
+.pf-actionbar.self {
+  grid-template-columns: 1fr;
+}
+
+.pf-actionbar.self .pf-bubble {
+  display: none;
+}
+
+.pf-bubble {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 2px solid #C8C8C8;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+
+.pf-cta {
+  height: 44px;
+  border: none;
+  border-radius: 24px;
+  background: #d8d8d8;
+  font-weight: 700;
+  letter-spacing: .2px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+  cursor: pointer;
+}
+
+/* ===== Dividers ===== */
+.pf-divider {
+  height: 1px;
+  border: none;
+  background: #D4D4D4;
+  max-width: 760px;
+  margin: 8px 0 6px;
+}
+
+.pf-divider.tail {
+  margin-top: 20px;
+}
+
+/* ===== List Container ===== */
+.pf-list {
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 6px;
+}
+
+.pf-empty {
+  color: #6a6a6a;
+  padding: 8px 0 14px;
+  text-align: center;
+}
+
+/* ===== Individual Posts ===== */
+.pf-post {
+  padding: 10px 0 14px;
+  border-bottom: 1px solid #D4D4D4;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pf-post:hover {
+  background: #fafafa;
+}
+
+.pf-post-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pf-post-left {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.pf-mini-avatar {
+  font-size: 20px;
+  margin-top: 2px;
+  line-height: 1;
+}
+
+.pf-post-titlewrap {
+  line-height: 1.2;
+  flex: 1;
+}
+
+.pf-post-title {
+  font-weight: 700;
+  font-size: 16px;
+  color: #111;
+}
+
+.pf-post-sub {
+  font-size: 12px;
+  color: #6b6b6b;
+  margin-top: 2px;
+}
+
+.pf-post-tools {
+  display: flex;
+  gap: 10px;
+}
+
+.pf-iconbtn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.pf-iconbtn:hover {
+  background: #f0f0f0;
+}
+
+/* ===== Post Images ===== */
+.pf-post-images {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.pf-imgbox {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  background: #EFEFEF;
+  border: 1px solid #DADADA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.pf-imgbox img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pf-imgph {
+  font-size: 26px;
+  color: #9a9a9a;
+}
+
+/* ===== Post Footer ===== */
+.pf-post-foot {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  column-gap: 16px;
+  margin-top: 10px;
+  color: #555;
+  font-size: 13px;
+}
+
+.pf-time {
+  justify-self: start;
+}
+
+.pf-views {
+  justify-self: start;
+}
+
+.pf-comment {
+  justify-self: end;
+}
+
+/* ===== Edit Form ===== */
+.pf-editcard {
+  background: #fff;
+  border: 1px solid #e5e8eb;
+  border-radius: 16px;
+  padding: 16px 18px 14px;
+  max-width: 760px;
+  margin: 12px auto 0;
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+}
+
+.pf-edit-title {
+  margin: 2px 0 10px;
+  font-weight: 800;
+  font-size: 18px;
+  text-align: center;
+  color: #0f172a;
+}
+
+.pf-edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.pf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pf-field-col2 {
+  grid-column: 1 / -1;
+}
+
+.pf-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #667085;
+  letter-spacing: .2px;
+}
+
+.pf-input,
+.pf-textarea,
+.pf-select {
+  border: 1px solid #d0d5dd;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+  background: #fff;
+  font-family: inherit;
+}
+
+.pf-input::placeholder,
+.pf-textarea::placeholder {
+  color: #9aa3b2;
+}
+
+.pf-input:focus,
+.pf-textarea:focus,
+.pf-select:focus {
+  border-color: #155eef;
+  box-shadow: 0 0 0 3px rgba(21,94,239,.15);
+}
+
+.pf-textarea {
+  resize: vertical;
+  min-height: 92px;
+}
+
+.pf-avatar-preview {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #e5e8eb;
+  background: #f8fafc;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  overflow: hidden;
+}
+
+.pf-avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ===== Edit Form Buttons ===== */
+.pf-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pf-btn {
+  border: 1px solid #d0d5dd;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.pf-btn-primary {
+  background: #155eef;
+  border-color: #155eef;
+  color: #fff;
+}
+
+.pf-btn:disabled {
+  opacity: .6;
+  cursor: default;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 640px) {
+  .pf-edit-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .pf-field-col2 {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .pf-container {
+    padding: 0 14px;
+  }
+  
+  .pf-topcard {
+    grid-template-columns: 88px 1fr;
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+  
+  .pf-avatar {
+    width: 72px;
+    height: 72px;
+    font-size: 36px;
+  }
+  
+  .pf-pill {
+    padding: 8px 12px;
+    margin: 6px 0;
+    max-width: 100%;
+  }
+  
+  .pf-actionbar {
+    grid-template-columns: 48px 1fr;
+  }
+  
+  .pf-imgbox {
+    width: 44vw;
+    height: 44vw;
+    max-width: 208px;
+  }
+  
+  .pf-post-images {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* ===== Listings Count Header ===== */
+.pf-list-header {
+  margin: 0 0 8px 0;
+  padding: 0 4px;
+  font-weight: 700;
+  font-size: 18px;
+  color: #111;
+}
+
+/* ===== Selected State ===== */
+.pf-post-selected {
+  outline: 2px solid #7c3aed !important;
+  outline-offset: 2px;
+  background: #f8f7ff;
+}
+
+/* ===== Professional UI Enhancements ===== */
+
+/* Modern card shadows and borders */
+.pf-scope {
+  --primary-color: #2563eb;
+  --secondary-color: #64748b;
+  --success-color: #10b981;
+  --border-color: #e2e8f0;
+  --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --card-shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Enhanced top card */
+.pf-topcard {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
+  margin-bottom: 24px;
+}
+
+/* Professional avatar */
+.pf-avatar {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Enhanced pills */
+.pf-pill {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pf-pill:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.pf-pill.pf-editable:hover {
+  background: #eff6ff;
+  border-color: var(--primary-color);
+}
+
+.pf-edit-hint {
+  font-size: 12px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.pf-pill:hover .pf-edit-hint {
+  opacity: 1;
+}
+
+/* Improved listing cards */
+.pf-post {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.pf-post:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2px);
+  border-color: var(--primary-color);
+}
+
+.pf-post-selected {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Enhanced images grid */
+.pf-post-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.pf-imgbox {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pf-imgbox img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Professional buttons */
+.pf-iconbtn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.pf-iconbtn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: scale(1.05);
+}
+
+/* Enhanced modal */
+.pf-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-color);
+  max-width: 400px;
+  width: 90vw;
+}
+
+.pf-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.pf-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.pf-btn-ghost {
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.pf-btn-ghost:hover {
+  background: #f1f5f9;
+}
+
+.pf-btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.pf-btn-danger:hover {
+  background: #b91c1c;
+}
+
+/* Professional loading states */
+.pf-empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: #64748b;
+  font-style: italic;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
+/* Enhanced typography */
+.pf-list-header {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.pf-post-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.pf-post-sub {
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* Improved editing interface */
+.pf-edit-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pf-edit-input, .pf-edit-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pf-edit-input:focus, .pf-edit-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.pf-save-btn, .pf-cancel-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.pf-save-btn {
+  background: var(--success-color);
+  color: white;
+}
+
+.pf-save-btn:hover {
+  background: #059669;
+}
+
+.pf-cancel-btn {
+  background: #6b7280;
+  color: white;
+}
+
+.pf-cancel-btn:hover {
+  background: #4b5563;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .pf-topcard {
+    padding: 20px;
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .pf-top-right {
+    align-items: center;
+  }
+  
+  .pf-post-images {
+    grid-template-columns: 1fr;
+  }
+  
+  .pf-modal-actions {
+    flex-direction: column;
+  }
+}
+
+.pf-avatar-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  border: 2px solid white;
+  cursor: pointer;
+}
+
+.pf-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
