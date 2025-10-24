@@ -6,7 +6,7 @@
   
   html, body, #root, .app-container,
   .mp-root, .cl-root, .cg-root, .register-container,
-  .uni-page, .uni-card, .post-detail,
+  .uni-page, .uni-card,
   .modal, .kebab-menu, .mp-header, .mp-tabs {
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -232,7 +232,15 @@
 .cl-btn.ghost { background: #e5e7eb; color: #333; }
 
 /* =================== Create Group Placeholder =================== */
-.cg-root { display:grid; grid-template-rows:auto 1fr; height:100vh; }
+.cg-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  height: auto;
+}
+.cg-main {
+  flex: 1 0 auto;
+}
 .cg-main { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; }
 
 /* =================== ULink Logo =================== */
@@ -299,7 +307,7 @@ input[type="password"]::-webkit-textfield-decoration-container {
 }
 
 /* Global layout */
-html, body, #root { height: 99%; }
+html, body, #root { min-height: 100%; height: auto; }
 body { margin: 0; }
 
 html, body { 
@@ -386,4 +394,6 @@ html, body {
   cursor: pointer;
 }
 .gp-apply { background: #f6f8fb; }
+
+
 

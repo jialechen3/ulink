@@ -303,6 +303,7 @@ export default function ListingPage({
                                 onMouseLeave={() => setHoveredPostId(null)}
                                 title="Open group"
                                 >
+                                    
                                 <div className="mp-post-head" style={{ gridTemplateColumns: "1fr auto" }}>
                                     <div className="mp-post-texts">
                                     {g.title?.trim() && <div className="mp-post-title">{g.title}</div>}
@@ -361,6 +362,7 @@ export default function ListingPage({
 
 
                 <footer className="mp-tabs">
+                    
                     <button
                         className={`tab ${activeTab === "listings" ? "active" : ""}`}
                         onClick={() => setActiveTab("listings")}
