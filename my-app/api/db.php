@@ -164,6 +164,44 @@ if (!is_array($body)) $body = [];
 
 /* ===================== GET ===================== */
 
+//  Bug Report 处理逻辑
+// ------------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents("php://input"), true);
+
+    if (!empty($input['action']) && $input['action'] === 'report_bug') {
+        try {
+            $stmt = $conn->prepare("
+                INSERT INTO reports (user_id, page_name, url, category, description, steps, contact)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ");
+            if (!$stmt) {
+                fail(500, "Prepare failed", ["error" => $conn->error]);
+            }
+
+            $user_id = intval($input['user_id'] ?? 0);
+                if ($user_id === 0) $user_id = null; // ✅ 匿名用户用 NULL
+            $page_name = $input['page_name'] ?? '';
+            $url = $input['url'] ?? '';
+            $category = $input['category'] ?? '';
+            $desc = $input['desc'] ?? '';
+            $steps = $input['steps'] ?? '';
+            $contact = $input['contact'] ?? '';
+
+            // 👇 注意这里类型声明："i"=整数,"s"=字符串
+            $stmt->bind_param("issssss", $user_id, $page_name, $url, $category, $desc, $steps, $contact);
+            $stmt->execute();
+
+            ok(["success" => true, "id" => $conn->insert_id]);
+        } catch (Throwable $e) {
+            fail(500, "Insert report failed", ["error" => $e->getMessage()]);
+        }
+        exit;
+    }
+}
+
+
+
 /* 0) 默认：返回所有用户 + 大学名称（保持你现有“直接数组”结构） */
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
     try {
