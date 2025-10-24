@@ -323,3 +323,67 @@ html, body {
   backdrop-filter: saturate(150%) blur(8px);
   border-bottom: 1px solid #eee;
 }
+
+/* ===== Groups filter toolbar & menu ===== */
+.gp-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 8px 14px;
+}
+
+.gp-filter-btn {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.gp-chip {
+  font-size: 12px;
+  color: #444;
+  background: #f6f8fb;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
+/* dropdown */
+.gp-filter-menu {
+  position: relative;
+  margin: 6px 14px 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+}
+
+.gp-filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.gp-filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.gp-clear, .gp-apply {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.gp-apply { background: #f6f8fb; }
+
