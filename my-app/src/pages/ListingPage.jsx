@@ -27,28 +27,27 @@ function parsePics(pictures) {
   return [];
 }
 const EMOJI_POOL = ["🐧","🦊","🐼","🐯","🦉","🐨","🐸","🐵","🦁","🐮","🐱","🐶","🐻","🦄"];
-function makeEmojiMembers(n) {
-  const arr = [];
-  const lim = Math.max(0, Math.min(n, 5)); // show up to 5
-  for (let i = 0; i < lim; i++) {
-    arr.push(EMOJI_POOL[(Math.floor(Math.random()*EMOJI_POOL.length))]);
-  }
-  return arr;
-}
-// stable per-user emoji
+// stable per-user emoji (no randomness)
 function emojiForUser(userId) {
-  const n = Math.abs(Number(userId));
+  const n = Math.abs(Number(userId) || 0);
   return EMOJI_POOL[n % EMOJI_POOL.length];
 }
+
+// stable per group+slot when we don't have member ids
+function emojiForGroupSlot(groupId, index) {
+  const base = (Number(groupId) || 0) + index * 9973; // big prime spread
+  return EMOJI_POOL[Math.abs(base) % EMOJI_POOL.length];
+}
+
 
 // simple index-based pick (if you still want it)
 function pickEmoji(i) {
   return EMOJI_POOL[i % EMOJI_POOL.length];
 }
 
-// detect URL/data URLs
+// simple url check
 function isUrlLike(s) {
-  return /^(https?:)?\/\//.test(s || "") || (s || "").startsWith("data:");
+  return /^(https?:)?\/\//.test(s || "") || (s || "").startsWith("data:") || (s || "").startsWith("uploads/");
 }
 
 export default function ListingPage({
@@ -71,6 +70,23 @@ export default function ListingPage({
     const [activeTab, setActiveTab] = useState("listings");
     const [groups, setGroups] = useState([]);
     const [groupsLoading, setGroupsLoading] = useState(false);
+    // --- Groups filter UI state (only used on Groups tab) ---
+    const [showGroupFilter, setShowGroupFilter] = useState(false);
+    const [catFilter, setCatFilter] = useState(new Set()); // stores lowercase keys
+
+    // Allowed categories to show in dropdown (strings shown in UI)
+    const CATS = ["Study", "Sport", "Fun", "Exercise"];
+
+    function toggleCat(label) {
+    const key = label.toLowerCase();
+    setCatFilter(prev => {
+        const next = new Set(prev);
+        next.has(key) ? next.delete(key) : next.add(key);
+        return next;
+    });
+    }
+    function clearCats() { setCatFilter(new Set()); }
+
     const [hoveredPostId, setHoveredPostId] = useState(null);
 
     const fetchListings = async () => {
@@ -134,6 +150,13 @@ export default function ListingPage({
         );
     }, [q, listings]);
 
+    const groupsToShow = useMemo(() => {
+        if (!Array.isArray(groups)) return [];
+        if (catFilter.size === 0) return groups;
+        return groups.filter(g => g?.category && catFilter.has(String(g.category).toLowerCase()));
+    }, [groups, catFilter]);
+
+
     return (
         <div className="mp-root">
             <AppHeader
@@ -150,116 +173,192 @@ export default function ListingPage({
             />
 
             <div className="mp-content-wrapper">
-                <main className="mp-feed">
+       <        main className="mp-feed">
                     {activeTab === "listings" ? (
                         filtered.length > 0 ? (
-                            filtered.map((item) => (
-                                <article
-                                    key={item.id}
-                                    className={`mp-post ${hoveredPostId === item.id ? 'mp-post-hover' : ''}`}
-                                    onClick={() => onOpenPost && onOpenPost(item)}
-                                    onMouseEnter={() => setHoveredPostId(item.id)}
-                                    onMouseLeave={() => setHoveredPostId(null)}
-                                    role="button"
-                                    tabIndex={0}
-                                    onKeyDown={(e) => e.key === "Enter" && onOpenPost && onOpenPost(item)}
-                                    title="Open post"
-                                >
-                                    <div className="mp-post-texts">
-                                        {item.title?.trim() && <div className="mp-post-title">{item.title}</div>}
-                                        {item.description?.trim() && <div className="mp-post-desc">{item.description}</div>}
-                                        {item.price !== undefined && <div className="mp-post-price">${item.price}</div>}
-                                    </div>
+                        filtered.map((item) => (
+                            <article
+                            key={item.id}
+                            className={`mp-post ${hoveredPostId === item.id ? "mp-post-hover" : ""}`}
+                            onClick={() => onOpenPost && onOpenPost(item)}
+                            onMouseEnter={() => setHoveredPostId(item.id)}
+                            onMouseLeave={() => setHoveredPostId(null)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === "Enter" && onOpenPost && onOpenPost(item)}
+                            title="Open post"
+                            >
+                            <div className="mp-post-texts">
+                                {item.title?.trim() && <div className="mp-post-title">{item.title}</div>}
+                                {item.description?.trim() && <div className="mp-post-desc">{item.description}</div>}
+                                {item.price !== undefined && <div className="mp-post-price">${item.price}</div>}
+                            </div>
 
-                                    <div className="mp-post-media">
-                                        <div className="mp-imgbox">
-                                            {Array.isArray(item.pictures) && item.pictures[0] ? (
-                                                <img
-                                                    src={item.pictures[0]}
-                                                    alt=""
-                                                    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
-                                                    loading="lazy"
-                                                />
-                                            ) : (
-                                                <span className="mp-img-ic">🖼️</span>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="mp-post-meta">
-                                        <span>{timeAgo(item.created_at)}</span>
-                                        <span className="mp-dot" />
-                                        <span className="mp-eye" aria-label="views">👁</span>
-                                        <span>999</span>
-                                        <button
-                                            className="mp-cmt"
-                                            aria-label="comments"
-                                            onClick={(e) => { e.stopPropagation(); onOpenPost && onOpenPost(item); }}
-                                            title="Open comments"
-                                        >
-                                            💬
-                                        </button>
-                                    </div>
-
-                                    <div className="mp-divider" />
-                                </article>
-                            ))
-                        ) : (
-                        groups.map((g) => {
-                            const pics = parsePics(g.pictures);
-                            const capText = g.capacity == null ? `${g.member_count || 0}/∞` : `${g.member_count || 0}/${g.capacity}`;
-                            const previews = (Array.isArray(g.member_previews) && g.member_previews.length)
-                                // have previews: use avatar_url if present, otherwise fallback emoji
-                                ? g.member_previews.slice(0,5).map((m,i) => m.avatar_url || pickEmoji(i))
-                                // no previews: fabricate up to 5 emojis from member_count
-                                : makeEmojiMembers(g.member_count || 0);
-                            const overflow = Math.max(0, (g.member_count || 0) - previews.length);
-                            return (
-                            <article key={g.id} className="mp-post" title="Open group">
-                                <div className="mp-post-head" style={{ gridTemplateColumns: "1fr auto" }}>
-                                <div className="mp-post-texts">
-                                    {g.title?.trim() && <div className="mp-post-title">{g.title}</div>}
-                                    {g.description?.trim() && <div className="mp-post-desc">{g.description}</div>}
+                            <div className="mp-post-media">
+                                <div className="mp-imgbox">
+                                {Array.isArray(item.pictures) && item.pictures[0] ? (
+                                    <img
+                                    src={item.pictures[0]}
+                                    alt=""
+                                    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
+                                    loading="lazy"
+                                    />
+                                ) : (
+                                    <span className="mp-img-ic">🖼️</span>
+                                )}
                                 </div>
-                                <div className="gp-badge" title="Category">{g.category?.trim() || "Group"}</div>
-                                </div>
+                            </div>
 
-                                    <div className="mp-post-media" style={{ paddingLeft: 0, marginTop: 8 }}>
-                                    <div className="mp-imgbox">
-                                        {parsePics(g.pictures)[0] ? (
-                                        <img src={parsePics(g.pictures)[0]} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", borderRadius:8 }} loading="lazy" />
-                                        ) : <span className="mp-img-ic">🖼️</span>}
-                                    </div>
-                                    </div>
-
-                                <div className="gp-avatars">
-                                {previews.map((val, i) => (
-                                    <div className="gp-avatar" key={i} aria-hidden>
-                                    {isUrlLike(val) || (val||"").startsWith("uploads/") || (val||"").startsWith("data:")
-                                        ? <img src={val} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                                        : val}
-                                    </div>
-                                ))}
-                                {overflow > 0 && <div className="gp-overflow">+{overflow}</div>}
-                                </div>
-
-
-                                <div className="mp-post-meta" style={{ paddingLeft: 0 }}>
-                                <span>{timeAgo(g.created_at)}</span>
+                            <div className="mp-post-meta">
+                                <span>{timeAgo(item.created_at)}</span>
                                 <span className="mp-dot" />
                                 <span className="mp-eye" aria-label="views">👁</span>
-                                <span>{Number.isFinite(+g.views) ? +g.views : 0}</span>
-                                <span className="gp-cap" title="Members / Capacity">👥 {capText}</span>
+                                <span>999</span>
+                                <button
+                                className="mp-cmt"
+                                aria-label="comments"
+                                onClick={(e) => { e.stopPropagation(); onOpenPost && onOpenPost(item); }}
+                                title="Open comments"
+                                >
+                                💬
+                                </button>
+                            </div>
+
+                            <div className="mp-divider" />
+                            </article>
+                        ))
+                        ) : (
+                        <div className="mp-empty">No listings found for this university.</div>
+                        )
+                    ) : activeTab === "groups" ? (
+                        groupsLoading ? (
+                        <div className="mp-empty" style={{ paddingTop: 24 }}>Loading groups…</div>
+                        ) : groups.length === 0 ? (
+                        <div className="mp-empty" style={{ paddingTop: 24 }}>No groups yet.</div>
+                        ) : (
+                        <>
+                            {/* Filter toolbar (Groups only) */}
+                            <div className="gp-toolbar">
+                            <button
+                                className="gp-filter-btn"
+                                onClick={() => setShowGroupFilter(v => !v)}
+                                aria-haspopup="menu"
+                                aria-expanded={showGroupFilter}
+                                title="Filter groups"
+                            >
+                                🔽 Filter
+                            </button>
+
+                            {/* If any filter active, show selected chips */}
+                            {catFilter.size > 0 && (
+                                <span className="gp-chip">
+                                {Array.from(catFilter)
+                                    .map(s => s[0].toUpperCase() + s.slice(1))
+                                    .join(", ")}
+                                </span>
+                            )}
+                            </div>
+
+                            {/* Dropdown menu with multi-select */}
+                            {showGroupFilter && (
+                            <div className="gp-filter-menu" role="menu">
+                                {CATS.map(lbl => {
+                                const key = lbl.toLowerCase();
+                                const checked = catFilter.has(key);
+                                return (
+                                    <label key={key} className="gp-filter-item">
+                                    <input
+                                        type="checkbox"
+                                        checked={checked}
+                                        onChange={() => toggleCat(lbl)}
+                                    />
+                                    <span>{lbl}</span>
+                                    </label>
+                                );
+                                })}
+                                <div className="gp-filter-actions">
+                                <button className="gp-clear" onClick={clearCats}>Clear filters</button>
+                                <button className="gp-apply" onClick={() => setShowGroupFilter(false)}>Done</button>
+                                </div>
+                            </div>
+                            )}
+
+                            {/* Use filtered array */}
+                            {groupsToShow.map((g) => {
+                            const pics = parsePics(g.pictures);
+                            const capText =
+                                g.capacity == null ? `${g.member_count || 0}/∞` : `${g.member_count || 0}/${g.capacity}`;
+
+                            // Stable previews
+                            const previews = (Array.isArray(g.member_previews) && g.member_previews.length)
+                                ? g.member_previews.slice(0, 5).map(m => m.avatar_url || emojiForUser(m.user_id))
+                                : Array.from({ length: Math.min(5, g.member_count || 0) }, (_, i) => emojiForGroupSlot(g.id, i));
+                            const overflow = Math.max(0, (g.member_count || 0) - 5);
+
+                            return (
+                                <article
+                                key={g.id}
+                                className={`mp-post ${hoveredPostId === g.id ? "mp-post-hover" : ""}`}
+                                onMouseEnter={() => setHoveredPostId(g.id)}
+                                onMouseLeave={() => setHoveredPostId(null)}
+                                title="Open group"
+                                >
+                                <div className="mp-post-head" style={{ gridTemplateColumns: "1fr auto" }}>
+                                    <div className="mp-post-texts">
+                                    {g.title?.trim() && <div className="mp-post-title">{g.title}</div>}
+                                    {g.description?.trim() && <div className="mp-post-desc">{g.description}</div>}
+                                    </div>
+                                    <div className="gp-badge" title="Category">{g.category?.trim() || "Group"}</div>
                                 </div>
 
-                                    <div className="mp-divider" />
+                                <div className="mp-post-media" style={{ paddingLeft: 0, marginTop: 8 }}>
+                                    <div className="mp-imgbox">
+                                    {pics[0] ? (
+                                        <img
+                                        src={pics[0]}
+                                        alt=""
+                                        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }}
+                                        loading="lazy"
+                                        />
+                                    ) : (
+                                        <span className="mp-img-ic">🖼️</span>
+                                    )}
+                                    </div>
+                                </div>
+
+                                <div className="gp-avatars">
+                                    {previews.map((val, i) => (
+                                    <div className="gp-avatar" key={i} aria-hidden>
+                                        {isUrlLike(val) ? (
+                                        <img src={val} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                        ) : (
+                                        val
+                                        )}
+                                    </div>
+                                    ))}
+                                    {overflow > 0 && <div className="gp-overflow">+{overflow}</div>}
+                                </div>
+
+                                <div className="mp-post-meta" style={{ paddingLeft: 0 }}>
+                                    <span>{timeAgo(g.created_at)}</span>
+                                    <span className="mp-dot" />
+                                    <span className="mp-eye" aria-label="views">👁</span>
+                                    <span>{Number.isFinite(+g.views) ? +g.views : 0}</span>
+                                    <span className="gp-cap" title="Members / Capacity">👥 {capText}</span>
+                                </div>
+
+                                <div className="mp-divider" />
                                 </article>
-                            ))
-                            )
-                        ) : (
-                            <div className="mp-empty" style={{ paddingTop: 24 }}>Messages coming soon…</div>
-                        )}
-                </main>
+                            );
+                            })}
+                        </>
+                        )
+                    ) : (
+                        <div className="mp-empty" style={{ paddingTop: 24 }}>Messages coming soon…</div>
+                    )}
+                    </main>
+
+
 
                 <footer className="mp-tabs">
                     <button
