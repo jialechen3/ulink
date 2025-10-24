@@ -79,6 +79,7 @@ export default function PostDetailPage({
 
   return (
     <div className="cg-root">
+      
       <AppHeader
         username={username}
         onBack={onBack}
@@ -90,6 +91,7 @@ export default function PostDetailPage({
       />
 
       <main className="cg-main post-detail">
+        
         {/* Post Header */}
         <div className="pd-head">
           <div className="pd-user">
@@ -98,6 +100,7 @@ export default function PostDetailPage({
               <div className="pd-username">{post.username || "Anonymous"}</div>
               <div className="pd-time">
                 {new Date(post.created_at).toLocaleString()}
+                
               </div>
             </div>
           </div>

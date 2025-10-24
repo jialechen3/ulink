@@ -505,3 +505,121 @@ html, body, #root, .mp-root, .mp-content-wrapper {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
 }
+
+/* ====== Bottom Navigation Hover Animation ====== */
+
+/* base state */
+.mp-tabs .tab {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 10px 0;
+  cursor: pointer;
+  color: #666;
+  font-size: 14px;
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+/* hover state */
+.mp-tabs .tab:hover {
+  color: #4a76d9;               /* same as your brand blue */
+  transform: translateY(-3px);  /* small lift on hover */
+}
+
+/* active state */
+.mp-tabs .tab.active {
+  color: #6a5acd;               /* violet accent for active */
+  font-weight: 700;
+}
+
+/* optional animated underline effect */
+.mp-tabs .tab::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 0%;
+  height: 2px;
+  background-color: #4a76d9;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: width 0.25s ease;
+}
+.mp-tabs .tab:hover::after {
+  width: 40%;
+}
+.mp-tabs .tab.active::after {
+  width: 60%;
+  background-color: #6a5acd;
+}
+
+/* optional subtle scale-down on click (press) */
+.mp-tabs .tab:active {
+  transform: translateY(-1px) scale(0.96);
+}
+/* ======= Modern Boxed Navigation Buttons ======= */
+.mp-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  padding: 8px 10px;
+  gap: 8px;                 /* space between boxes */
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+/* Each nav button as a “card” */
+.mp-tabs .tab {
+  background: #f8f9fa;                /* soft neutral tone */
+  border: 1px solid #e0e0e0;
+  border-radius: 14px;                /* smooth corners */
+  padding: 8px 0;
+  text-align: center;
+  color: #555;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+/* Hover animation */
+.mp-tabs .tab:hover {
+  background-color: #eaf1ff;
+  color: #2a65d6;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Active (selected) state */
+.mp-tabs .tab.active {
+  background-color: #4a76d9;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(74, 118, 217, 0.25);
+  transform: translateY(-2px);
+  border-color: #4a76d9;
+  font-weight: 600;
+}
+
+/* On mobile, slightly more compact */
+@media (max-width: 480px) {
+  .mp-tabs {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+  .mp-tabs .tab {
+    font-size: 12px;
+    padding: 6px 0;
+  }
+}
+

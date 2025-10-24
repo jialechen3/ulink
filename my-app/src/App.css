@@ -6,7 +6,7 @@
   
   html, body, #root, .app-container,
   .mp-root, .cl-root, .cg-root, .register-container,
-  .uni-page, .uni-card, .post-detail,
+  .uni-page, .uni-card,
   .modal, .kebab-menu, .mp-header, .mp-tabs {
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -232,7 +232,15 @@
 .cl-btn.ghost { background: #e5e7eb; color: #333; }
 
 /* =================== Create Group Placeholder =================== */
-.cg-root { display:grid; grid-template-rows:auto 1fr; height:100vh; }
+.cg-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  height: auto;
+}
+.cg-main {
+  flex: 1 0 auto;
+}
 .cg-main { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px; }
 
 /* =================== ULink Logo =================== */
@@ -298,20 +306,35 @@ input[type="password"]::-webkit-textfield-decoration-container {
   -webkit-appearance: none;
 }
 
-/* Global layout */
-html, body, #root { height: 99%; }
-body { margin: 0; }
-
-html, body { 
-  margin: 0; 
-  padding: 0; 
-  width: 100%; 
-  overflow-x: hidden; 
-  overscroll-behavior-x: none; 
+/* Global layout - FULL WIDTH */
+html, body, #root { 
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
-#root { 
-  width: 100%; 
-  overflow-x: hidden; 
+
+html, body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  overflow: visible;
+  max-width: none; /* Remove the 1280px limit */
+  margin: 0; /* Remove auto centering */
+  padding: 0;
+}
+
+/* Remove centering from all pages */
+.mp-root, .pf-scope, .cl-root, .cg-root, .register-container {
+  width: 100%;
+  min-height: 100vh;
+  max-width: none;
+  margin: 0;
 }
 
 /* App header global */
@@ -323,3 +346,69 @@ html, body {
   backdrop-filter: saturate(150%) blur(8px);
   border-bottom: 1px solid #eee;
 }
+
+/* ===== Groups filter toolbar & menu ===== */
+.gp-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 8px 14px;
+}
+
+.gp-filter-btn {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.gp-chip {
+  font-size: 12px;
+  color: #444;
+  background: #f6f8fb;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
+/* dropdown */
+.gp-filter-menu {
+  position: relative;
+  margin: 6px 14px 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+}
+
+.gp-filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.gp-filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.gp-clear, .gp-apply {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.gp-apply { background: #f6f8fb; }
+
+
+
