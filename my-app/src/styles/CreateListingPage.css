@@ -1,0 +1,228 @@
+:root {
+    --u-header-h: 72px;
+}
+
+/* 页面容器 避免被 AppHeader 遮挡 */
+.clp-page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: calc(var(--u-header-h) + 24px) 20px 80px 20px;
+}
+
+/* 标题 */
+.page-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+}
+
+/* 表单网格 */
+.clp-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 12px;
+}
+
+.clp-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.clp-field label {
+    font-size: 13px;
+    color: #374151;
+    font-weight: 600;
+}
+.clp-field .row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.clp-field .count {
+    margin-left: auto;
+    font-size: 12px;
+    color: #9aa3af;
+}
+
+.cl-input,
+.cl-textarea,
+select.cl-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.cl-textarea { resize: vertical; }
+.cl-input:focus,
+.cl-textarea:focus,
+select.cl-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.2);
+}
+
+/* 价格左侧 $ */
+.clp-price { position: relative; }
+.clp-price .cl-input { padding-left: 28px; }
+.clp-dollar {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-weight: 700;
+}
+
+/* 媒体行 左大图右缩略图 */
+.clp-media-row {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+/* 大图预览 支持拖拽 */
+.clp-gallery {
+    position: relative;
+    height: 320px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #f9fafb;
+    border: 2px dashed #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.clp-gallery.dz-hover {
+    border-color: #60a5fa;
+    background: #eff6ff;
+}
+.clp-gallery img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.clp-empty { text-align: center; color: #9aa3af; }
+.clp-empty .empty-main { font-size: 20px; margin-bottom: 6px; }
+
+/* 导航与删除按钮 - 居中调整 */
+.nav-btn,
+.remove-btn {
+    position: absolute;
+    border: none;
+    border-radius: 50%;
+    background: rgba(17, 24, 39, 0.6);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+/* 左右箭头在垂直正中 */
+.nav-btn {
+    width: 40px;
+    height: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 22px;
+}
+.nav-btn.left {
+    left: 12px;
+}
+.nav-btn.right {
+    right: 12px;
+}
+
+/* 右上角关闭按钮 */
+.remove-btn {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+}
+
+/* 悬停状态微亮 */
+.nav-btn:hover,
+.remove-btn:hover {
+    background: rgba(17, 24, 39, 0.8);
+}
+
+/* 右侧添加与缩略图 */
+.clp-side-uploader {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.add-btn {
+    height: 50px;
+    border-radius: 12px;
+    border: 2px dashed #60a5fa;
+    background: #f0f9ff;
+    font-weight: 700;
+    cursor: pointer;
+}
+.thumb-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    max-height: 228px;
+    overflow: auto;
+}
+.thumb-list li {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #fff;
+}
+.thumb-list li.on { outline: 2px solid #3b82f6; }
+.thumb-list img {
+    width: 100%;
+    height: 84px;
+    object-fit: cover;
+}
+
+/* 底部布局与按钮 */
+.clp-bottom-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: end;
+    margin-top: 16px;
+}
+.clp-actions { display: flex; gap: 10px; }
+.clp-actions .ghost,
+.clp-actions .primary {
+    height: 46px;
+    border-radius: 12px;
+    padding: 0 18px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid #d1d5db;
+    background: #fff;
+}
+.clp-actions .ghost:hover { background: #f3f4f6; }
+.clp-actions .primary {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}
+.clp-actions .primary:disabled { opacity: .7; cursor: default; }
+
+/* 自适应 */
+@media (max-width: 840px) {
+    .clp-grid-2 { grid-template-columns: 1fr; }
+    .clp-media-row { grid-template-columns: 1fr; }
+    .clp-bottom-row { grid-template-columns: 1fr; }
+}
