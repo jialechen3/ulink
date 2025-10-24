@@ -35,14 +35,20 @@ function makeEmojiMembers(n) {
   }
   return arr;
 }
+// stable per-user emoji
+function emojiForUser(userId) {
+  const n = Math.abs(Number(userId));
+  return EMOJI_POOL[n % EMOJI_POOL.length];
+}
 
-// 简单的 Groups 视图（占位，可改成真实 DB）
-function GroupsView() {
-    return (
-        <div className="mp-empty" style={{ paddingTop: 24 }}>
-            Groups list coming soon…
-        </div>
-    );
+// simple index-based pick (if you still want it)
+function pickEmoji(i) {
+  return EMOJI_POOL[i % EMOJI_POOL.length];
+}
+
+// detect URL/data URLs
+function isUrlLike(s) {
+  return /^(https?:)?\/\//.test(s || "") || (s || "").startsWith("data:");
 }
 
 export default function ListingPage({
@@ -51,21 +57,21 @@ export default function ListingPage({
                                         onLogout,
                                         onGoCreateListing,
                                         onGoCreateGroup,
-                                        onGoProfile,        // ✅ 点击用户名跳转
+                                        onGoProfile,
                                         onGoMessages,
                                         onOpenPost,
                                         reloadTick = 0,
                                         onRequestRefresh,
-                                        username = "User name",   // ✅ 新增：从外部传入要显示的用户名
+                                        username = "User name",
                                     }) {
     const [listings, setListings] = useState([]);
     const [q, setQ] = useState("");
     const [showReport, setShowReport] = useState(false);
     const [openFab, setOpenFab] = useState(false);
-    const [activeTab, setActiveTab] = useState("listings"); // "listings" | "groups"
+    const [activeTab, setActiveTab] = useState("listings");
     const [groups, setGroups] = useState([]);
     const [groupsLoading, setGroupsLoading] = useState(false);
-
+    const [hoveredPostId, setHoveredPostId] = useState(null);
 
     const fetchListings = async () => {
         if (!university) return;
@@ -78,65 +84,42 @@ export default function ListingPage({
         }
     };
 
-    async function fetchGroupsMock() {
+    async function fetchGroups() {
+        if (!university) return;
         setGroupsLoading(true);
         try {
-            // Simulated network delay
-            await new Promise(r => setTimeout(r, 300));
+            const url = `${API_BASE}/db.php?groups_by_university=${encodeURIComponent(university)}&limit=100&previews=1`;
+            const res = await fetch(url);
+            const data = await res.json().catch(() => ({}));
 
-            // Build 5 demo groups. Feel free to tweak copy/pics.
-            const now = new Date().toISOString();
-            const demo = [
-                {
-                    id: 9001, title: "CSE 331 — Algorithm Grind",
-                    description: "Weekly DP/Greedy review",
-                    pictures: [], category: "study",
-                    capacity: 3, member_count: 2, views: 42, created_at: now
-                },
-                {
-                    id: 9002, title: "CSE 474 — ML Review",
-                    description: "Paper reading + LeetML",
-                    pictures: [], category: "study",
-                    capacity: 2, member_count: 2, views: 81, created_at: now
-                },
-                {
-                    id: 9003, title: "CSE 250 — DS Q&A",
-                    description: "Sunday office hours (Zoom)",
-                    pictures: [], category: "qa",
-                    capacity: null, member_count: 1, views: 12, created_at: now
-                },
-                {
-                    id: 9004, title: "CSE 442 — Project Sync",
-                    description: "Standup + code review",
-                    pictures: [], category: "project",
-                    capacity: 6, member_count: 4, views: 5, created_at: now
-                },
-                {
-                    id: 9005, title: "Exam Prep — Algorithms",
-                    description: "Past papers & tricks",
-                    pictures: [], category: "exam",
-                    capacity: 5, member_count: 3, views: 19, created_at: now
-                },
-        ];
+            const items = Array.isArray(data?.items) ? data.items
+                        : (Array.isArray(data) ? data : []);
 
-    // OPTIONAL: if you have listing photos, copy first image into groups for nicer cards
-    // e.g., if (listings?.[0]?.pictures) demo[0].pictures = [listings[0].pictures[0]];
-    setGroups(demo);
-  } finally {
-    setGroupsLoading(false);
-  }
-}
+            const normalized = items.map(g => ({
+            ...g,
+            pictures: parsePics(g.pictures),
+            comments: parsePics(g.comments),
+            member_previews: Array.isArray(g.member_previews) ? g.member_previews : []
+            }));
 
-    // 首次 & 大学变化 & 外部刷新信号 时拉取
+            // newest first
+            normalized.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+            setGroups(normalized);
+        } catch (e) {
+            console.error("fetchGroups failed:", e);
+            setGroups([]);
+        } finally {
+            setGroupsLoading(false);
+        }
+        }
+
     useEffect(() => {
         fetchListings();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [university, reloadTick]);
 
-    // NEW: only fetch groups when the Groups tab is active
     useEffect(() => {
         if (activeTab !== "groups") return;   // guard
-        fetchGroupsMock();                    // or fetchGroups()
+        fetchGroups();                    // 10242025从mockfetch替换为真实fetch
         // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [activeTab, university, reloadTick]);
     
@@ -153,86 +136,83 @@ export default function ListingPage({
 
     return (
         <div className="mp-root">
-            {/* Header */}
             <AppHeader
               username={username ||user?.name || user?.username}
-              showBack={false}                          // 首页不显示返回
-              showSearch={true}                         // 首页需要搜索框
+              showBack={false}
+              showSearch={true}
               searchPlaceholder="Search"
-              searchValue={q}                           // 绑定现有状态
-              onSearchChange={setQ}                    // 绑定 setter
-              onHome={() => onRequestRefresh?.()}      // “Home”=触发刷新
-              onGoProfile={onGoProfile}                // 点击头像/用户名
-              onReport={() => setShowReport(true)}     // 三点上报
-              onLogout={onLogout}                      // 退出
+              searchValue={q}
+              onSearchChange={setQ}
+              onHome={() => onRequestRefresh?.()}
+              onGoProfile={onGoProfile}
+              onReport={() => setShowReport(true)}
+              onLogout={onLogout}
             />
 
-            {/* Feed / Groups */}
-            <main className="mp-feed">
-                {activeTab === "listings" ? (
-                    filtered.length > 0 ? (
-                        filtered.map((item) => (
-                            <article
-                                key={item.id}
-                                className="mp-post"
-                                onClick={() => onOpenPost && onOpenPost(item)}      // 👈 整卡可点击
-                                role="button"
-                                tabIndex={0}
-                                onKeyDown={(e) => e.key === "Enter" && onOpenPost && onOpenPost(item)}
-                                title="Open post"
-                            >
-                                <div className="mp-post-texts">
-                                    {item.title?.trim() && <div className="mp-post-title">{item.title}</div>}
-                                    {item.description?.trim() && <div className="mp-post-desc">{item.description}</div>}
-                                    {item.price !== undefined && <div className="mp-post-price">${item.price}</div>}
-                                </div>
-
-                                <div className="mp-post-media">
-                                    <div className="mp-imgbox">
-                                        {Array.isArray(item.pictures) && item.pictures[0] ? (
-                                            <img
-                                                src={item.pictures[0]}
-                                                alt=""
-                                                style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
-                                                loading="lazy"
-                                            />
-                                        ) : (
-                                            <span className="mp-img-ic">🖼️</span>
-                                        )}
+            <div className="mp-content-wrapper">
+                <main className="mp-feed">
+                    {activeTab === "listings" ? (
+                        filtered.length > 0 ? (
+                            filtered.map((item) => (
+                                <article
+                                    key={item.id}
+                                    className={`mp-post ${hoveredPostId === item.id ? 'mp-post-hover' : ''}`}
+                                    onClick={() => onOpenPost && onOpenPost(item)}
+                                    onMouseEnter={() => setHoveredPostId(item.id)}
+                                    onMouseLeave={() => setHoveredPostId(null)}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => e.key === "Enter" && onOpenPost && onOpenPost(item)}
+                                    title="Open post"
+                                >
+                                    <div className="mp-post-texts">
+                                        {item.title?.trim() && <div className="mp-post-title">{item.title}</div>}
+                                        {item.description?.trim() && <div className="mp-post-desc">{item.description}</div>}
+                                        {item.price !== undefined && <div className="mp-post-price">${item.price}</div>}
                                     </div>
-                                </div>
 
-                                <div className="mp-post-meta">
-                                    <span>{timeAgo(item.created_at)}</span>
-                                    <span className="mp-dot" />
-                                    <span className="mp-eye" aria-label="views">👁</span>
-                                    <span>999</span>
-                                    <button
-                                        className="mp-cmt"
-                                        aria-label="comments"
-                                        onClick={(e) => { e.stopPropagation(); onOpenPost && onOpenPost(item); }}
-                                        title="Open comments"
-                                    >
-                                        💬
-                                    </button>
-                                </div>
+                                    <div className="mp-post-media">
+                                        <div className="mp-imgbox">
+                                            {Array.isArray(item.pictures) && item.pictures[0] ? (
+                                                <img
+                                                    src={item.pictures[0]}
+                                                    alt=""
+                                                    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
+                                                    loading="lazy"
+                                                />
+                                            ) : (
+                                                <span className="mp-img-ic">🖼️</span>
+                                            )}
+                                        </div>
+                                    </div>
 
-                                <div className="mp-divider" />
-                            </article>
-                        ))
-                    ) : (
-                        <div className="mp-empty">No listings found for this university.</div>
-                    )
-                ) : activeTab === "groups" ? (
-                        groupsLoading ? (
-                        <div className="mp-empty" style={{ paddingTop: 24 }}>Loading groups…</div>
-                        ) : groups.length === 0 ? (
-                        <div className="mp-empty" style={{ paddingTop: 24 }}>No groups yet.</div>
+                                    <div className="mp-post-meta">
+                                        <span>{timeAgo(item.created_at)}</span>
+                                        <span className="mp-dot" />
+                                        <span className="mp-eye" aria-label="views">👁</span>
+                                        <span>999</span>
+                                        <button
+                                            className="mp-cmt"
+                                            aria-label="comments"
+                                            onClick={(e) => { e.stopPropagation(); onOpenPost && onOpenPost(item); }}
+                                            title="Open comments"
+                                        >
+                                            💬
+                                        </button>
+                                    </div>
+
+                                    <div className="mp-divider" />
+                                </article>
+                            ))
                         ) : (
                         groups.map((g) => {
                             const pics = parsePics(g.pictures);
                             const capText = g.capacity == null ? `${g.member_count || 0}/∞` : `${g.member_count || 0}/${g.capacity}`;
-                            const previews = makeEmojiMembers(g.member_count || 0);
+                            const previews = (Array.isArray(g.member_previews) && g.member_previews.length)
+                                // have previews: use avatar_url if present, otherwise fallback emoji
+                                ? g.member_previews.slice(0,5).map((m,i) => m.avatar_url || pickEmoji(i))
+                                // no previews: fabricate up to 5 emojis from member_count
+                                : makeEmojiMembers(g.member_count || 0);
                             const overflow = Math.max(0, (g.member_count || 0) - previews.length);
                             return (
                             <article key={g.id} className="mp-post" title="Open group">
@@ -244,18 +224,25 @@ export default function ListingPage({
                                 <div className="gp-badge" title="Category">{g.category?.trim() || "Group"}</div>
                                 </div>
 
-                                <div className="mp-post-media" style={{ paddingLeft: 0, marginTop: 8 }}>
-                                <div className="mp-imgbox">
-                                    {pics[0] ? (
-                                    <img src={pics[0]} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", borderRadius:8 }} loading="lazy" />
-                                    ) : <span className="mp-img-ic">🖼️</span>}
-                                </div>
-                                </div>
+                                    <div className="mp-post-media" style={{ paddingLeft: 0, marginTop: 8 }}>
+                                    <div className="mp-imgbox">
+                                        {parsePics(g.pictures)[0] ? (
+                                        <img src={parsePics(g.pictures)[0]} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", borderRadius:8 }} loading="lazy" />
+                                        ) : <span className="mp-img-ic">🖼️</span>}
+                                    </div>
+                                    </div>
 
                                 <div className="gp-avatars">
-                                {previews.map((emj, i) => <div className="gp-avatar" key={i} aria-hidden>{emj}</div>)}
+                                {previews.map((val, i) => (
+                                    <div className="gp-avatar" key={i} aria-hidden>
+                                    {isUrlLike(val) || (val||"").startsWith("uploads/") || (val||"").startsWith("data:")
+                                        ? <img src={val} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                                        : val}
+                                    </div>
+                                ))}
                                 {overflow > 0 && <div className="gp-overflow">+{overflow}</div>}
                                 </div>
+
 
                                 <div className="mp-post-meta" style={{ paddingLeft: 0 }}>
                                 <span>{timeAgo(g.created_at)}</span>
@@ -265,58 +252,56 @@ export default function ListingPage({
                                 <span className="gp-cap" title="Members / Capacity">👥 {capText}</span>
                                 </div>
 
-                                <div className="mp-divider" />
-                            </article>
-                            );
-                        })
-                        )
-                    ) : (
-                        /* Messages (or placeholder) */
-                        <div className="mp-empty" style={{ paddingTop: 24 }}>Messages coming soon…</div>
+                                    <div className="mp-divider" />
+                                </article>
+                            ))
+                            )
+                        ) : (
+                            <div className="mp-empty" style={{ paddingTop: 24 }}>Messages coming soon…</div>
+                        )}
+                </main>
+
+                <footer className="mp-tabs">
+                    <button
+                        className={`tab ${activeTab === "listings" ? "active" : ""}`}
+                        onClick={() => setActiveTab("listings")}
+                    >
+                        Listings
+                    </button>
+                    <button
+                        className={`tab ${activeTab === "groups" ? "active" : ""}`}
+                        onClick={() => setActiveTab("groups")}
+                    >
+                        Groups
+                    </button>
+                    <button className="tab" onClick={onGoMessages}>Messages</button>
+
+                    <button
+                        className="mp-fab-right"
+                        aria-label="create"
+                        onClick={() => setOpenFab((v) => !v)}
+                    >
+                        +
+                    </button>
+
+                    {openFab && (
+                        <div className="fab-menu" role="menu">
+                            <button
+                                className="fab-item"
+                                onClick={() => { setOpenFab(false); onGoCreateGroup && onGoCreateGroup(); }}
+                            >
+                                Create group
+                            </button>
+                            <button
+                                className="fab-item"
+                                onClick={() => { setOpenFab(false); onGoCreateListing && onGoCreateListing(); }}
+                            >
+                                Create listing
+                            </button>
+                        </div>
                     )}
-                    </main>
-
-            {/* Tabs + 右下角 FAB */}
-            <footer className="mp-tabs">
-                <button
-                    className={`tab ${activeTab === "listings" ? "active" : ""}`}
-                    onClick={() => setActiveTab("listings")}
-                >
-                    Listings
-                </button>
-                <button
-                    className={`tab ${activeTab === "groups" ? "active" : ""}`}
-                    onClick={() => setActiveTab("groups")}
-                >
-                    Groups
-                </button>
-                <button className="tab" onClick={onGoMessages}>Messages</button>
-
-                <button
-                    className="mp-fab-right"
-                    aria-label="create"
-                    onClick={() => setOpenFab((v) => !v)}
-                >
-                    +
-                </button>
-
-                {openFab && (
-                    <div className="fab-menu" role="menu">
-                        <button
-                            className="fab-item"
-                            onClick={() => { setOpenFab(false); onGoCreateGroup && onGoCreateGroup(); }}
-                        >
-                            Create group
-                        </button>
-                        <button
-                            className="fab-item"
-                            onClick={() => { setOpenFab(false); onGoCreateListing && onGoCreateListing(); }}
-                        >
-                            Create listing
-                        </button>
-                    </div>
-                )}
-            </footer>
+                </footer>
+            </div>
 
             <BugReportModal isOpen={showReport} onClose={() => setShowReport(false)} />
         </div>

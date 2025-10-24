@@ -82,6 +82,7 @@ try {
     ");
     add_col_if_missing($conn, "users", "`created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
     add_col_if_missing($conn, "users", "`university_id` INT NULL");
+    add_col_if_missing($conn, "users", "`avatar_url` VARCHAR(255) NULL");
 
     // universities
     $conn->query("
@@ -115,6 +116,48 @@ try {
             views INT NOT NULL DEFAULT 0
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ");
+    /* ----(New) groups（学习小组）表 —— 与你给出的字段一致---- */
+    $conn->query("
+        CREATE TABLE IF NOT EXISTS `groups` (
+            id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+            user_id INT UNSIGNED NOT NULL,
+            university_id INT UNSIGNED NOT NULL,
+            title VARCHAR(160) NOT NULL,
+            description TEXT NULL,
+            pictures JSON NULL,
+            comments JSON NULL,
+            category VARCHAR(100) DEFAULT NULL,
+            location VARCHAR(255) DEFAULT NULL,
+            contact VARCHAR(255) DEFAULT NULL,
+            capacity INT UNSIGNED DEFAULT NULL,       -- NULL 表示不限
+            member_count INT UNSIGNED NOT NULL DEFAULT 0,
+            views INT UNSIGNED NOT NULL DEFAULT 0,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+
+    // 组合索引（与 listings 一样的风格 + 分类筛选友好）
+    add_index_if_missing($conn, "groups", "idx_groups_university_created_at",
+        "INDEX idx_groups_university_created_at (university_id, created_at DESC)");
+    add_index_if_missing($conn, "groups", "idx_groups_user_created_at",
+        "INDEX idx_groups_user_created_at (user_id, created_at DESC)");
+    add_index_if_missing($conn, "groups", "idx_groups_uni_cat_created",
+        "INDEX idx_groups_uni_cat_created (university_id, category, created_at DESC)");
+
+    // group_members（成员关系）
+    $conn->query("
+        CREATE TABLE IF NOT EXISTS `group_members` (
+            group_id INT UNSIGNED NOT NULL,
+            user_id  INT UNSIGNED NOT NULL,
+            joined_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (group_id, user_id),
+            KEY idx_member_user (user_id),
+            KEY idx_member_group (group_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+    /* ----(DianZ，10242025）---------------------------------- */
+
     // 你现有代码里用到的可选扩展列
     add_col_if_missing($conn, "listings", "`price` DECIMAL(10,2) NULL");
     add_col_if_missing($conn, "listings", "`category` VARCHAR(64) NULL");
@@ -164,7 +207,54 @@ if (!is_array($body)) $body = [];
 
 /* ===================== GET ===================== */
 
+//  Bug Report 处理逻辑
+// ------------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents("php://input"), true);
+
+    if (!empty($input['action']) && $input['action'] === 'report_bug') {
+        try {
+            $stmt = $conn->prepare("
+                INSERT INTO reports (user_id, page_name, url, category, description, steps, contact)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ");
+            if (!$stmt) {
+                fail(500, "Prepare failed", ["error" => $conn->error]);
+            }
+
+            $user_id = intval($input['user_id'] ?? 0);
+                if ($user_id === 0) $user_id = null; // ✅ 匿名用户用 NULL
+            $page_name = $input['page_name'] ?? '';
+            $url = $input['url'] ?? '';
+            $category = $input['category'] ?? '';
+            $desc = $input['desc'] ?? '';
+            $steps = $input['steps'] ?? '';
+            $contact = $input['contact'] ?? '';
+
+            // 👇 注意这里类型声明："i"=整数,"s"=字符串
+            $stmt->bind_param("issssss", $user_id, $page_name, $url, $category, $desc, $steps, $contact);
+            $stmt->execute();
+
+            ok(["success" => true, "id" => $conn->insert_id]);
+        } catch (Throwable $e) {
+            fail(500, "Insert report failed", ["error" => $e->getMessage()]);
+        }
+        exit;
+    }
+}
+
+
+
 /* 0) 默认：返回所有用户 + 大学名称（保持你现有“直接数组”结构） */
+/* ----(New)互斥校验：同一请求不允许既要listings又要groups----*/
+if (isset($_GET['listings_by_university']) && isset($_GET['groups_by_university'])) {
+    fail(400, "Choose either listings_by_university or groups_by_university, not both.");
+}
+if (isset($_GET['listings_by_user']) && isset($_GET['groups_by_user'])) {
+    fail(400, "Choose either listings_by_user or groups_by_user, not both.");
+}
+/* ----(DianZ，10242025）---------------------------------- */
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
     try {
         $sql = "SELECT u.id, u.username, u.university_id, uni.name AS university
@@ -211,6 +301,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['listings_by_university'
         fail(500, "Fetch listings failed", ["error"=>$e->getMessage()]);
     }
 }
+/* 1.1) (New) groups_by_university（可选 &category=study） */
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['groups_by_university'])) {
+    try {
+        $uni = intval($_GET['groups_by_university']);
+        $cat = trim((string)($_GET['category'] ?? ''));
+
+        if ($cat !== '') {
+            $stmt = $conn->prepare("
+                SELECT
+                    g.id, g.user_id, g.university_id,
+                    g.title, g.description,
+                    g.pictures, g.comments,
+                    g.category, g.location, g.contact,
+                    g.capacity, g.member_count,
+                    g.views, g.created_at,
+                    u.username
+                FROM `groups` g
+                LEFT JOIN users u ON u.id = g.user_id
+                WHERE g.university_id = ? AND LOWER(g.category) = LOWER(?)
+                ORDER BY g.created_at DESC
+                LIMIT 100
+            ");
+            $stmt->bind_param("is", $uni, $cat);
+        } else {
+            $stmt = $conn->prepare("
+                SELECT
+                    g.id, g.user_id, g.university_id,
+                    g.title, g.description,
+                    g.pictures, g.comments,
+                    g.category, g.location, g.contact,
+                    g.capacity, g.member_count,
+                    g.views, g.created_at,
+                    u.username
+                FROM `groups` g
+                LEFT JOIN users u ON u.id = g.user_id
+                WHERE g.university_id = ?
+                ORDER BY g.created_at DESC
+                LIMIT 100
+            ");
+            $stmt->bind_param("i", $uni);
+        }
+
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $items = [];
+        while ($row = $res->fetch_assoc()) {
+            // 与 listings 保持一致：把 JSON 列转数组
+            $row['pictures'] = $row['pictures'] ? json_decode($row['pictures'], true) : [];
+            $row['comments'] = $row['comments'] ? json_decode($row['comments'], true) : [];
+            $items[] = $row;
+        }
+        /* 预览用户头像：用 IN (...) + PHP 侧截取前5个，避免 bind_param 数量不匹配 */
+        $withPrev = isset($_GET['previews']) && $_GET['previews'] == '1';
+        if ($withPrev && !empty($items)) {
+            // 1) 收集并净化 group ids
+            $ids = array_map('intval', array_column($items, 'id'));
+            $ids = array_values(array_unique(array_filter($ids)));
+
+            if (!empty($ids)) {
+                // 2) 如果 users.avatar_url 列不存在，也能返回 null（更健壮）
+                $hasAvatar = table_has_col($conn, "users", "avatar_url");
+                $avatarSel = $hasAvatar ? "u.avatar_url" : "NULL AS avatar_url";
+
+                // 3) 查询成员（按加入时间倒序）；注意：这里不再使用 bind_param
+                $sqlPrev = "
+                SELECT gm.group_id, gm.user_id, $avatarSel
+                FROM group_members gm
+                LEFT JOIN users u ON u.id = gm.user_id
+                WHERE gm.group_id IN (" . implode(',', $ids) . ")
+                ORDER BY gm.group_id, gm.joined_at DESC
+                ";
+                $resPrev = $conn->query($sqlPrev);
+
+                // 4) 分组并保留每组前 5 个
+                $byG = [];
+                while ($r = $resPrev->fetch_assoc()) {
+                    $gid = (int)$r['group_id'];
+                    if (!isset($byG[$gid])) $byG[$gid] = [];
+                    if (count($byG[$gid]) < 5) {
+                        $byG[$gid][] = [
+                            "user_id"    => (int)$r['user_id'],
+                            "avatar_url" => $r['avatar_url'] ?? null
+                        ];
+                    }
+                }
+
+                // 5) 回填到 items
+                foreach ($items as &$it) {
+                    $gid = (int)$it['id'];
+                    $it['member_previews'] = $byG[$gid] ?? [];
+                }
+                unset($it);
+            }
+        }
+        ok(["success" => true, "items" => $items]);
+    } catch (Throwable $e) {
+        fail(500, "Fetch groups failed", ["error" => $e->getMessage()]);
+    }
+}
+/* ----(DianZ，10242025）---------------------------------- */
 
 /* 2) 查询单个用户（登录后获取其 university_id 等） */
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['user'])) {
@@ -260,6 +450,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['listings_by_user'])) {
         fail(500, "Fetch user listings failed", ["error"=>$e->getMessage()]);
     }
 }
+
+
+/* 3.1) groups_by_user（某用户创建的所有小组） */
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['groups_by_user'])) {
+    try {
+        $uid = intval($_GET['groups_by_user']);
+        $stmt = $conn->prepare("
+            SELECT
+                g.id, g.user_id, g.university_id,
+                g.title, g.description,
+                g.pictures, g.comments,
+                g.category, g.location, g.contact,
+                g.capacity, g.member_count,
+                g.views, g.created_at,
+                u.username
+            FROM `groups` g
+            LEFT JOIN users u ON u.id = g.user_id
+            WHERE g.user_id = ?
+            ORDER BY g.created_at DESC
+            LIMIT 100
+        ");
+        $stmt->bind_param("i", $uid);
+        $stmt->execute();
+        $res = $stmt->get_result();
+
+        $items = [];
+        while ($row = $res->fetch_assoc()) {
+            $row['pictures'] = $row['pictures'] ? json_decode($row['pictures'], true) : [];
+            $row['comments'] = $row['comments'] ? json_decode($row['comments'], true) : [];
+            $items[] = $row;
+        }
+
+        ok(["success" => true, "items" => $items]);
+    } catch (Throwable $e) {
+        fail(500, "Fetch user groups failed", ["error" => $e->getMessage()]);
+    }
+}
+
+
+/* 3.2) group_categories_by_university —— 返回 {category, c} 列表 */
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['group_categories_by_university'])) {
+    try {
+        $uni = intval($_GET['group_categories_by_university']);
+        $stmt = $conn->prepare("
+            SELECT
+              COALESCE(NULLIF(TRIM(category), ''), 'uncategorized') AS category,
+              COUNT(*) AS c
+            FROM `groups`
+            WHERE university_id = ?
+            GROUP BY category
+            ORDER BY c DESC, category ASC
+        ");
+        $stmt->bind_param("i", $uni);
+        $stmt->execute();
+        $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        ok(["success" => true, "items" => $rows]);
+    } catch (Throwable $e) {
+        fail(500, "Fetch group categories failed", ["error" => $e->getMessage()]);
+    }
+}
+
+/* ----(DianZ，10242025）---------------------------------- */
+
 /* ===================== POST ===================== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $body['action'] ?? '';
