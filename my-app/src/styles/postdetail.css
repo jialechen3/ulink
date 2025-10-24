@@ -300,4 +300,31 @@
     padding-top: 80px;
   }
 }
+/* === Scrollable Post Detail Layout (same logic as .pf-scope) === */
+.pd-scope {
+  position: absolute;
+  top: 64px;           /* match your AppHeader height */
+  bottom: 60px;        /* match your bottom navigation height (or 0 if none) */
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #fff;    /* keep readable in dark mode */
+  z-index: 1;
+}
+
+/* Internal container spacing (same as .pf-container) */
+.pd-container {
+  padding: 16px 20px 40px 20px;
+  box-sizing: border-box;
+}
+
+/* Optional scrollbar polish */
+.pd-scope::-webkit-scrollbar {
+  width: 8px;
+}
+.pd-scope::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
 

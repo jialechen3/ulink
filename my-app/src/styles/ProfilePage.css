@@ -739,3 +739,49 @@
   flex-direction: column;
   gap: 12px;
 }
+
+.pf-scope {
+  overflow: auto !important; /* Instead of hidden */
+}
+
+.pf-container {
+  overflow: visible !important;
+}
+
+/* Profile page layout fix */
+.pf-scope {
+  position: absolute;   /* take full viewport space */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;     /* scroll only inside this page */
+  overflow-x: hidden;
+  background: #f3f3f3;
+  z-index: 1;
+}
+
+/* Optional: pad for your fixed header height */
+.pf-container {
+  padding-top: 80px;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+}
+/* Adjust scrollable area to avoid header/footer overlap */
+.pf-scope {
+  position: absolute;
+  top: 64px;           /* height of your fixed header (AppHeader) */
+  bottom: 60px;        /* height of your bottom nav bar / tabs */
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #f3f3f3;
+  z-index: 1;
+}
+
+/* Optional: internal padding for spacing consistency */
+.pf-container {
+  padding: 16px 20px 40px 20px; /* extra bottom space for comfort */
+  box-sizing: border-box;
+}
