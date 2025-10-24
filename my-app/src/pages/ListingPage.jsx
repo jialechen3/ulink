@@ -35,6 +35,21 @@ function makeEmojiMembers(n) {
   }
   return arr;
 }
+// stable per-user emoji
+function emojiForUser(userId) {
+  const n = Math.abs(Number(userId));
+  return EMOJI_POOL[n % EMOJI_POOL.length];
+}
+
+// simple index-based pick (if you still want it)
+function pickEmoji(i) {
+  return EMOJI_POOL[i % EMOJI_POOL.length];
+}
+
+// detect URL/data URLs
+function isUrlLike(s) {
+  return /^(https?:)?\/\//.test(s || "") || (s || "").startsWith("data:");
+}
 
 export default function ListingPage({
                                         user,
@@ -69,57 +84,44 @@ export default function ListingPage({
         }
     };
 
-    async function fetchGroupsMock() {
+    async function fetchGroups() {
+        if (!university) return;
         setGroupsLoading(true);
         try {
-            await new Promise(r => setTimeout(r, 300));
-            const now = new Date().toISOString();
-            const demo = [
-                {
-                    id: 9001, title: "CSE 331 — Algorithm Grind",
-                    description: "Weekly DP/Greedy review",
-                    pictures: [], category: "study",
-                    capacity: 3, member_count: 2, views: 42, created_at: now
-                },
-                {
-                    id: 9002, title: "CSE 474 — ML Review",
-                    description: "Paper reading + LeetML",
-                    pictures: [], category: "study",
-                    capacity: 2, member_count: 2, views: 81, created_at: now
-                },
-                {
-                    id: 9003, title: "CSE 250 — DS Q&A",
-                    description: "Sunday office hours (Zoom)",
-                    pictures: [], category: "qa",
-                    capacity: null, member_count: 1, views: 12, created_at: now
-                },
-                {
-                    id: 9004, title: "CSE 442 — Project Sync",
-                    description: "Standup + code review",
-                    pictures: [], category: "project",
-                    capacity: 6, member_count: 4, views: 5, created_at: now
-                },
-                {
-                    id: 9005, title: "Exam Prep — Algorithms",
-                    description: "Past papers & tricks",
-                    pictures: [], category: "exam",
-                    capacity: 5, member_count: 3, views: 19, created_at: now
-                },
-            ];
-            setGroups(demo);
+            const url = `${API_BASE}/db.php?groups_by_university=${encodeURIComponent(university)}&limit=100&previews=1`;
+            const res = await fetch(url);
+            const data = await res.json().catch(() => ({}));
+
+            const items = Array.isArray(data?.items) ? data.items
+                        : (Array.isArray(data) ? data : []);
+
+            const normalized = items.map(g => ({
+            ...g,
+            pictures: parsePics(g.pictures),
+            comments: parsePics(g.comments),
+            member_previews: Array.isArray(g.member_previews) ? g.member_previews : []
+            }));
+
+            // newest first
+            normalized.sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+            setGroups(normalized);
+        } catch (e) {
+            console.error("fetchGroups failed:", e);
+            setGroups([]);
         } finally {
             setGroupsLoading(false);
         }
-    }
+        }
 
     useEffect(() => {
         fetchListings();
     }, [university, reloadTick]);
 
     useEffect(() => {
-        if (activeTab !== "groups") return;
-        fetchGroupsMock();
-    }, [activeTab, university, reloadTick]);
+        if (activeTab !== "groups") return;   // guard
+        fetchGroups();                    // 10242025从mockfetch替换为真实fetch
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [activeTab, university, reloadTick]);
     
 
     const filtered = useMemo(() => {
@@ -203,29 +205,24 @@ export default function ListingPage({
                                 </article>
                             ))
                         ) : (
-                            <div className="mp-empty">No listings found for this university.</div>
-                        )
-                    ) : activeTab === "groups" ? (
-                            groupsLoading ? (
-                            <div className="mp-empty" style={{ paddingTop: 24 }}>Loading groups…</div>
-                            ) : groups.length === 0 ? (
-                            <div className="mp-empty" style={{ paddingTop: 24 }}>No groups yet.</div>
-                            ) : (
-                            groups.map((g) => (
-                                <article 
-                                    key={g.id} 
-                                    className={`mp-post ${hoveredPostId === g.id ? 'mp-post-hover' : ''}`}
-                                    onMouseEnter={() => setHoveredPostId(g.id)}
-                                    onMouseLeave={() => setHoveredPostId(null)}
-                                    title="Open group"
-                                >
-                                    <div className="mp-post-head" style={{ gridTemplateColumns: "1fr auto" }}>
-                                    <div className="mp-post-texts">
-                                        {g.title?.trim() && <div className="mp-post-title">{g.title}</div>}
-                                        {g.description?.trim() && <div className="mp-post-desc">{g.description}</div>}
-                                    </div>
-                                    <div className="gp-badge" title="Category">{g.category?.trim() || "Group"}</div>
-                                    </div>
+                        groups.map((g) => {
+                            const pics = parsePics(g.pictures);
+                            const capText = g.capacity == null ? `${g.member_count || 0}/∞` : `${g.member_count || 0}/${g.capacity}`;
+                            const previews = (Array.isArray(g.member_previews) && g.member_previews.length)
+                                // have previews: use avatar_url if present, otherwise fallback emoji
+                                ? g.member_previews.slice(0,5).map((m,i) => m.avatar_url || pickEmoji(i))
+                                // no previews: fabricate up to 5 emojis from member_count
+                                : makeEmojiMembers(g.member_count || 0);
+                            const overflow = Math.max(0, (g.member_count || 0) - previews.length);
+                            return (
+                            <article key={g.id} className="mp-post" title="Open group">
+                                <div className="mp-post-head" style={{ gridTemplateColumns: "1fr auto" }}>
+                                <div className="mp-post-texts">
+                                    {g.title?.trim() && <div className="mp-post-title">{g.title}</div>}
+                                    {g.description?.trim() && <div className="mp-post-desc">{g.description}</div>}
+                                </div>
+                                <div className="gp-badge" title="Category">{g.category?.trim() || "Group"}</div>
+                                </div>
 
                                     <div className="mp-post-media" style={{ paddingLeft: 0, marginTop: 8 }}>
                                     <div className="mp-imgbox">
@@ -235,18 +232,25 @@ export default function ListingPage({
                                     </div>
                                     </div>
 
-                                    <div className="gp-avatars">
-                                    {makeEmojiMembers(g.member_count || 0).map((emj, i) => <div className="gp-avatar" key={i} aria-hidden>{emj}</div>)}
-                                    {Math.max(0, (g.member_count || 0) - 5) > 0 && <div className="gp-overflow">+{Math.max(0, (g.member_count || 0) - 5)}</div>}
+                                <div className="gp-avatars">
+                                {previews.map((val, i) => (
+                                    <div className="gp-avatar" key={i} aria-hidden>
+                                    {isUrlLike(val) || (val||"").startsWith("uploads/") || (val||"").startsWith("data:")
+                                        ? <img src={val} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                                        : val}
                                     </div>
+                                ))}
+                                {overflow > 0 && <div className="gp-overflow">+{overflow}</div>}
+                                </div>
 
-                                    <div className="mp-post-meta" style={{ paddingLeft: 0 }}>
-                                    <span>{timeAgo(g.created_at)}</span>
-                                    <span className="mp-dot" />
-                                    <span className="mp-eye" aria-label="views">👁</span>
-                                    <span>{Number.isFinite(+g.views) ? +g.views : 0}</span>
-                                    <span className="gp-cap" title="Members / Capacity">👥 {g.capacity == null ? `${g.member_count || 0}/∞` : `${g.member_count || 0}/${g.capacity}`}</span>
-                                    </div>
+
+                                <div className="mp-post-meta" style={{ paddingLeft: 0 }}>
+                                <span>{timeAgo(g.created_at)}</span>
+                                <span className="mp-dot" />
+                                <span className="mp-eye" aria-label="views">👁</span>
+                                <span>{Number.isFinite(+g.views) ? +g.views : 0}</span>
+                                <span className="gp-cap" title="Members / Capacity">👥 {capText}</span>
+                                </div>
 
                                     <div className="mp-divider" />
                                 </article>
