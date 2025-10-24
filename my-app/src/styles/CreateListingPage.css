@@ -226,3 +226,32 @@ select.cl-input:focus {
     .clp-media-row { grid-template-columns: 1fr; }
     .clp-bottom-row { grid-template-columns: 1fr; }
 }
+
+/* FORCE SCROLL - Add this to your Create Listing CSS */
+html, body {
+  overflow-y: auto !important;
+  height: 100% !important;
+}
+
+#root {
+  min-height: 100vh !important;
+  overflow: visible !important;
+}
+
+.cl-root {
+  min-height: 100vh !important;
+  overflow-y: auto !important;
+}
+
+.clp-page {
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.clp-page {
+  min-height: 100vh;
+  overflow-y: auto;
+  position: relative;
+  top: var(--u-header-h); /* Push down by header height */
+  height: calc(100vh - var(--u-header-h)); /* Adjust height accordingly */
+}
