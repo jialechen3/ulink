@@ -1,6 +1,6 @@
 // src/Logo.jsx
 import React from "react";
-import "./App.css";   // 包含 .ulink-logo 的样式
+import "../App.css";   // 包含 .ulink-logo 的样式
 
 export default function Logo({ size = 36, align = "center" }) {
     return (

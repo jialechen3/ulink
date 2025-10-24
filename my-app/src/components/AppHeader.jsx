@@ -1,8 +1,8 @@
-// src/AppHeader.jsx
-import "./App.css";
-import KebabMenu from "./KebabMenu";
-import Logo from "./Logo.jsx";
-import { API_BASE } from "./config";
+import "../styles/Header.css";
+import "../App.css"; 
+import KebabMenu from "../components/KebabMenu.jsx";  // KebabMenu should be in components/
+import Logo from "../components/Logo.jsx";
+import { API_BASE } from "../config.js";  // or "../../config.js"
 
 /** ✅ 自动计算部署路径前缀（根据 API_BASE 自动匹配 aptitude/cattle 环境） */
 function getBaseFromAPI() {

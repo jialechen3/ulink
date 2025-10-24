@@ -1,17 +1,17 @@
 // src/App.jsx — Hash 路由版（#/path/，刷新不会 404）+ 已有大学后禁止访问选大学页
 import { useEffect, useState } from "react";
-import RegisterPage from "./RegisterPage";
-import UniversitySelection from "./UniversitySelection";
-import SignInPage from "./SignInPage";
-import ListingPage from "./ListingPage";
-import CreateListingPage from "./CreateListingPage";
-import CreateGroupPage from "./CreateGroupPage";
-import ProfilePage from "./ProfilePage";
-import MessagesPage from "./MessagesPage";
-import PostDetailPage from "./PostDetailPage";
+import RegisterPage from "./pages/RegisterPage.jsx";
+import UniversitySelection from "./pages/UniversitySelection.jsx";
+import SignInPage from "./pages/SignInPage.jsx";
+import ListingPage from "./pages/ListingPage.jsx";
+import CreateListingPage from "./pages/CreateListingPage.jsx";
+import CreateGroupPage from "./pages/CreateGroupPage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
+import MessagesPage from "./pages/MessagesPage.jsx";
+import PostDetailPage from "./pages/PostDetailPage.jsx";
 import { API_BASE } from "./config";
 
-import EditListingPage from "./EditListingPage.jsx"; // ✅ 你刚创建的页面
+import EditListingPage from "./pages/EditListingPage.jsx"; // ✅ 你刚创建的页面
 
 
 /** 解析当前 step（基于 location.hash） */

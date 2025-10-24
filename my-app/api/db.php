@@ -164,6 +164,44 @@ if (!is_array($body)) $body = [];
 
 /* ===================== GET ===================== */
 
+//  Bug Report 处理逻辑
+// ------------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = json_decode(file_get_contents("php://input"), true);
+
+    if (!empty($input['action']) && $input['action'] === 'report_bug') {
+        try {
+            $stmt = $conn->prepare("
+                INSERT INTO reports (user_id, page_name, url, category, description, steps, contact)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ");
+            if (!$stmt) {
+                fail(500, "Prepare failed", ["error" => $conn->error]);
+            }
+
+            $user_id = intval($input['user_id'] ?? 0);
+                if ($user_id === 0) $user_id = null; // ✅ 匿名用户用 NULL
+            $page_name = $input['page_name'] ?? '';
+            $url = $input['url'] ?? '';
+            $category = $input['category'] ?? '';
+            $desc = $input['desc'] ?? '';
+            $steps = $input['steps'] ?? '';
+            $contact = $input['contact'] ?? '';
+
+            // 👇 注意这里类型声明："i"=整数,"s"=字符串
+            $stmt->bind_param("issssss", $user_id, $page_name, $url, $category, $desc, $steps, $contact);
+            $stmt->execute();
+
+            ok(["success" => true, "id" => $conn->insert_id]);
+        } catch (Throwable $e) {
+            fail(500, "Insert report failed", ["error" => $e->getMessage()]);
+        }
+        exit;
+    }
+}
+
+
+
 /* 0) 默认：返回所有用户 + 大学名称（保持你现有“直接数组”结构） */
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && empty($_GET)) {
     try {
@@ -229,7 +267,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['user'])) {
         fail(500, "Fetch user failed", ["error"=>$e->getMessage()]);
     }
 }
-
+/* 3) 按用户读取 listing（获取用户发布的所有商品） */
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['listings_by_user'])) {
+    try {
+        $user_id = intval($_GET['listings_by_user']);
+        $stmt = $conn->prepare("
+            SELECT 
+                l.id, l.user_id, l.university_id, l.title, l.description,
+                l.pictures, l.comments,
+                l.price, l.category, l.location, l.contact,
+                l.views, l.created_at,
+                u.username
+            FROM listings l
+            LEFT JOIN users u ON u.id = l.user_id
+            WHERE l.user_id = ?
+            ORDER BY l.created_at DESC
+            LIMIT 100
+        ");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $items = [];
+        while ($row = $res->fetch_assoc()) {
+            $row['pictures'] = $row['pictures'] ? json_decode($row['pictures'], true) : [];
+            $row['comments'] = $row['comments'] ? json_decode($row['comments'], true) : [];
+            $items[] = $row;
+        }
+        ok(["success"=>true, "items"=>$items]);
+    } catch (Throwable $e) {
+        fail(500, "Fetch user listings failed", ["error"=>$e->getMessage()]);
+    }
+}
 /* ===================== POST ===================== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $body['action'] ?? '';
