@@ -340,3 +340,168 @@
   }
 }
 
+/* Fix for single scrollbar */
+.mp-root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mp-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mp-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px;
+  padding-bottom: 80px; /* Space for tabs */
+}
+
+.mp-tabs {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #e5e8eb;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-around;
+  z-index: 100;
+}
+
+/* Ensure header is fixed */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: white;
+}
+
+/* Remove any existing overflow from main elements */
+.mp-post, .mp-empty {
+  max-width: 100%;
+  overflow: visible;
+}
+
+/* Nuclear option - remove all scrollbars except main feed */
+* {
+  overflow: visible !important;
+}
+
+.mp-feed {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+html, body, #root, .mp-root, .mp-content-wrapper {
+  overflow: hidden !important;
+}
+
+/* Hover effects for post cards */
+.mp-post {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.mp-post-hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-color: #3b82f6;
+  background: #f8fafc;
+}
+
+/* Enhanced image hover effect */
+.mp-post-hover .mp-imgbox {
+  transform: scale(1.02);
+  transition: transform 0.3s ease;
+}
+
+.mp-imgbox {
+  transition: transform 0.3s ease;
+}
+
+/* Title color change on hover */
+.mp-post-hover .mp-post-title {
+  color: #3b82f6;
+}
+
+.mp-post-title {
+  transition: color 0.3s ease;
+  color: #1e293b;
+}
+
+/* Price highlight on hover */
+.mp-post-hover .mp-post-price {
+  background: #3b82f6;
+  color: white;
+}
+
+.mp-post-price {
+  transition: all 0.3s ease;
+  background: #f1f5f9;
+  color: #64748b;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+/* Meta information subtle highlight */
+.mp-post-hover .mp-post-meta {
+  opacity: 0.9;
+}
+
+.mp-post-meta {
+  transition: opacity 0.3s ease;
+  opacity: 0.7;
+}
+
+/* Group-specific hover enhancements */
+.mp-post-hover .gp-badge {
+  background: #3b82f6;
+  color: white;
+  transform: scale(1.05);
+}
+
+.gp-badge {
+  transition: all 0.3s ease;
+  background: #f1f5f9;
+  color: #64748b;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Avatar animation on hover */
+.mp-post-hover .gp-avatar {
+  transform: scale(1.1);
+}
+
+.gp-avatar {
+  transition: transform 0.3s ease;
+}
+
+/* Ensure smooth transitions for all interactive elements */
+.mp-post * {
+  transition: all 0.3s ease;
+}
+
+/* Focus state for accessibility */
+.mp-post:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
