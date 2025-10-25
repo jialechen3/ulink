@@ -1,14 +1,27 @@
-
-
-.post-detail {
-  width: 100%;
-  max-width: 1200px;         /* expand wide on desktop */
-  margin: 0 auto;
-  padding: 80px 24px 40px;   /* top offset for header + side padding */
-  box-sizing: border-box;
-  line-height: 1.6;
+/* ===== POSTDETAIL LAYOUT FIX ===== */
+.pd-scope {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  overflow-y: auto !important;
+  background: white !important;
+  z-index: 1000 !important;
 }
 
+.pd-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 20px 40px 20px;
+  box-sizing: border-box;
+}
+
+/* ===== POST CONTENT STYLES ===== */
+.post-detail {
+  width: 100%;
+  line-height: 1.6;
+}
 
 .pd-head {
   display: flex;
@@ -48,14 +61,22 @@
   margin-bottom: 10px;
 }
 
+/* ===== IMAGE FIX ===== */
 .pd-media {
   width: 100%;
   margin-top: 10px;
+  display: flex;
+  justify-content: center;
 }
 
 .pd-img {
-  width: 100%;
+  max-width: 100% !important;
+  max-height: 400px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
   border-radius: 10px;
+  display: block;
 }
 
 .pd-desc {
@@ -72,10 +93,20 @@
   font-size: 14px;
 }
 
+.pd-price {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2e7d32;
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+/* ===== COMMENTS SECTION ===== */
 .pd-comments {
   margin-top: 24px;
   border-top: 1px solid #ddd;
   padding-top: 12px;
+  width: 100%;
 }
 
 .pd-comment {
@@ -105,33 +136,6 @@
   margin-top: 4px;
 }
 
-/* === Make comment section scale to full width of parent === */
-.pd-comments {
-  width: 100%;
-  max-width: 100%;
-  margin-top: 32px;
-  border-top: 1px solid #ddd;
-  padding-top: 20px;
-  box-sizing: border-box;
-}
-
-/* === Make each comment line up nicely and stretch === */
-.pd-comment {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-top: 14px;
-}
-
-.pd-comment-body {
-  flex: 1;
-  background: #f5f5f5;
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-size: 15px;
-}
-
-/* === Make comment input bar expand fully too === */
 .pd-comment-input {
   display: flex;
   gap: 10px;
@@ -146,40 +150,39 @@
   flex: 1;
   width: 100%;
   min-height: 60px;
+  resize: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  font-family: inherit;
 }
 
-/* === Responsive tweaks === */
+.pd-comment-input button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+  height: fit-content;
+}
+
+.pd-comment-input button:hover {
+  background-color: #0056b3;
+}
+
+.pd-no-comments {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
 @media (min-width: 1024px) {
-  .pd-comments {
-    padding-left: 40px;
-    padding-right: 40px;
-  }
-}
-
-@media (max-width: 480px) {
-  .pd-comments {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .pd-comment-input {
-    flex-direction: column;
-  }
-
-  .pd-comment-input button {
-    align-self: flex-end;
-  }
-}
-
-
-/* 🌐 Large screens (desktop 1024px–1440px) */
-@media (min-width: 1024px) {
-  .post-detail {
-    max-width: 1400px;       /* use more horizontal space */
-    padding-left: 60px;
-    padding-right: 60px;
-  }
-
   .pd-title {
     font-size: 24px;
   }
@@ -189,10 +192,9 @@
   }
 }
 
-/* 📱 Small screens (mobile ≤ 480px) */
 @media (max-width: 480px) {
-  .post-detail {
-    padding: 90px 16px 32px;
+  .pd-container {
+    padding: 70px 16px 32px 16px !important;
   }
 
   .pd-head {
@@ -220,44 +222,7 @@
   .pd-comment-body {
     font-size: 13px;
   }
-}
 
-/* 💬 Comment input section */
-.pd-comment-input {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  border-top: 1px solid #ddd;
-  padding-top: 10px;
-}
-
-.pd-comment-input textarea {
-  flex: 1;
-  resize: none;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  font-family: inherit;
-}
-
-.pd-comment-input button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.2s;
-}
-
-.pd-comment-input button:hover {
-  background-color: #0056b3;
-}
-
-/* 📱 Mobile tweak */
-@media (max-width: 480px) {
   .pd-comment-input {
     flex-direction: column;
   }
@@ -265,66 +230,115 @@
   .pd-comment-input button {
     align-self: flex-end;
   }
-}
-
-/* 💲 Price section */
-.pd-price {
-  font-size: 18px;
-  font-weight: 600;
-  color: #2e7d32; /* dark green for clarity */
-  margin-top: 8px;
-  margin-bottom: 12px;
-}
-
-@media (max-width: 480px) {
+  
   .pd-price {
     font-size: 16px;
     margin-top: 6px;
   }
 }
+/* ===== CENTER ALIGNMENT FIXES ===== */
 
-/* === Offset main content so header doesn't cover it === */
-.post-detail {
-  padding-top: 70px; /* adjust based on your AppHeader height */
-}
-
-/* Optional: consistent side padding for nice layout */
-.post-detail {
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-/* On smaller screens, give slightly more breathing room */
-@media (max-width: 480px) {
-  .post-detail {
-    padding-top: 80px;
-  }
-}
-/* === Scrollable Post Detail Layout (same logic as .pf-scope) === */
-.pd-scope {
-  position: absolute;
-  top: 64px;           /* match your AppHeader height */
-  bottom: 60px;        /* match your bottom navigation height (or 0 if none) */
-  left: 0;
-  right: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  background: #fff;    /* keep readable in dark mode */
-  z-index: 1;
+/* Center the post header */
+.pd-head {
+  display: flex;
+  justify-content: center; /* Change from space-between to center */
+  align-items: center;
+  margin-bottom: 12px;
+  text-align: center;
+  flex-direction: column; /* Stack vertically */
+  gap: 10px;
 }
 
-/* Internal container spacing (same as .pf-container) */
-.pd-container {
-  padding: 16px 20px 40px 20px;
-  box-sizing: border-box;
+/* Center user info */
+.pd-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center; /* Add this */
 }
 
-/* Optional scrollbar polish */
-.pd-scope::-webkit-scrollbar {
-  width: 8px;
-}
-.pd-scope::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
+.pd-user-info {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  align-items: center; /* Center align text */
+  text-align: center;
 }
 
+/* Center the stats */
+.pd-stats {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+  color: #666;
+  font-size: 14px;
+  justify-content: center; /* Add this */
+  align-items: center;
+}
+
+/* Center the title */
+.pd-title {
+  font-size: 20px;
+  margin-top: 8px;
+  margin-bottom: 10px;
+  text-align: center; /* Add this */
+}
+
+/* Center the price */
+.pd-price {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2e7d32;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  text-align: center; /* Add this */
+}
+
+/* Center the description */
+.pd-desc {
+  margin-top: 14px;
+  font-size: 15px;
+  white-space: pre-line;
+  text-align: center; /* Add this */
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Hide the menu if not needed */
+.pd-menu {
+  display: none; /* Hide the empty menu */
+}
+
+/* ===== CLICKABLE AUTHOR STYLES ===== */
+.pd-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 8px 16px;
+  border-radius: 12px;
+}
+
+.pd-user:hover {
+  background: #f5f5f5;
+  transform: translateY(-1px);
+}
+
+.pd-user:active {
+  transform: translateY(0);
+  background: #e8e8e8;
+}
+
+/* Add a subtle indicator that it's clickable */
+.pd-username {
+  font-weight: 600;
+  color: #2563eb; /* Blue color to indicate clickable */
+  transition: color 0.2s ease;
+}
+
+.pd-user:hover .pd-username {
+  color: #1d4ed8; /* Darker blue on hover */
+}

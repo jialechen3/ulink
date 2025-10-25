@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { API_BASE } from "../config";
-import "../App.css";
 import "../styles/ListingPage.css";
 import "../styles/Header.css";
 

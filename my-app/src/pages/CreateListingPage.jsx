@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import "../App.css";
 import "../styles/CreateListingPage.css";
 import { API_BASE } from "../config";
 import KebabMenu from "../components/KebabMenu";
