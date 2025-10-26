@@ -21,9 +21,9 @@ if (strpos($host, 'localhost') !== false) {
     $dbname = "testdb";
 } else {
     // ✅ 学校服务器
-    $servername = "localhost";
-    $username = "zzhong5";
-    $password = "50457160";
+    $servername = "dpg-d3uohbmuk2gs73e17iqg-a.render.com";
+    $username = "ulinkdb_user";
+    $password = "Cb8dUEedVckgedX2AW5b9DdnTWQgckjJ";
     $dbname = "cse442_2025_fall_team_z_db";
 }
 
